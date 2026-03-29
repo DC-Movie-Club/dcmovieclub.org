@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @font-face {
   font-family: 'DCMC';
@@ -10,48 +8,62 @@
   font-display: swap;
 }
 
-@layer base {
-  :root {
-    --font-dcmc: 'DCMC';
-    --background: 0 0% 5%;
-    --foreground: 0 0% 95%;
-    --primary: 0 72% 51%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 15%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 240 4% 20%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 0 72% 51%;
-    --accent-foreground: 0 0% 100%;
-    --border: 240 4% 20%;
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    font-family: var(--font-dcmc), Georgia, serif;
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+:root {
+  --font-dcmc: 'DCMC';
+  --background: 0 0% 5%;
+  --foreground: 0 0% 95%;
+  --primary: 0 72% 51%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 15%;
+  --secondary-foreground: 0 0% 95%;
+  --muted: 240 4% 20%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 0 72% 51%;
+  --accent-foreground: 0 0% 100%;
+  --border: 240 4% 20%;
 }
 
-@layer utilities {
-  .h-screen-mobile {
-    height: 100vh;
-    height: 100dvh;
-  }
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-border: hsl(var(--border));
+  --font-dcmc: 'DCMC', Georgia, serif;
+  --font-sans: system-ui, sans-serif;
+  --aspect-poster: 2/3;
+  --aspect-wide: 16/9;
+}
 
-  .text-balance {
-    text-wrap: balance;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-scroll-behavior="smooth"] {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-dcmc), Georgia, serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@utility h-screen-mobile {
+  height: 100vh;
+  height: 100dvh;
+}
+
+@utility text-balance {
+  text-wrap: balance;
 }
