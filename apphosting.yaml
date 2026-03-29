@@ -7,8 +7,14 @@ runConfig:
 
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyAnqRPKNxUeyxN2XD53tvJ06_iV-1xkWfE
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: dcmovieclub-61fed.firebaseapp.com
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: dcmovieclub-61fed
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: dcmovieclub-61fed.firebasestorage.app
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "996463986368"
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:996463986368:web:f4c20f61a309d1949a8f25
