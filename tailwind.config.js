@@ -25,8 +25,8 @@ module.exports = {
         border: "hsl(var(--border))",
       },
       fontFamily: {
+        dcmc: ["var(--font-dcmc)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "Georgia", "serif"],
       },
       aspectRatio: {
         poster: "2/3",
