@@ -87,99 +87,7 @@ See also: [setup-google-cloud-resources.md](./setup-google-cloud-resources.md) f
 
 ---
 
-## 6. Server Actions (Image Upload)
-
-**What was stripped:** No server-side image processing or upload pipeline.
-
-**Dependencies:** Firebase Admin SDK, Sharp, Cloud Storage
-
-**To restore:**
-1. `pnpm add sharp`
-2. Create `src/app/admin/actions/uploadPhoto.ts` (Next.js server action):
-   - Accept FormData with file + auth token
-   - Verify admin auth via ID token
-   - Process image into variants using Sharp:
-     - `full` — original dimensions, 85% WebP
-     - `large` — 2400px, 85% WebP
-     - `medium` — 1920px, 85% WebP
-     - `small` — 1200px, 80% WebP
-     - `blur` — 20px, 20% WebP (placeholder)
-   - Upload all variants to Cloud Storage
-3. Create `src/app/admin/lib/imageProcessing.ts` for the Sharp pipeline
-
----
-
-## 7. Progressive Image Loading
-
-**What was stripped:** No lazy-loading or blur placeholder images.
-
-**Dependencies:** Cloud Storage image variants (above)
-
-**To restore:**
-1. Create `src/components/ProgressiveImage.tsx`:
-   - Load blur placeholder first (tiny WebP)
-   - Swap to full image on load
-   - Responsive `srcset` with size variants
-   - Error fallback
-2. Add `getVariantUrls()` helper to `src/lib/firebase.ts` to construct CDN URLs for each variant
-
----
-
-## 8. Photo Gallery / Carousel
-
-**What was stripped:** No gallery viewer or photo navigation.
-
-**To restore:**
-1. `pnpm add yet-another-react-lightbox`
-2. Create `src/components/PhotoDisplay.tsx`:
-   - Full-screen photo carousel
-   - Arrow key navigation
-   - Swipe support on mobile
-3. Create `src/components/GalleryClient.tsx`:
-   - Gallery grid/list view
-   - Click-to-expand into PhotoDisplay
-4. Add dynamic route `src/app/gallery/[[...slug]]/page.tsx`
-
----
-
-## 9. Keyboard Shortcuts
-
-**What was stripped:** No global keyboard handling.
-
-**To restore:**
-1. Create `src/components/GlobalKeyHandler.tsx`:
-   - Arrow keys for photo navigation
-   - Escape to close lightbox/modals
-2. Add to root layout
-
----
-
-## 10. Scroll Progress Tracking
-
-**What was stripped:** No scroll-based UI effects.
-
-**To restore:**
-1. Create `src/hooks/useScrollProgress.ts`:
-   - Track scroll position as 0-1 value
-   - Used for background fade effects on home page
-
----
-
-## 11. Cache Revalidation API Route
-
-**What was stripped:** No API routes (incompatible with static export).
-
-**Dependencies:** SSR mode, `REVALIDATION_SECRET` env var
-
-**To restore:**
-1. Create `src/app/api/revalidate/route.ts`:
-   - POST endpoint that validates secret
-   - Calls `revalidateTag('site-config')`
-   - Called by `onConfigChange` Cloud Function
-
----
-
-## 12. Dynamic Sitemap
+## 6. Dynamic Sitemap
 
 **What was stripped:** No dynamic sitemap generation.
 
@@ -235,7 +143,7 @@ Create `src/components/ui/` with shadcn-style wrappers around Radix primitives.
 
 ## Dependency Summary
 
-All additional packages needed to restore everything:
+All additional packages needed to restore everything above:
 
 ```bash
 # Firebase
@@ -250,15 +158,108 @@ pnpm add iconoir-react  # (lucide-react already included)
 # Admin features
 pnpm add @tanstack/react-query @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities @mdxeditor/editor react-dropzone react-phone-number-input
 
-# Image processing
-pnpm add sharp
-
-# Gallery
-pnpm add yet-another-react-lightbox
-
 # Markdown rendering
 pnpm add react-markdown
 
 # Utilities
 pnpm add react-use
 ```
+
+---
+---
+
+# Probably Don't Need
+
+Features from melinamara.com that likely aren't relevant for dcmovieclub.org.
+
+---
+
+## Server Actions (Image Upload)
+
+**What was stripped:** No server-side image processing or upload pipeline.
+
+**Dependencies:** Firebase Admin SDK, Sharp, Cloud Storage
+
+**To restore:**
+1. `pnpm add sharp`
+2. Create `src/app/admin/actions/uploadPhoto.ts` (Next.js server action):
+   - Accept FormData with file + auth token
+   - Verify admin auth via ID token
+   - Process image into variants using Sharp:
+     - `full` — original dimensions, 85% WebP
+     - `large` — 2400px, 85% WebP
+     - `medium` — 1920px, 85% WebP
+     - `small` — 1200px, 80% WebP
+     - `blur` — 20px, 20% WebP (placeholder)
+   - Upload all variants to Cloud Storage
+3. Create `src/app/admin/lib/imageProcessing.ts` for the Sharp pipeline
+
+---
+
+## Progressive Image Loading
+
+**What was stripped:** No lazy-loading or blur placeholder images.
+
+**Dependencies:** Cloud Storage image variants (above)
+
+**To restore:**
+1. Create `src/components/ProgressiveImage.tsx`:
+   - Load blur placeholder first (tiny WebP)
+   - Swap to full image on load
+   - Responsive `srcset` with size variants
+   - Error fallback
+2. Add `getVariantUrls()` helper to `src/lib/firebase.ts` to construct CDN URLs for each variant
+
+---
+
+## Photo Gallery / Carousel
+
+**What was stripped:** No gallery viewer or photo navigation.
+
+**To restore:**
+1. `pnpm add yet-another-react-lightbox`
+2. Create `src/components/PhotoDisplay.tsx`:
+   - Full-screen photo carousel
+   - Arrow key navigation
+   - Swipe support on mobile
+3. Create `src/components/GalleryClient.tsx`:
+   - Gallery grid/list view
+   - Click-to-expand into PhotoDisplay
+4. Add dynamic route `src/app/gallery/[[...slug]]/page.tsx`
+
+---
+
+## Keyboard Shortcuts
+
+**What was stripped:** No global keyboard handling.
+
+**To restore:**
+1. Create `src/components/GlobalKeyHandler.tsx`:
+   - Arrow keys for photo navigation
+   - Escape to close lightbox/modals
+2. Add to root layout
+
+---
+
+## Scroll Progress Tracking
+
+**What was stripped:** No scroll-based UI effects.
+
+**To restore:**
+1. Create `src/hooks/useScrollProgress.ts`:
+   - Track scroll position as 0-1 value
+   - Used for background fade effects on home page
+
+---
+
+## Cache Revalidation API Route
+
+**What was stripped:** No API routes (incompatible with static export).
+
+**Dependencies:** SSR mode, `REVALIDATION_SECRET` env var
+
+**To restore:**
+1. Create `src/app/api/revalidate/route.ts`:
+   - POST endpoint that validates secret
+   - Calls `revalidateTag('site-config')`
+   - Called by `onConfigChange` Cloud Function
