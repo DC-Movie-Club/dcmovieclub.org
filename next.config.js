@@ -22,6 +22,9 @@ const nextConfig = {
       },
     ],
   },
+  outputFileTracingIncludes: {
+    "/*": ["./public/**/*"],
+  },
   reactStrictMode: true,
   trailingSlash: false,
 };
