@@ -1,5 +1,8 @@
 import Image from "next/image";
 
+{/* Landing page. Will feature upcoming events prominently, newsletter signup
+    (embedded Substack), and a warm intro to the club. Design TBD with designer Hannah. */}
+
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
