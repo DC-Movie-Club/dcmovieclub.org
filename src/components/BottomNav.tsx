@@ -1,97 +1,100 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { routes } from "@/config/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-const menuRoutes = [routes.about, routes.contact, routes.instagram];
+const menuRoutes = [routes.about, routes.contact];
 const NAV_LOGO_SIZE = 112;
-const NAV_LOGO_SPACER = NAV_LOGO_SIZE + 8;
+
+const ICON_SIZE = "size-6 xs:size-6";
+const LABEL_SIZE = "text-[8px] xs:text-[10px]";
+const ITEM_PADDING = "px-2 py-1 xs:px-3 xs:py-1.5";
+const LOGO_SIZE = "size-24 -top-8 xs:size-28 xs:-top-8";
+const LOGO_SPACER = "w-[88px] xs:w-[120px]";
 
 export function BottomNav() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <>
-      {/* Menu drawer */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)}>
-          <div
-            className="absolute bottom-20 left-1/2 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-surface p-4 shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          >
+    <nav className="fixed bottom-0 left-0 right-0 z-50 xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
+      <div className="relative flex items-center justify-center gap-4 bg-charcoal px-4 py-2 xs:rounded-full xs:px-6 xs:py-3">
+        <NavLink
+          route={routes.events}
+          active={pathname === routes.events.href}
+        />
+
+        <NavLink route={routes.blog} active={pathname === routes.blog.href} />
+
+        <div className={LOGO_SPACER} />
+
+        <NavLink
+          route={routes.partnerships}
+          active={pathname === routes.partnerships.href}
+        />
+
+        <Dialog>
+          <DialogTrigger render={<NavButton icon={Ellipsis} label="More" />} />
+          <DialogContent showCloseButton={false}>
+            <DialogTitle className="sr-only">More</DialogTitle>
             <ul className="flex flex-col gap-1">
               {menuRoutes.map((route) => {
                 const Icon = route.icon;
                 return (
                   <li key={route.key}>
-                    <Link
-                      href={route.href}
-                      onClick={() => setMenuOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-muted",
-                        pathname === route.href
-                          ? "text-primary"
-                          : "text-foreground",
-                      )}
+                    <DialogClose
+                      render={
+                        <Link
+                          href={route.href}
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-muted",
+                            pathname === route.href
+                              ? "text-primary"
+                              : "text-foreground",
+                          )}
+                        />
+                      }
                     >
-                      <Icon size={30} />
-                      <span className="text-sm uppercase tracking-wide">
+                      <Icon size={24} />
+                      <span className="text-base uppercase tracking-wide">
                         {route.label}
                       </span>
-                    </Link>
+                    </DialogClose>
                   </li>
                 );
               })}
             </ul>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        </Dialog>
 
-      {/* Bottom nav bar */}
-      <nav className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
-        <div className="relative flex items-center gap-4 rounded-full bg-charcoal px-6 py-3">
-          <NavButton
-            icon={menuOpen ? X : Menu}
-            label="Menu"
-            active={false}
-            onClick={() => setMenuOpen(!menuOpen)}
+        <Link
+          href={routes.home.href}
+          className={cn(
+            "absolute left-1/2 -translate-x-1/2 transition-transform hover:scale-105",
+            LOGO_SIZE,
+          )}
+        >
+          <Image
+            src="/images/dcmc-logo.png"
+            alt="DC Movie Club"
+            width={NAV_LOGO_SIZE}
+            height={NAV_LOGO_SIZE}
+            className={LOGO_SIZE}
           />
-
-          <NavLink
-            route={routes.events}
-            active={pathname === routes.events.href}
-          />
-
-          {/* Spacer for the absolutely positioned logo */}
-          <div style={{ width: NAV_LOGO_SPACER }} />
-
-          <NavLink route={routes.blog} active={pathname === routes.blog.href} />
-
-          <NavLink
-            route={routes.partnerships}
-            active={pathname === routes.partnerships.href}
-          />
-
-          <Link
-            href={routes.home.href}
-            className="absolute left-1/2 -translate-x-1/2 -top-8 transition-transform hover:scale-105"
-          >
-            <Image
-              src="/images/dcmc-logo.png"
-              alt="DC Movie Club"
-              width={NAV_LOGO_SIZE}
-              height={NAV_LOGO_SIZE}
-            />
-          </Link>
-        </div>
-      </nav>
-    </>
+        </Link>
+      </div>
+    </nav>
   );
 }
 
@@ -107,12 +110,13 @@ function NavLink({
     <Link
       href={route.href}
       className={cn(
-        "relative flex flex-col items-center gap-0.5 px-3 py-1.5 transition-all hover:scale-110",
+        "relative flex flex-col items-center gap-0.5 transition-all hover:scale-110",
+        ITEM_PADDING,
         active ? "text-rust" : "text-cream hover:text-cream",
       )}
     >
-      <Icon size={30} />
-      <span className="text-[10px] uppercase tracking-wide">
+      <Icon className={ICON_SIZE} />
+      <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>
         {route.labelShort}
       </span>
       {active && (
@@ -135,27 +139,24 @@ function NavLink({
   );
 }
 
-function NavButton({
-  icon: Icon,
-  label,
-  active,
-  onClick,
-}: {
-  icon: React.ComponentType<{ size?: number }>;
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+const NavButton = forwardRef<
+  HTMLButtonElement,
+  {
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    label: string;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>
+>(function NavButton({ icon: Icon, label, ...props }, ref) {
   return (
     <button
-      onClick={onClick}
+      ref={ref}
       className={cn(
-        "relative flex flex-col items-center gap-0.5 px-3 py-1.5 transition-all hover:scale-110",
-        active ? "text-rust" : "text-cream hover:text-cream",
+        "relative flex flex-col items-center gap-0.5 text-cream transition-all hover:scale-110 hover:text-cream",
+        ITEM_PADDING,
       )}
+      {...props}
     >
-      <Icon size={30} />
-      <span className="text-[10px] uppercase tracking-wide">{label}</span>
+      <Icon className={ICON_SIZE} />
+      <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>{label}</span>
     </button>
   );
-}
+});
