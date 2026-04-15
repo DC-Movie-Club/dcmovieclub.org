@@ -4,9 +4,10 @@ import { forwardRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Ellipsis } from "lucide-react";
+import { ArrowUpRight, Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { routes } from "@/config/navigation";
+import { Letterboxd } from "@/components/icons/Letterboxd";
 import {
   Dialog,
   DialogClose,
@@ -29,7 +30,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
-      <div className="relative flex items-center justify-center gap-4 bg-charcoal px-4 py-2 xs:rounded-full xs:px-6 xs:py-3">
+      <div className="relative flex items-center justify-center gap-4 border-2 border-charcoal bg-surface px-4 py-2 hand-drawn hand-drawn-animated xs:rounded-full xs:px-6 xs:py-3">
         <NavLink
           route={routes.events}
           active={pathname === routes.events.href}
@@ -54,6 +55,7 @@ export function BottomNav() {
                 return (
                   <li key={route.key}>
                     <DialogClose
+                      nativeButton={false}
                       render={
                         <Link
                           href={route.href}
@@ -74,6 +76,28 @@ export function BottomNav() {
                   </li>
                 );
               })}
+              <li>
+                <DialogClose
+                  nativeButton={false}
+                  render={
+                    <a
+                      href="https://letterboxd.com/DCMovieClub/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:bg-muted"
+                    />
+                  }
+                >
+                  <Letterboxd size={24} />
+                  <span className="flex-1 text-base uppercase tracking-wide">
+                    Letterboxd
+                  </span>
+                  <ArrowUpRight
+                    size={12}
+                    className="text-muted-foreground"
+                  />
+                </DialogClose>
+              </li>
             </ul>
           </DialogContent>
         </Dialog>
@@ -112,7 +136,7 @@ function NavLink({
       className={cn(
         "relative flex flex-col items-center gap-0.5 transition-all hover:scale-110",
         ITEM_PADDING,
-        active ? "text-rust" : "text-cream hover:text-cream",
+        active ? "text-rust" : "text-foreground hover:text-foreground",
       )}
     >
       <Icon className={ICON_SIZE} />
@@ -145,13 +169,14 @@ const NavButton = forwardRef<
     icon: React.ComponentType<{ size?: number; className?: string }>;
     label: string;
   } & React.ButtonHTMLAttributes<HTMLButtonElement>
->(function NavButton({ icon: Icon, label, ...props }, ref) {
+>(function NavButton({ icon: Icon, label, className, ...props }, ref) {
   return (
     <button
       ref={ref}
       className={cn(
-        "relative flex flex-col items-center gap-0.5 text-cream transition-all hover:scale-110 hover:text-cream",
+        "relative flex cursor-pointer flex-col items-center gap-0.5 text-foreground transition-all hover:scale-110 hover:text-foreground",
         ITEM_PADDING,
+        className,
       )}
       {...props}
     >
