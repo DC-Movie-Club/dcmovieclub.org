@@ -50,7 +50,7 @@ export function BottomNav() {
       <div className="relative flex items-center justify-center gap-4 px-4 py-2 xs:px-6 xs:py-3">
         <div
           className={cn(
-            "absolute inset-0 border-t-2 border-charcoal-detail bg-surface hand-drawn-subtle xs:border-2 xs:rounded-full",
+            "absolute inset-0 border-t-2 border-charcoal/20 bg-surface hand-drawn-subtle xs:border-2 xs:rounded-full",
             hovered && "hand-drawn-animated",
           )}
         />
@@ -89,6 +89,7 @@ export function BottomNav() {
             <ul className="flex flex-col gap-1">
               {menuRoutes.map((route) => {
                 const Icon = route.icon;
+                const active = pathname === route.href;
                 return (
                   <li key={route.key}>
                     <DialogClose
@@ -97,15 +98,21 @@ export function BottomNav() {
                         <Link
                           href={route.href}
                           className={cn(
-                            "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-muted",
-                            pathname === route.href
-                              ? "text-primary"
-                              : "text-foreground",
+                            "group/item flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
+                            active
+                              ? "text-rust"
+                              : "text-foreground hover:text-rust",
                           )}
                         />
                       }
                     >
-                      <Icon size={24} />
+                      <Icon
+                        size={24}
+                        className={cn(
+                          "hand-drawn-subtle",
+                          !active && "group-hover/item:hand-drawn group-hover/item:hand-drawn-animated",
+                        )}
+                      />
                       <span className="text-base uppercase tracking-wide">
                         {route.label}
                       </span>
@@ -121,17 +128,17 @@ export function BottomNav() {
                       href="https://letterboxd.com/DCMovieClub/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:bg-muted"
+                      className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
                     />
                   }
                 >
-                  <Letterboxd size={24} />
+                  <Letterboxd size={24} className="hand-drawn-subtle group-hover/item:hand-drawn group-hover/item:hand-drawn-animated" />
                   <span className="flex-1 text-base uppercase tracking-wide">
                     Letterboxd
                   </span>
                   <ArrowUpRight
                     size={12}
-                    className="text-muted-foreground"
+                    className="text-muted-foreground group-hover/item:text-rust"
                   />
                 </DialogClose>
               </li>
