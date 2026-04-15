@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'DCMC';
-  src: url('/fonts/dcmc.otf') format('opentype');
+  font-family: "DCMC";
+  src: url("/fonts/dcmc.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -21,6 +21,7 @@
   --color-cream: #efecdf;
   --color-teal: #375b6d;
   --color-charcoal: #393a3e;
+  --color-charcoal-detail: #4e505a;
 
   /* --- Brand: Secondary --- */
   --color-rose: #ca6c84;
@@ -30,7 +31,7 @@
   --color-purple: #6372af;
 
   /* --- Semantic --- */
-  --color-background: #efecdf;
+  --color-background: #f5f3e8;
   --color-foreground: #393a3e;
   --color-primary: #a2390a;
   --color-primary-foreground: #efecdf;
@@ -49,9 +50,9 @@
   --color-inverted-foreground: #efecdf;
 
   /* --- Typography --- */
-  --font-dcmc: 'DCMC', Georgia, serif;
+  --font-dcmc: "DCMC", Georgia, serif;
   --font-sans: system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
 
   /* --- Aspect Ratios --- */
   --aspect-poster: 2/3;
@@ -99,15 +100,61 @@ body {
 }
 
 @utility hand-drawn-animated {
-  animation: hand-drawn-wiggle 2.5s infinite;
+  animation: hand-drawn-wiggle 2.25s infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility hand-drawn-subtle {
+  filter: url(#hand-drawn-subtle);
+}
+
+@utility hand-drawn-subtle-animated {
+  animation: hand-drawn-subtle-wiggle 2.25s infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes hand-drawn-subtle-wiggle {
+  0%,
+  100% {
+    filter: url(#hand-drawn-subtle-f1);
+  }
+  20% {
+    filter: url(#hand-drawn-subtle-f2);
+  }
+  40% {
+    filter: url(#hand-drawn-subtle-f3);
+  }
+  60% {
+    filter: url(#hand-drawn-subtle-f4);
+  }
+  80% {
+    filter: url(#hand-drawn-subtle-f5);
+  }
 }
 
 @keyframes hand-drawn-wiggle {
-  0%, 100% { filter: url(#hand-drawn-f1); }
-  20% { filter: url(#hand-drawn-f2); }
-  40% { filter: url(#hand-drawn-f3); }
-  60% { filter: url(#hand-drawn-f4); }
-  80% { filter: url(#hand-drawn-f5); }
+  0%,
+  100% {
+    filter: url(#hand-drawn-f1);
+  }
+  20% {
+    filter: url(#hand-drawn-f2);
+  }
+  40% {
+    filter: url(#hand-drawn-f3);
+  }
+  60% {
+    filter: url(#hand-drawn-f4);
+  }
+  80% {
+    filter: url(#hand-drawn-f5);
+  }
 }
 
 :root {
