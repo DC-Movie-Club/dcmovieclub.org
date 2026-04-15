@@ -94,6 +94,22 @@ body {
   text-wrap: balance;
 }
 
+@utility hand-drawn {
+  filter: url(#hand-drawn);
+}
+
+@utility hand-drawn-animated {
+  animation: hand-drawn-wiggle 2.5s infinite;
+}
+
+@keyframes hand-drawn-wiggle {
+  0%, 100% { filter: url(#hand-drawn-f1); }
+  20% { filter: url(#hand-drawn-f2); }
+  40% { filter: url(#hand-drawn-f3); }
+  60% { filter: url(#hand-drawn-f4); }
+  80% { filter: url(#hand-drawn-f5); }
+}
+
 :root {
   --radius: 0.625rem;
 }

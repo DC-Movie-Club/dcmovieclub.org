@@ -16,6 +16,8 @@ export default function Home() {
       <p className="mt-8 text-2xl tracking-wide text-muted-foreground">
         Something great coming soon
       </p>
+      <div className="mt-12 size-48 border-4 border-charcoal hand-drawn" />
+      <div className="mt-6 size-48 border-4 border-charcoal hand-drawn hand-drawn-animated" />
     </div>
   );
 }
