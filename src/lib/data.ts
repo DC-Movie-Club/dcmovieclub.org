@@ -1,4 +1,3 @@
-import sharp from "sharp"
 import type { CalendarEvent } from "@/types/event"
 import type { LetterboxdReview } from "@/types/letterboxd"
 import type { SubstackPost } from "@/types/post"
@@ -94,7 +93,13 @@ type LetterboxdLogResponse = {
   items?: LetterboxdLogEntry[]
 }
 
+let cachedToken: { value: string; expiresAt: number } | null = null
+
 async function getLetterboxdAccessToken(): Promise<string | null> {
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 1000) {
+    return cachedToken.value
+  }
+
   const clientId = process.env.LETTERBOXD_CLIENT_ID
   const clientSecret = process.env.LETTERBOXD_CLIENT_SECRET
   if (!clientId || !clientSecret) return null
@@ -114,6 +119,10 @@ async function getLetterboxdAccessToken(): Promise<string | null> {
     })
     if (!res.ok) return null
     const data: LetterboxdTokenResponse = await res.json()
+    cachedToken = {
+      value: data.access_token,
+      expiresAt: Date.now() + data.expires_in * 1000,
+    }
     return data.access_token
   } catch {
     return null
@@ -168,19 +177,31 @@ export async function getRecentLetterboxdReviews(
   }
 }
 
+function toTinyUrl(url: string): string {
+  const match = url.match(/^(https:\/\/substackcdn\.com\/image\/fetch\/)[^/]+(\/.+)$/)
+  return match ? `${match[1]}w_24,q_20,f_webp${match[2]}` : url
+}
+
+const blurCache = new Map<string, string | null>()
+
 async function generateBlurDataUrl(
   imageUrl: string,
 ): Promise<string | null> {
+  const cached = blurCache.get(imageUrl)
+  if (cached !== undefined) return cached
+
   try {
-    const res = await fetch(imageUrl)
-    if (!res.ok) return null
+    const res = await fetch(toTinyUrl(imageUrl))
+    if (!res.ok) {
+      blurCache.set(imageUrl, null)
+      return null
+    }
     const buffer = Buffer.from(await res.arrayBuffer())
-    const tiny = await sharp(buffer)
-      .resize(20, null, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 20 })
-      .toBuffer()
-    return `data:image/webp;base64,${tiny.toString("base64")}`
+    const dataUrl = `data:image/webp;base64,${buffer.toString("base64")}`
+    blurCache.set(imageUrl, dataUrl)
+    return dataUrl
   } catch {
+    blurCache.set(imageUrl, null)
     return null
   }
 }
