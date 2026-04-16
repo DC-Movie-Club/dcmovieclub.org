@@ -18,6 +18,7 @@ type GoogleCalendarResponse = {
   items?: GoogleCalendarEvent[]
 }
 
+// TODO: use Ticket Tailor API (TICKET_TAILOR_API_KEY) to fetch event images (images.header / images.thumbnail) for events with a TT link
 const TICKET_TAILOR_RE = /https?:\/\/(?:(?:www\.|app\.)?tickettailor\.com|buytickets\.at)\/[^\s<"']*/i
 
 function extractTicketUrl(description?: string): string | null {
