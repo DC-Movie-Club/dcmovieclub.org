@@ -58,6 +58,7 @@ import {
   CalloutNode,
   $createCalloutNode,
 } from "@/app/admin/components/CalloutNode";
+import { TableActionMenuPlugin } from "@/app/admin/components/TableActionMenu";
 import {
   getResources,
   saveResources,
@@ -572,6 +573,7 @@ export function ResourcesEditor({
         <ListPlugin />
         <CheckListPlugin />
         <TablePlugin />
+        <TableActionMenuPlugin />
         <HorizontalRulePlugin />
         <AutoLinkPlugin matchers={LINK_MATCHERS} />
         <ClickableLinkPlugin />

@@ -1,3 +1,5 @@
+@reference "./globals.css";
+
 body {
   font-family: var(--font-sans);
   --font-heading: system-ui, -apple-system, sans-serif;
@@ -12,15 +14,16 @@ body {
 }
 
 .editor-table-cell {
-  border: 1px solid var(--color-border);
-  padding: 0.5rem;
-  vertical-align: top;
+  @apply border border-border p-2 align-top relative;
   min-width: 4rem;
-  position: relative;
+}
+
+.editor-table-cell > :last-child {
+  margin-bottom: 0;
 }
 
 .editor-table-cell-header {
-  background: var(--color-muted);
+  background-color: #e2dfd2 !important;
   font-weight: 600;
 }
 
@@ -44,14 +47,12 @@ body {
   top: 0.2rem;
   width: 1rem;
   height: 1rem;
-  border: 1px solid var(--color-border);
   border-radius: 3px;
-  background: var(--color-background);
+  @apply border border-border bg-background;
 }
 
 .editor-check-item-checked::before {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  @apply bg-primary border-primary;
 }
 
 .editor-check-item-checked::after {
@@ -61,12 +62,11 @@ body {
   top: 0.35rem;
   width: 0.35rem;
   height: 0.6rem;
-  border: solid var(--color-primary-foreground);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+  @apply border-solid border-primary-foreground;
 }
 
 .editor-check-item-checked {
-  text-decoration: line-through;
-  color: var(--color-muted-foreground);
+  @apply line-through text-muted-foreground;
 }
