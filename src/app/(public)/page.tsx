@@ -8,7 +8,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getUpcomingEvents } from "@/lib/data";
+import { getUpcomingEvents, getPastEventCount } from "@/lib/data";
 import { getRecentLetterboxdReviews } from "@/lib/data";
 import { Link, ExternalLink } from "@/components/ui/link";
 import { Letterboxd } from "@/components/icons/Letterboxd";
@@ -258,16 +258,17 @@ function UpcomingEvents({ events }: { events: CalendarEvent[] }) {
 }
 
 export default async function Home() {
-  const [events, reviews] = await Promise.all([
+  const [events, reviews, pastEventCount] = await Promise.all([
     getUpcomingEvents(),
     getRecentLetterboxdReviews(),
+    getPastEventCount(),
   ]);
 
   const [featuredEvent, ...remainingEvents] = events;
 
   return (
     <div className="flex flex-col gap-10 py-10">
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-4">
         <Image
           src="/images/dcmc-logo.png"
           alt="DC Movie Club"
@@ -275,6 +276,17 @@ export default async function Home() {
           height={180}
           priority
         />
+        <div className="mx-auto max-w-sm rounded-xl border-2 border-charcoal/15 px-5 py-4 text-center">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            An inclusive and (mostly) unpretentious club to discuss movies and
+            make friends!
+          </p>
+          {pastEventCount > 0 && (
+            <p className="mt-2 text-sm tracking-wide text-muted-foreground">
+              {pastEventCount} events and counting
+            </p>
+          )}
+        </div>
       </div>
 
       {featuredEvent && <FeaturedEvent event={featuredEvent} />}

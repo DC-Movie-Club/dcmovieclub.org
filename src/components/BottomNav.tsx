@@ -6,11 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Ellipsis, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { routes } from "@/config/navigation";
-import { Discord } from "@/components/icons/Discord";
-import { Instagram } from "@/components/icons/Instagram";
-import { Letterboxd } from "@/components/icons/Letterboxd";
-import { Youtube } from "@/components/icons/Youtube";
+import { routes, socials } from "@/config/navigation";
 import {
   Dialog,
   DialogClose,
@@ -44,8 +40,14 @@ export function BottomNav() {
   };
 
   const logoHoverProps = {
-    onMouseEnter: () => { setHovered(true); setLogoHovered(true); },
-    onMouseLeave: () => { setHovered(false); setLogoHovered(false); },
+    onMouseEnter: () => {
+      setHovered(true);
+      setLogoHovered(true);
+    },
+    onMouseLeave: () => {
+      setHovered(false);
+      setLogoHovered(false);
+    },
   };
 
   return (
@@ -83,11 +85,7 @@ export function BottomNav() {
         <Dialog>
           <DialogTrigger
             render={
-              <NavButton
-                icon={Ellipsis}
-                label="More"
-                {...itemHoverProps}
-              />
+              <NavButton icon={Ellipsis} label="More" {...itemHoverProps} />
             }
           />
           <DialogContent showCloseButton={false}>
@@ -115,7 +113,10 @@ export function BottomNav() {
                       <div className="relative">
                         {active && (
                           <svg
-                            className={cn("absolute -inset-1 h-[calc(100%+8px)] w-[calc(100%+8px)] overflow-visible", WATERCOLOR_CLASSES[i % WATERCOLOR_CLASSES.length])}
+                            className={cn(
+                              "absolute -inset-1 h-[calc(100%+8px)] w-[calc(100%+8px)] overflow-visible",
+                              WATERCOLOR_CLASSES[i % WATERCOLOR_CLASSES.length],
+                            )}
                             viewBox="0 0 100 100"
                             preserveAspectRatio="none"
                           >
@@ -129,7 +130,8 @@ export function BottomNav() {
                           size={24}
                           className={cn(
                             "relative sketch-subtle",
-                            !active && "group-hover/item:sketch-subtle-animated",
+                            !active &&
+                              "group-hover/item:sketch-subtle-animated",
                           )}
                         />
                       </div>
@@ -140,37 +142,49 @@ export function BottomNav() {
                   </li>
                 );
               })}
-              {[
-                { label: "Contact", href: "https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=abbie@dcmovieclub.org", icon: Mail },
-                { label: "Instagram", href: "https://www.instagram.com/dcmovieclub/", icon: Instagram },
-                { label: "Letterboxd", href: "https://letterboxd.com/DCMovieClub/", icon: Letterboxd },
-                { label: "Discord", href: "https://discord.com/invite/hWRfjVpPws", icon: Discord },
-                { label: "YouTube", href: "https://www.youtube.com/@DCMovieClub", icon: Youtube },
-              ].map((link) => (
-                <li key={link.label}>
-                  <DialogClose
-                    nativeButton={false}
-                    render={
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
-                      />
-                    }
-                  >
-                    <link.icon size={24} className="sketch-subtle group-hover/item:sketch-subtle-animated" />
-                    <span className="flex-1 text-base uppercase tracking-wide">
-                      {link.label}
-                    </span>
-                    <ArrowUpRight
-                      size={12}
-                      className="text-muted-foreground group-hover/item:text-rust"
+              <li key="contact">
+                <DialogClose
+                  nativeButton={false}
+                  render={
+                    <a
+                      href="https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=abbie@dcmovieclub.org"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
                     />
-                  </DialogClose>
-                </li>
-              ))}
+                  }
+                >
+                  <Mail
+                    size={24}
+                    className="sketch-subtle group-hover/item:sketch-subtle-animated"
+                  />
+                  <span className="flex-1 text-base uppercase tracking-wide">
+                    Contact
+                  </span>
+                  <ArrowUpRight
+                    size={12}
+                    className="text-muted-foreground group-hover/item:text-rust"
+                  />
+                </DialogClose>
+              </li>
             </ul>
+            <hr className="sketch border-t-2 border-charcoal/20 my-2" />
+            <div className="flex items-center justify-center gap-4 py-2">
+              {Object.values(socials).map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group/item text-muted-foreground transition-colors hover:text-rust"
+                >
+                  <link.icon
+                    size={24}
+                    className="sketch-subtle group-hover/item:sketch-subtle-animated"
+                  />
+                </a>
+              ))}
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -187,10 +201,7 @@ export function BottomNav() {
             alt="DC Movie Club"
             width={NAV_LOGO_SIZE}
             height={NAV_LOGO_SIZE}
-            className={cn(
-              LOGO_SIZE,
-              logoHovered && "sketch-subtle-animated",
-            )}
+            className={cn(LOGO_SIZE, logoHovered && "sketch-subtle-animated")}
           />
         </Link>
       </div>
@@ -235,7 +246,10 @@ function NavLink({
       <div className="relative">
         {active && (
           <svg
-            className={cn("absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)] overflow-visible", WATERCOLOR_CLASSES[watercolorIndex])}
+            className={cn(
+              "absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)] overflow-visible",
+              WATERCOLOR_CLASSES[watercolorIndex],
+            )}
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
           >
@@ -277,7 +291,12 @@ const NavButton = forwardRef<
       )}
       {...props}
     >
-      <Icon className={cn(ICON_SIZE, "sketch-subtle group-hover/item:sketch-subtle-animated")} />
+      <Icon
+        className={cn(
+          ICON_SIZE,
+          "sketch-subtle group-hover/item:sketch-subtle-animated",
+        )}
+      />
       <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>{label}</span>
     </button>
   );

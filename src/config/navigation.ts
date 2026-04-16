@@ -6,7 +6,11 @@ import {
   Handshake,
   Mail,
 } from "lucide-react";
+import { Discord } from "@/components/icons/Discord";
 import { Instagram } from "@/components/icons/Instagram";
+import { Letterboxd } from "@/components/icons/Letterboxd";
+import { Substack } from "@/components/icons/Substack";
+import { Youtube } from "@/components/icons/Youtube";
 
 export const routes = {
   home: {
@@ -58,4 +62,12 @@ export const routes = {
     href: "/instagram",
     icon: Instagram,
   },
+} as const;
+
+export const socials = {
+  instagram: { key: "instagram", label: "Instagram", href: "https://www.instagram.com/dcmovieclub/", icon: Instagram },
+  letterboxd: { key: "letterboxd", label: "Letterboxd", href: "https://letterboxd.com/DCMovieClub/", icon: Letterboxd },
+  discord: { key: "discord", label: "Discord", href: "https://discord.com/invite/hWRfjVpPws", icon: Discord },
+  substack: { key: "substack", label: "Substack", href: "https://dcmovieclub.substack.com", icon: Substack },
+  youtube: { key: "youtube", label: "YouTube", href: "https://www.youtube.com/@DCMovieClub", icon: Youtube },
 } as const;

@@ -28,6 +28,40 @@ function extractTicketUrl(description?: string): string | null {
   return match ? match[0] : null
 }
 
+export async function getPastEventCount(): Promise<number> {
+  const apiKey = process.env.GOOGLE_CALENDAR_API_KEY
+  if (!apiKey) return 0
+
+  let count = 0
+  let pageToken: string | undefined
+
+  try {
+    do {
+      const params = new URLSearchParams({
+        key: apiKey,
+        timeMax: new Date().toISOString(),
+        singleEvents: "true",
+        maxResults: "2500",
+        fields: "nextPageToken,items(id)",
+      })
+      if (pageToken) params.set("pageToken", pageToken)
+
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?${params}`
+      const res = await fetch(url, { next: { revalidate: 3600 } })
+      if (!res.ok) return count
+
+      const data: { items?: { id: string }[]; nextPageToken?: string } =
+        await res.json()
+      count += data.items?.length ?? 0
+      pageToken = data.nextPageToken
+    } while (pageToken)
+
+    return count
+  } catch {
+    return count
+  }
+}
+
 export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
   const apiKey = process.env.GOOGLE_CALENDAR_API_KEY
   if (!apiKey) return []
