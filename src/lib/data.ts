@@ -1,4 +1,5 @@
 import type { CalendarEvent } from "@/types/event"
+import type { SubstackPost } from "@/types/post"
 
 const CALENDAR_ID =
   "5a3c273aeca64dfd79ebc3784f4249046a77febbc71d5281e4a92a71c2f5c5c8@group.calendar.google.com"
@@ -56,6 +57,30 @@ export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
       allDay: !item.start.dateTime,
       link: item.htmlLink ?? null,
       ticketUrl: extractTicketUrl(item.description),
+    }))
+  } catch {
+    return []
+  }
+}
+
+const SUBSTACK_FEED_URL = "https://dcmovieclub.substack.com/feed"
+
+export async function getRecentPosts(limit = 10): Promise<SubstackPost[]> {
+  try {
+    const res = await fetch(SUBSTACK_FEED_URL, { next: { revalidate: 3600 } })
+    if (!res.ok) return []
+
+    const xml = await res.text()
+    const Parser = (await import("rss-parser")).default
+    const parser = new Parser()
+    const feed = await parser.parseString(xml)
+
+    return (feed.items ?? []).slice(0, limit).map((item) => ({
+      title: item.title ?? "Untitled",
+      link: item.link ?? "",
+      description: item.contentSnippet ?? null,
+      pubDate: item.pubDate ?? "",
+      imageUrl: item.enclosure?.url ?? null,
     }))
   } catch {
     return []
