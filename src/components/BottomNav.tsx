@@ -59,12 +59,14 @@ export function BottomNav() {
         <NavLink
           route={routes.events}
           active={pathname === routes.events.href}
+          watercolorIndex={0}
           {...(pathname === routes.events.href ? {} : itemHoverProps)}
         />
 
         <NavLink
           route={routes.blog}
           active={pathname === routes.blog.href}
+          watercolorIndex={1}
           {...(pathname === routes.blog.href ? {} : itemHoverProps)}
         />
 
@@ -73,6 +75,7 @@ export function BottomNav() {
         <NavLink
           route={routes.partnerships}
           active={pathname === routes.partnerships.href}
+          watercolorIndex={2}
           {...(pathname === routes.partnerships.href ? {} : itemHoverProps)}
         />
 
@@ -89,7 +92,7 @@ export function BottomNav() {
           <DialogContent showCloseButton={false}>
             <DialogTitle className="sr-only">More</DialogTitle>
             <ul className="flex flex-col gap-1">
-              {menuRoutes.map((route) => {
+              {menuRoutes.map((route, i) => {
                 const Icon = route.icon;
                 const active = pathname === route.href;
                 return (
@@ -108,13 +111,27 @@ export function BottomNav() {
                         />
                       }
                     >
-                      <Icon
-                        size={24}
-                        className={cn(
-                          "sketch-subtle",
-                          !active && "group-hover/item:sketch-subtle-animated",
+                      <div className="relative">
+                        {active && (
+                          <svg
+                            className={cn("absolute -inset-1 h-[calc(100%+8px)] w-[calc(100%+8px)] overflow-visible", WATERCOLOR_CLASSES[i % WATERCOLOR_CLASSES.length])}
+                            viewBox="0 0 100 100"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M15,12 L30,5 L45,14 L55,4 L70,8 L85,12 L95,25 L92,45 L96,60 L88,75 L78,88 L60,92 L40,95 L25,88 L12,75 L5,58 L8,35 L6,20Z"
+                              fill="#e8cfc5"
+                            />
+                          </svg>
                         )}
-                      />
+                        <Icon
+                          size={24}
+                          className={cn(
+                            "relative sketch-subtle",
+                            !active && "group-hover/item:sketch-subtle-animated",
+                          )}
+                        />
+                      </div>
                       <span className="text-base uppercase tracking-wide">
                         {route.label}
                       </span>
@@ -178,14 +195,23 @@ export function BottomNav() {
   );
 }
 
+const WATERCOLOR_CLASSES = [
+  "watercolor-0",
+  "watercolor-1",
+  "watercolor-2",
+  "watercolor-3",
+] as const;
+
 function NavLink({
   route,
   active,
+  watercolorIndex = 0,
   onMouseEnter,
   onMouseLeave,
 }: {
   route: (typeof routes)[keyof typeof routes];
   active: boolean;
+  watercolorIndex?: number;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }) {
@@ -203,32 +229,30 @@ function NavLink({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <Icon
-        className={cn(
-          ICON_SIZE,
-          "sketch-subtle",
-          !active && "group-hover/item:sketch-subtle-animated",
+      <div className="relative">
+        {active && (
+          <svg
+            className={cn("absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)] overflow-visible", WATERCOLOR_CLASSES[watercolorIndex])}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M15,12 L30,5 L45,14 L55,4 L70,8 L85,12 L95,25 L92,45 L96,60 L88,75 L78,88 L60,92 L40,95 L25,88 L12,75 L5,58 L8,35 L6,20Z"
+              className="fill-rust-wash"
+            />
+          </svg>
         )}
-      />
-      <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>
+        <Icon
+          className={cn(
+            ICON_SIZE,
+            "relative sketch-subtle",
+            !active && "group-hover/item:sketch-subtle-animated",
+          )}
+        />
+      </div>
+      <span className={cn(LABEL_SIZE, "relative uppercase tracking-wide")}>
         {route.labelShort}
       </span>
-      {active && (
-        <svg
-          className="absolute -bottom-1 left-1/2 -translate-x-1/2"
-          width="32"
-          height="6"
-          viewBox="0 0 32 6"
-          fill="none"
-        >
-          <path
-            d="M2 4C6 2.5 10 1.5 16 2C22 2.5 26 3.5 30 2"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      )}
     </Link>
   );
 }

@@ -19,6 +19,8 @@ DC Movie Club's aesthetic is **hand-made, indie, and analog**. Everything should
 | Cream         | `#efecdf` | Light backgrounds, text on dark surfaces         |
 | Dark Teal     | `#375b6d` | Secondary brand color — alternate logo, links    |
 | Charcoal      | `#393a3e` | Dark backgrounds, body text on light surfaces    |
+| Charcoal Detail | `#4e505a` | Lighter charcoal for subtle borders              |
+| Rust Wash     | `#e8cfc5` | Faded rust for watercolor active indicators      |
 
 ### Secondary Colors
 
@@ -117,10 +119,14 @@ Film cards and content cards should feel like **printed ephemera**:
 
 ### Navigation
 
-- Can be inverted (`bg-charcoal text-cream`) for contrast against the light page
+- Bottom nav bar with sketch-filtered border (`sketch-subtle`, animates to `sketch-animated` on hover)
 - Nav items: icon + uppercase label in `font-dcmc`
-- Active state: highlighted with brand accent (rust/sienna)
-- Consider a decorative active indicator — a notch, underline, or hand-drawn-style marker
+- Icons get `sketch-subtle` filter at rest, full `sketch` + animation on hover
+- Active state: `text-rust` with a **watercolor splash** behind the icon using `fill-rust-wash` (`#e8cfc5`)
+- Watercolor effect uses SVG `feTurbulence` + `feDisplacementMap` + `feComponentTransfer` (discrete alpha steps) to create organic spatter shapes
+- Each nav item gets a unique watercolor filter (different turbulence seeds) so the splashes look distinct
+- Active items skip hover animations; the "More" button always animates
+- Logo animates only when the logo itself is hovered
 
 ### Inputs
 

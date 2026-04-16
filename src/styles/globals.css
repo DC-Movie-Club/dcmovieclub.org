@@ -22,6 +22,7 @@
   --color-teal: #375b6d;
   --color-charcoal: #393a3e;
   --color-charcoal-detail: #4e505a;
+  --color-rust-wash: #e8cfc5;
 
   /* --- Brand: Secondary --- */
   --color-rose: #ca6c84;
@@ -110,6 +111,22 @@ body {
 
 @utility sketch-subtle-animated {
   filter: url(#sketch-subtle-animated);
+}
+
+@utility watercolor-0 {
+  filter: url(#watercolor-0);
+}
+
+@utility watercolor-1 {
+  filter: url(#watercolor-1);
+}
+
+@utility watercolor-2 {
+  filter: url(#watercolor-2);
+}
+
+@utility watercolor-3 {
+  filter: url(#watercolor-3);
 }
 
 :root {

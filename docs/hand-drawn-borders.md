@@ -316,3 +316,52 @@ Replaced the T9 approach with a simpler filter using SVG SMIL `<animate>` for th
 
 ### Current file: `src/components/SketchFilter.tsx`
 ### Tailwind utilities: `sketch`, `sketch-animated`, `sketch-subtle`, `sketch-subtle-animated`
+
+---
+
+## Watercolor Active Indicator
+
+Separate from the sketch/hand-drawn border system. Used as a background splash behind active nav items.
+
+### Technique
+SVG filter applied to an angular splat SVG path. The filter creates organic spatter-like shapes from a geometric starting point.
+
+### Filter chain (S5 variant)
+```xml
+<filter id="watercolor-N" x="-40%" y="-40%" width="180%" height="180%">
+  <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="5" seed="S1" result="noise-lg" />
+  <feTurbulence type="turbulence" baseFrequency="0.12" numOctaves="3" seed="S2" result="noise-md" />
+  <feDisplacementMap in="SourceGraphic" in2="noise-lg" scale="15" xChannelSelector="R" yChannelSelector="G" result="d1" />
+  <feDisplacementMap in="d1" in2="noise-md" scale="6" xChannelSelector="B" yChannelSelector="R" result="d2" />
+  <feGaussianBlur in="d2" stdDeviation="1" result="blurred" />
+  <feComponentTransfer in="blurred">
+    <feFuncA type="discrete" tableValues="0 0.3 0.6 0.8 1" />
+  </feComponentTransfer>
+</filter>
+```
+
+### How it works
+1. **Two turbulence layers** — large-scale (bf=0.03) for overall shape distortion, medium-scale (bf=0.12) for finer detail
+2. **Chained displacement** — first pass warps the shape broadly, second pass adds jagged micro-detail
+3. **Blur** — softens the displaced result slightly
+4. **Discrete alpha steps** — `feComponentTransfer` with `feFuncA type="discrete"` quantizes the alpha into 5 bands (0, 0.3, 0.6, 0.8, 1), creating uneven opacity like a real paint spatter
+
+### Base shape
+Angular splat SVG path (not a smooth circle/pill — gives the filter more interesting edges to work with):
+```
+M15,12 L30,5 L45,14 L55,4 L70,8 L85,12 L95,25 L92,45 L96,60 L88,75 L78,88 L60,92 L40,95 L25,88 L12,75 L5,58 L8,35 L6,20Z
+```
+
+### Unique per item
+Each nav item uses a different filter with different turbulence seeds, so the splatters look distinct. Seeds: `{88,55}`, `{23,71}`, `{44,99}`, `{61,33}`.
+
+### Color
+Faded rust `#e8cfc5` (`fill-rust-wash` / `--color-rust-wash`). Tested blue (`#d7e8e9`), gold (`#f5dfa8`, `#fae8b8`, `#f0d48a`), and brand orange (`#eca344`) — faded rust won for harmony with the `text-rust` active state.
+
+### References
+- [CodePen: spartanatreyu — watercolor text](https://codepen.io/spartanatreyu/pen/xggjWz) — simple displacement for organic texture
+- [CodePen: sevenissimo — watercolor playground](https://codepen.io/sevenissimo/pen/dmarJr) — multi-layer displacement with masks
+- [CodePen: cassie-codes — watercolor painting](https://codepen.io/cassie-codes/pen/GRJzgLL) — SourceAlpha displacement for blob shapes
+
+### Current file: `src/components/WatercolorFilter.tsx`
+### Tailwind utilities: `watercolor-0`, `watercolor-1`, `watercolor-2`, `watercolor-3`
