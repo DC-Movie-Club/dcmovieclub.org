@@ -95,66 +95,21 @@ body {
   text-wrap: balance;
 }
 
-@utility hand-drawn {
-  filter: url(#hand-drawn);
+
+@utility sketch {
+  filter: url(#sketch);
 }
 
-@utility hand-drawn-animated {
-  animation: hand-drawn-wiggle 2.25s infinite;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
+@utility sketch-animated {
+  filter: url(#sketch-animated);
 }
 
-@utility hand-drawn-subtle {
-  filter: url(#hand-drawn-subtle);
+@utility sketch-subtle {
+  filter: url(#sketch-subtle);
 }
 
-@utility hand-drawn-subtle-animated {
-  animation: hand-drawn-subtle-wiggle 2.25s infinite;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@keyframes hand-drawn-subtle-wiggle {
-  0%,
-  100% {
-    filter: url(#hand-drawn-subtle-f1);
-  }
-  20% {
-    filter: url(#hand-drawn-subtle-f2);
-  }
-  40% {
-    filter: url(#hand-drawn-subtle-f3);
-  }
-  60% {
-    filter: url(#hand-drawn-subtle-f4);
-  }
-  80% {
-    filter: url(#hand-drawn-subtle-f5);
-  }
-}
-
-@keyframes hand-drawn-wiggle {
-  0%,
-  100% {
-    filter: url(#hand-drawn-f1);
-  }
-  20% {
-    filter: url(#hand-drawn-f2);
-  }
-  40% {
-    filter: url(#hand-drawn-f3);
-  }
-  60% {
-    filter: url(#hand-drawn-f4);
-  }
-  80% {
-    filter: url(#hand-drawn-f5);
-  }
+@utility sketch-subtle-animated {
+  filter: url(#sketch-subtle-animated);
 }
 
 :root {

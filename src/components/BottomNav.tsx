@@ -7,7 +7,9 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { routes } from "@/config/navigation";
+import { Discord } from "@/components/icons/Discord";
 import { Letterboxd } from "@/components/icons/Letterboxd";
+import { Youtube } from "@/components/icons/Youtube";
 import {
   Dialog,
   DialogClose,
@@ -50,8 +52,8 @@ export function BottomNav() {
       <div className="relative flex items-center justify-center gap-4 px-4 py-2 xs:px-6 xs:py-3">
         <div
           className={cn(
-            "absolute inset-0 border-t-2 border-charcoal/20 bg-surface hand-drawn-subtle xs:border-2 xs:rounded-full",
-            hovered && "hand-drawn-animated",
+            "absolute inset-0 border-t-2 border-charcoal/20 bg-surface sketch xs:border-2 xs:rounded-full",
+            hovered && "sketch-animated",
           )}
         />
         <NavLink
@@ -109,8 +111,8 @@ export function BottomNav() {
                       <Icon
                         size={24}
                         className={cn(
-                          "hand-drawn-subtle",
-                          !active && "group-hover/item:hand-drawn group-hover/item:hand-drawn-animated",
+                          "sketch-subtle",
+                          !active && "group-hover/item:sketch-subtle-animated",
                         )}
                       />
                       <span className="text-base uppercase tracking-wide">
@@ -120,28 +122,34 @@ export function BottomNav() {
                   </li>
                 );
               })}
-              <li>
-                <DialogClose
-                  nativeButton={false}
-                  render={
-                    <a
-                      href="https://letterboxd.com/DCMovieClub/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
+              {[
+                { label: "Letterboxd", href: "https://letterboxd.com/DCMovieClub/", icon: Letterboxd },
+                { label: "Discord", href: "https://discord.com/invite/hWRfjVpPws", icon: Discord },
+                { label: "YouTube", href: "https://www.youtube.com/@DCMovieClub", icon: Youtube },
+              ].map((link) => (
+                <li key={link.label}>
+                  <DialogClose
+                    nativeButton={false}
+                    render={
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
+                      />
+                    }
+                  >
+                    <link.icon size={24} className="sketch-subtle group-hover/item:sketch-subtle-animated" />
+                    <span className="flex-1 text-base uppercase tracking-wide">
+                      {link.label}
+                    </span>
+                    <ArrowUpRight
+                      size={12}
+                      className="text-muted-foreground group-hover/item:text-rust"
                     />
-                  }
-                >
-                  <Letterboxd size={24} className="hand-drawn-subtle group-hover/item:hand-drawn group-hover/item:hand-drawn-animated" />
-                  <span className="flex-1 text-base uppercase tracking-wide">
-                    Letterboxd
-                  </span>
-                  <ArrowUpRight
-                    size={12}
-                    className="text-muted-foreground group-hover/item:text-rust"
-                  />
-                </DialogClose>
-              </li>
+                  </DialogClose>
+                </li>
+              ))}
             </ul>
           </DialogContent>
         </Dialog>
@@ -161,7 +169,7 @@ export function BottomNav() {
             height={NAV_LOGO_SIZE}
             className={cn(
               LOGO_SIZE,
-              logoHovered && "hand-drawn hand-drawn-animated",
+              logoHovered && "sketch-subtle-animated",
             )}
           />
         </Link>
@@ -198,8 +206,8 @@ function NavLink({
       <Icon
         className={cn(
           ICON_SIZE,
-          "hand-drawn-subtle",
-          !active && "group-hover/item:hand-drawn group-hover/item:hand-drawn-animated",
+          "sketch-subtle",
+          !active && "group-hover/item:sketch-subtle-animated",
         )}
       />
       <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>
@@ -242,7 +250,7 @@ const NavButton = forwardRef<
       )}
       {...props}
     >
-      <Icon className={cn(ICON_SIZE, "hand-drawn-subtle group-hover/item:hand-drawn group-hover/item:hand-drawn-animated")} />
+      <Icon className={cn(ICON_SIZE, "sketch-subtle group-hover/item:sketch-subtle-animated")} />
       <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>{label}</span>
     </button>
   );

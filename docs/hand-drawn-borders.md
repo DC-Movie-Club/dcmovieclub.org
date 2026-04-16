@@ -199,30 +199,83 @@ T9's key innovation: both paths get blur treatment. The smooth path gets heavy b
 
 ---
 
-## Architecture
+## Previous Production Implementation (T9 + CSS Keyframes)
 
-### Files
-- **`src/components/HandDrawnFilters.tsx`** — `<HandDrawnFilter>` component generates a single T9 filter chain with configurable `id` and `seed`. `<HandDrawnFilters>` renders the hidden SVG with 1 static + 5 animation frame filters. Placed once in root layout.
-- **`src/styles/globals.css`** — Tailwind v4 utilities and keyframes
+This was the implementation used before switching to the SMIL-based approach. Preserved here for reference if we want to revert.
 
-### Usage
+### How it worked
+- `HandDrawnFilters.tsx` rendered a hidden SVG with **12 filter definitions**: 1 static + 5 animated frames at full intensity, and 1 static + 5 animated frames at subtle intensity
+- Each animated frame used a different `seed` value to produce a completely different noise field
+- CSS keyframes cycled through the 5 frames over 2.25s, snapping between them (discrete, not interpolated)
+- Two CSS classes per intensity: `hand-drawn` (static) + `hand-drawn-animated` (keyframe cycle)
+
+### Component: `HandDrawnFilters.tsx`
 ```tsx
-// Static hand-drawn border
-<div className="border-2 border-charcoal hand-drawn" />
+function HandDrawnFilter({
+  id,
+  seed,
+  wobbleScale = 5,
+  wobbleOctaves = 5,
+}: {
+  id: string;
+  seed?: number;
+  wobbleScale?: number;
+  wobbleOctaves?: number;
+}) {
+  return (
+    <filter id={id} x="-5%" y="-5%" width="110%" height="110%" filterUnits="objectBoundingBox">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves={wobbleOctaves} seed={seed} result="wobbleNoise" />
+      <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" in2="wobbleNoise" scale={wobbleScale} result="wobbled" />
+      <feGaussianBlur in="wobbled" stdDeviation={0.4} result="smooth" />
+      <feConvolveMatrix in="smooth" order={3} kernelMatrix="0 -1 0  -1 5 -1  0 -1 0" result="smoothSharp" />
+      <feTurbulence type="fractalNoise" baseFrequency="3.0" numOctaves={3} seed={77 + (seed ?? 0)} result="texNoise" />
+      <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="wobbled" in2="texNoise" scale={2} result="textured" />
+      <feGaussianBlur in="textured" stdDeviation={0.25} result="texturedSoft" />
+      <feComposite operator="arithmetic" k1={0} k2={0.6} k3={0.4} k4={0} in="smoothSharp" in2="texturedSoft" />
+    </filter>
+  );
+}
 
-// Animated hand-drawn border
-<div className="border-2 border-charcoal hand-drawn hand-drawn-animated" />
+const animationSeeds = [1, 20, 42, 65, 88] as const;
 
-// With cn() and conditional animation
-<div className={cn("border-2 border-charcoal hand-drawn", animate && "hand-drawn-animated")} />
+export function HandDrawnFilters() {
+  return (
+    <svg aria-hidden className="pointer-events-none absolute size-0">
+      <defs>
+        <HandDrawnFilter id="hand-drawn" />
+        {animationSeeds.map((seed, i) => (
+          <HandDrawnFilter key={seed} id={`hand-drawn-f${i + 1}`} seed={seed} />
+        ))}
+        <HandDrawnFilter id="hand-drawn-subtle" wobbleScale={3} wobbleOctaves={3} />
+        {animationSeeds.map((seed, i) => (
+          <HandDrawnFilter key={seed} id={`hand-drawn-subtle-f${i + 1}`} seed={seed} wobbleScale={3} wobbleOctaves={3} />
+        ))}
+      </defs>
+    </svg>
+  );
+}
 ```
 
-### Tailwind utilities
-- `hand-drawn` — applies `filter: url(#hand-drawn)` (static T9 filter)
-- `hand-drawn-animated` — adds 2.25s infinite keyframe cycle across 5 seed variants
-
-### CSS keyframes
+### CSS utilities and keyframes
 ```css
+@utility hand-drawn {
+  filter: url(#hand-drawn);
+}
+
+@utility hand-drawn-animated {
+  animation: hand-drawn-wiggle 2.25s infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
+@utility hand-drawn-subtle {
+  filter: url(#hand-drawn-subtle);
+}
+
+@utility hand-drawn-subtle-animated {
+  animation: hand-drawn-subtle-wiggle 2.25s infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
 @keyframes hand-drawn-wiggle {
   0%, 100% { filter: url(#hand-drawn-f1); }
   20%      { filter: url(#hand-drawn-f2); }
@@ -230,4 +283,36 @@ T9's key innovation: both paths get blur treatment. The smooth path gets heavy b
   60%      { filter: url(#hand-drawn-f4); }
   80%      { filter: url(#hand-drawn-f5); }
 }
+
+@keyframes hand-drawn-subtle-wiggle {
+  0%, 100% { filter: url(#hand-drawn-subtle-f1); }
+  20%      { filter: url(#hand-drawn-subtle-f2); }
+  40%      { filter: url(#hand-drawn-subtle-f3); }
+  60%      { filter: url(#hand-drawn-subtle-f4); }
+  80%      { filter: url(#hand-drawn-subtle-f5); }
+}
 ```
+
+### Usage
+```tsx
+// Static
+<div className="border-2 border-charcoal hand-drawn" />
+
+// Animated on hover
+<div className={cn("hand-drawn-subtle", hovered && "hand-drawn-animated")} />
+```
+
+---
+
+## Current Production Implementation (SMIL-Based)
+
+Replaced the T9 approach with a simpler filter using SVG SMIL `<animate>` for the boiling effect. Inspired by [Camillo Visini's post](https://camillovisini.com/coding/simulating-hand-drawn-motion-with-svg-filters).
+
+### Why we switched
+- Single filter definition per intensity instead of 6 (1 static + 5 frames)
+- Animation driven by SMIL `<animate>` inside the filter — no CSS keyframes needed
+- Much simpler filter chain: just `feTurbulence` + `feDisplacementMap` (no blur/sharpen/texture layers)
+- React doesn't render SMIL `<animate>` correctly in JSX, so the SVG is injected via `dangerouslySetInnerHTML`
+
+### Current file: `src/components/SketchFilter.tsx`
+### Tailwind utilities: `sketch`, `sketch-animated`, `sketch-subtle`, `sketch-subtle-animated`
