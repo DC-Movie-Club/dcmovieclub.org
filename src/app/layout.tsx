@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import { BottomNav } from "@/components/BottomNav";
-import { HandDrawnFilters } from "@/components/HandDrawnFilters";
 
 export const metadata: Metadata = {
   title: "DC Movie Club",
@@ -15,11 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className="min-h-screen bg-background text-foreground antialiased">
-        <HandDrawnFilters />
-        <main className="pb-24">{children}</main>
-        <BottomNav />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
