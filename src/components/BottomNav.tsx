@@ -58,17 +58,17 @@ export function BottomNav() {
           )}
         />
         <NavLink
-          route={routes.events}
-          active={pathname === routes.events.href}
+          route={routes.blog}
+          active={pathname === routes.blog.href}
           watercolorIndex={0}
-          {...(pathname === routes.events.href ? {} : itemHoverProps)}
+          {...(pathname === routes.blog.href ? {} : itemHoverProps)}
         />
 
         <NavLink
-          route={routes.blog}
-          active={pathname === routes.blog.href}
+          route={routes.events}
+          active={pathname === routes.events.href}
           watercolorIndex={1}
-          {...(pathname === routes.blog.href ? {} : itemHoverProps)}
+          {...(pathname === routes.events.href ? {} : itemHoverProps)}
         />
 
         <div className={LOGO_SPACER} />

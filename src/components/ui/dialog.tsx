@@ -61,7 +61,7 @@ function DialogContent({
         )}
         {...props}
       >
-        <div className="absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-surface sketch-subtle" />
+        <div className="absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-surface sketch" />
         <div className="relative">{children}</div>
         {showCloseButton && (
           <DialogPrimitive.Close
