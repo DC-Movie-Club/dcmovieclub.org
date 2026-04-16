@@ -15,8 +15,10 @@ function formatDate(raw: string) {
 
 function PostCard({ post }: { post: SubstackPost }) {
   return (
-    <ExternalLink
+    <a
       href={post.link}
+      target="_blank"
+      rel="noopener noreferrer"
       className="group/post flex flex-col gap-4 border-b border-border pb-8 sm:flex-row sm:gap-6"
     >
       {post.imageUrl && (
@@ -57,7 +59,7 @@ function PostCard({ post }: { post: SubstackPost }) {
           <ArrowUpRight size={14} />
         </span>
       </div>
-    </ExternalLink>
+    </a>
   );
 }
 
