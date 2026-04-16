@@ -21,6 +21,14 @@ const nextConfig = {
         hostname: "storage.googleapis.com",
         pathname: `/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/**`,
       },
+      {
+        protocol: "https",
+        hostname: "substackcdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "substack-post-media.s3.amazonaws.com",
+      },
     ],
   },
   outputFileTracingIncludes: {

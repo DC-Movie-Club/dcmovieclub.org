@@ -4,4 +4,5 @@ export type SubstackPost = {
   description: string | null
   pubDate: string
   imageUrl: string | null
+  blurDataUrl: string | null
 }
