@@ -59,6 +59,7 @@ import {
   $createCalloutNode,
 } from "@/app/admin/components/CalloutNode";
 import { TableActionMenuPlugin } from "@/app/admin/components/TableActionMenu";
+import { FloatingTextFormatToolbar } from "@/app/admin/components/FloatingTextFormatToolbar";
 import {
   getResources,
   saveResources,
@@ -574,6 +575,7 @@ export function ResourcesEditor({
         <CheckListPlugin />
         <TablePlugin hasCellBackgroundColor={false} />
         <TableActionMenuPlugin />
+        <FloatingTextFormatToolbar />
         <HorizontalRulePlugin />
         <AutoLinkPlugin matchers={LINK_MATCHERS} />
         <ClickableLinkPlugin />
