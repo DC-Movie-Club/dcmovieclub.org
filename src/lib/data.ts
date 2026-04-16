@@ -1,4 +1,6 @@
+import sharp from "sharp"
 import type { CalendarEvent } from "@/types/event"
+import type { LetterboxdReview } from "@/types/letterboxd"
 import type { SubstackPost } from "@/types/post"
 
 const CALENDAR_ID =
@@ -64,6 +66,125 @@ export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
   }
 }
 
+const DC_MOVIE_CLUB_LETTERBOXD_MEMBER_ID = "fE0Qx"
+
+type LetterboxdTokenResponse = {
+  access_token: string
+  expires_in: number
+}
+
+type LetterboxdLogEntry = {
+  id: string
+  film: {
+    id: string
+    name: string
+    releaseYear?: number
+    poster?: { sizes?: { width: number; height: number; url: string }[] }
+    links?: { type: string; id: string; url: string }[]
+  }
+  links?: { type: string; id: string; url: string }[]
+  like: boolean
+  diaryDetails?: { diaryDate: string; rewatch: boolean }
+  review?: { text: string }
+  rating?: number
+  whenCreated: string
+}
+
+type LetterboxdLogResponse = {
+  items?: LetterboxdLogEntry[]
+}
+
+async function getLetterboxdAccessToken(): Promise<string | null> {
+  const clientId = process.env.LETTERBOXD_CLIENT_ID
+  const clientSecret = process.env.LETTERBOXD_CLIENT_SECRET
+  if (!clientId || !clientSecret) return null
+
+  try {
+    const res = await fetch("https://api.letterboxd.com/api/v0/auth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+      },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: clientId,
+        client_secret: clientSecret,
+      }),
+    })
+    if (!res.ok) return null
+    const data: LetterboxdTokenResponse = await res.json()
+    return data.access_token
+  } catch {
+    return null
+  }
+}
+
+export async function getRecentLetterboxdReviews(
+  limit = 20,
+): Promise<LetterboxdReview[]> {
+  const token = await getLetterboxdAccessToken()
+  if (!token) return []
+
+  try {
+    const params = new URLSearchParams({
+      member: DC_MOVIE_CLUB_LETTERBOXD_MEMBER_ID,
+      perPage: String(limit),
+    })
+    const res = await fetch(
+      `https://api.letterboxd.com/api/v0/log-entries?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        next: { revalidate: 3600 },
+      },
+    )
+    if (!res.ok) return []
+
+    const data: LetterboxdLogResponse = await res.json()
+    if (!data.items) return []
+
+    return data.items.map((entry) => {
+      const poster =
+        entry.film.poster?.sizes?.find((s) => s.width >= 150) ??
+        entry.film.poster?.sizes?.[0]
+      return {
+        id: entry.id,
+        filmTitle: entry.film.name,
+        filmYear: entry.film.releaseYear ?? null,
+        posterUrl: poster?.url ?? null,
+        rating: entry.rating ?? null,
+        liked: entry.like,
+        review: entry.review?.text ?? null,
+        diaryDate: entry.diaryDetails?.diaryDate ?? null,
+        url: entry.links?.find((l) => l.type === "letterboxd")?.url
+          ?? `https://letterboxd.com/DCMovieClub/film/${entry.film.id}/`,
+      }
+    })
+  } catch {
+    return []
+  }
+}
+
+async function generateBlurDataUrl(
+  imageUrl: string,
+): Promise<string | null> {
+  try {
+    const res = await fetch(imageUrl)
+    if (!res.ok) return null
+    const buffer = Buffer.from(await res.arrayBuffer())
+    const tiny = await sharp(buffer)
+      .resize(20, null, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 20 })
+      .toBuffer()
+    return `data:image/webp;base64,${tiny.toString("base64")}`
+  } catch {
+    return null
+  }
+}
+
 const SUBSTACK_FEED_URL = "https://dcmovieclub.substack.com/feed"
 
 export async function getRecentPosts(limit = 10): Promise<SubstackPost[]> {
@@ -76,13 +197,20 @@ export async function getRecentPosts(limit = 10): Promise<SubstackPost[]> {
     const parser = new Parser()
     const feed = await parser.parseString(xml)
 
-    return (feed.items ?? []).slice(0, limit).map((item) => ({
-      title: item.title ?? "Untitled",
-      link: item.link ?? "",
-      description: item.contentSnippet ?? null,
-      pubDate: item.pubDate ?? "",
-      imageUrl: item.enclosure?.url ?? null,
-    }))
+    const items = (feed.items ?? []).slice(0, limit)
+
+    return Promise.all(
+      items.map(async (item) => ({
+        title: item.title ?? "Untitled",
+        link: item.link ?? "",
+        description: item.contentSnippet ?? null,
+        pubDate: item.pubDate ?? "",
+        imageUrl: item.enclosure?.url ?? null,
+        blurDataUrl: item.enclosure?.url
+          ? await generateBlurDataUrl(item.enclosure.url)
+          : null,
+      })),
+    )
   } catch {
     return []
   }
