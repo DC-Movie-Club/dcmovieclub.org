@@ -23,8 +23,7 @@ body {
 }
 
 .editor-table-cell-header {
-  background-color: #e2dfd2 !important;
-  font-weight: 600;
+  @apply bg-muted font-semibold;
 }
 
 .editor-checklist {

@@ -572,7 +572,7 @@ export function ResourcesEditor({
         <LinkPlugin />
         <ListPlugin />
         <CheckListPlugin />
-        <TablePlugin />
+        <TablePlugin hasCellBackgroundColor={false} />
         <TableActionMenuPlugin />
         <HorizontalRulePlugin />
         <AutoLinkPlugin matchers={LINK_MATCHERS} />
