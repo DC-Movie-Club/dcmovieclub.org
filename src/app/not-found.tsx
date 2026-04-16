@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { BottomNav } from "@/components/BottomNav";
 
 export default function NotFound() {
@@ -9,7 +9,7 @@ export default function NotFound() {
         <p className="mt-4 text-muted-foreground">Page not found.</p>
         <Link
           href="/"
-          className="mt-8 text-sm underline underline-offset-4 hover:text-primary"
+          className="mt-8 text-sm underline underline-offset-4"
         >
           Go home
         </Link>

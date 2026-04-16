@@ -2,6 +2,8 @@
     Will need a dynamic section for partner logos/descriptions and a static section
     with partnership info/contact. Abbie will provide copy and partner details. */}
 
+import { ExternalLink } from "@/components/ui/link";
+
 export default function Partnerships() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
@@ -15,12 +17,12 @@ export default function Partnerships() {
       </p>
       <p className="mt-8 text-muted-foreground">
         Interested in partnering?{" "}
-        <a
+        <ExternalLink
           href="mailto:abbie@dcmovieclub.org"
-          className="text-primary underline underline-offset-4 hover:text-accent"
+          className="text-primary underline underline-offset-4"
         >
           Reach out
-        </a>
+        </ExternalLink>
       </p>
     </div>
   );

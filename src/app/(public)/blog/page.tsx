@@ -1,6 +1,8 @@
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getRecentPosts } from "@/lib/data";
+import { ExternalLink } from "@/components/ui/link";
 import type { SubstackPost } from "@/types/post";
 
 function formatDate(raw: string) {
@@ -13,19 +15,22 @@ function formatDate(raw: string) {
 
 function PostCard({ post }: { post: SubstackPost }) {
   return (
-    <a
+    <ExternalLink
       href={post.link}
-      target="_blank"
-      rel="noopener noreferrer"
       className="group/post flex flex-col gap-4 border-b border-border pb-8 sm:flex-row sm:gap-6"
     >
       {post.imageUrl && (
-        <div className="aspect-wide w-full shrink-0 overflow-hidden rounded-lg sm:aspect-square sm:w-36">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+        <div className="relative aspect-wide w-full shrink-0 overflow-hidden rounded-lg sm:aspect-square sm:w-36">
+          <Image
             src={post.imageUrl}
             alt=""
-            className="h-full w-full object-cover transition-transform group-hover/post:scale-105"
+            fill
+            sizes="(min-width: 640px) 144px, 100vw"
+            className="object-cover transition-transform group-hover/post:scale-105"
+            {...(post.blurDataUrl && {
+              placeholder: "blur" as const,
+              blurDataURL: post.blurDataUrl,
+            })}
           />
         </div>
       )}
@@ -52,7 +57,7 @@ function PostCard({ post }: { post: SubstackPost }) {
           <ArrowUpRight size={14} />
         </span>
       </div>
-    </a>
+    </ExternalLink>
   );
 }
 
@@ -64,15 +69,13 @@ export default async function Blog() {
       <h1 className="text-4xl uppercase tracking-wide">Blog</h1>
       <p className="mt-6 text-lg text-muted-foreground">
         News, reviews, and dispatches from DC Movie Club.{" "}
-        <a
+        <ExternalLink
           href="https://dcmovieclub.substack.com"
-          target="_blank"
-          rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-rust underline"
         >
           Subscribe on Substack
           <ArrowUpRight size={16} />
-        </a>
+        </ExternalLink>
       </p>
 
       <div className="mt-10 flex flex-col gap-8">

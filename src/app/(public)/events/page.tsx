@@ -1,6 +1,7 @@
 import { MapPin, Clock, CalendarDays, Ticket, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getUpcomingEvents } from "@/lib/data";
+import { ExternalLink } from "@/components/ui/link";
 import type { CalendarEvent } from "@/types/event";
 
 function formatDate(iso: string) {
@@ -65,10 +66,8 @@ function EventCard({ event }: { event: CalendarEvent }) {
         )}
 
         {event.ticketUrl ? (
-          <a
+          <ExternalLink
             href={event.ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className={cn(
               "mt-2 inline-flex items-center gap-1.5 text-sm uppercase tracking-wide text-rust",
               "sketch-subtle group-hover/event:sketch-subtle-animated",
@@ -76,12 +75,10 @@ function EventCard({ event }: { event: CalendarEvent }) {
           >
             <Ticket size={14} />
             Get Tickets
-          </a>
+          </ExternalLink>
         ) : event.link ? (
-          <a
+          <ExternalLink
             href={event.link}
-            target="_blank"
-            rel="noopener noreferrer"
             className={cn(
               "mt-2 inline-flex items-center gap-1.5 text-sm uppercase tracking-wide text-rust",
               "sketch-subtle group-hover/event:sketch-subtle-animated",
@@ -89,7 +86,7 @@ function EventCard({ event }: { event: CalendarEvent }) {
           >
             View on Calendar
             <ArrowUpRight size={14} />
-          </a>
+          </ExternalLink>
         ) : null}
       </div>
     </div>
