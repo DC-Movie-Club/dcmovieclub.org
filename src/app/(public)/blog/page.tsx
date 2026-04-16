@@ -1,9 +1,9 @@
-import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getRecentPosts } from "@/lib/data";
 import { ExternalLink } from "@/components/ui/link";
 import type { SubstackPost } from "@/types/post";
+import { ThumbnailImage } from "./ThumbnailImage";
 
 function formatDate(raw: string) {
   return new Date(raw).toLocaleDateString("en-US", {
@@ -22,19 +22,7 @@ function PostCard({ post }: { post: SubstackPost }) {
       className="group/post flex flex-col gap-4 border-b border-border pb-8 sm:flex-row sm:gap-6"
     >
       {post.imageUrl && (
-        <div className="relative aspect-wide w-full shrink-0 overflow-hidden rounded-lg sm:aspect-square sm:w-36">
-          <Image
-            src={post.imageUrl}
-            alt=""
-            fill
-            sizes="(min-width: 640px) 144px, 100vw"
-            className="object-cover transition-transform group-hover/post:scale-105"
-            {...(post.blurDataUrl && {
-              placeholder: "blur" as const,
-              blurDataURL: post.blurDataUrl,
-            })}
-          />
-        </div>
+        <ThumbnailImage src={post.imageUrl} blurDataUrl={post.blurDataUrl} />
       )}
 
       <div className="flex min-w-0 flex-col">

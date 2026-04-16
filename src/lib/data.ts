@@ -182,6 +182,8 @@ function toTinyUrl(url: string): string {
   return match ? `${match[1]}w_24,q_20,f_webp${match[2]}` : url
 }
 
+// Unbounded, per-process cache. Fine for the blog since the RSS feed rotates old
+// posts out and never exceeds ~20 entries; revisit if the feed ever grows large.
 const blurCache = new Map<string, string | null>()
 
 async function generateBlurDataUrl(
