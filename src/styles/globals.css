@@ -13,7 +13,7 @@
 }
 
 @theme {
-  --font-heading: var(--font-heading-value);
+  --font-heading: "DCMC", Georgia, serif;
 }
 
 @theme inline {
@@ -83,11 +83,6 @@ html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
-html[data-admin] body {
-  font-family: var(--font-sans);
-  --font-heading-value: system-ui, -apple-system, sans-serif;
-}
-
 body {
   font-family: var(--font-dcmc);
   background-color: var(--color-background);
@@ -140,7 +135,6 @@ body {
 
 :root {
   --radius: 0.625rem;
-  --font-heading-value: "DCMC", Georgia, serif;
 }
 
 @layer base {

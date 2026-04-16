@@ -1,5 +1,5 @@
 export const adminTabs = [
-  { href: "/admin/users", label: "Users" },
+  { href: "/admin/admins", label: "Admins" },
   { href: "/admin/content", label: "Content" },
 ] as const;
 
