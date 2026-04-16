@@ -8,6 +8,7 @@ import { ArrowUpRight, Ellipsis, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { routes } from "@/config/navigation";
 import { Discord } from "@/components/icons/Discord";
+import { Instagram } from "@/components/icons/Instagram";
 import { Letterboxd } from "@/components/icons/Letterboxd";
 import { Youtube } from "@/components/icons/Youtube";
 import {
@@ -141,6 +142,7 @@ export function BottomNav() {
               })}
               {[
                 { label: "Contact", href: "https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=abbie@dcmovieclub.org", icon: Mail },
+                { label: "Instagram", href: "https://www.instagram.com/dcmovieclub/", icon: Instagram },
                 { label: "Letterboxd", href: "https://letterboxd.com/DCMovieClub/", icon: Letterboxd },
                 { label: "Discord", href: "https://discord.com/invite/hWRfjVpPws", icon: Discord },
                 { label: "YouTube", href: "https://www.youtube.com/@DCMovieClub", icon: Youtube },
