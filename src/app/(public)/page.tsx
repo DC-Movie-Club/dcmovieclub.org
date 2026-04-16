@@ -17,6 +17,9 @@ import { ParagraphLong } from "@/components/icons/ParagraphLong";
 import { ParagraphShort } from "@/components/icons/ParagraphShort";
 import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
+import { DieCutSticker } from "@/components/DieCutSticker";
+import { TextSticker } from "@/components/TextSticker";
+import { CountTicker } from "@/components/CountTicker";
 
 function formatDate(iso: string) {
   const date = new Date(iso);
@@ -269,32 +272,167 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-10 py-10">
-      <div className="flex flex-col items-center gap-4">
-        <Image
-          src="/images/dcmc-logo.png"
-          alt="DC Movie Club"
-          width={180}
-          height={180}
-          priority
-        />
-        <div className="mx-auto max-w-sm rounded-xl border-2 border-charcoal/15 px-5 py-4 text-center">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            An inclusive and (mostly) unpretentious club to discuss movies and
-            make friends!
-          </p>
+      <div className="flex flex-col items-center gap-6 px-6">
+        <div className="relative mx-auto flex w-full max-w-2xl flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center sm:gap-0">
+          <DieCutSticker
+            radius={6}
+            elevation="l2"
+            rotate={-5}
+            className="z-10 sm:-mr-6 sm:mt-6"
+          >
+            <Image
+              src="/images/dcmc-logo.png"
+              alt="DC Movie Club"
+              width={180}
+              height={180}
+              priority
+            />
+          </DieCutSticker>
+
+          <div className="flex flex-col items-center gap-4 sm:-ml-4 sm:items-start">
+            <DieCutSticker
+              radius={1}
+              elevation="l2"
+              outlineColor="#45586a"
+              rotate={2}
+            >
+              <svg
+                viewBox="0 0 560 120"
+                className="w-[380px] max-w-full"
+                role="img"
+                aria-label="An inclusive and (mostly) unpretentious club to discuss movies and make friends!"
+              >
+                <defs>
+                  <filter
+                    id="sprocket-shadow"
+                    x="-20%"
+                    y="-40%"
+                    width="140%"
+                    height="200%"
+                  >
+                    <feDropShadow
+                      dx="0"
+                      dy="0.8"
+                      stdDeviation="0.6"
+                      floodColor="#1e2a35"
+                      floodOpacity="0.4"
+                    />
+                  </filter>
+                </defs>
+                <rect width="560" height="120" rx="6" fill="#45586a" />
+                {Array.from({ length: 32 }, (_, i) => {
+                  const x = 5 + i * 17.5;
+                  return (
+                    <g key={i} filter="url(#sprocket-shadow)">
+                      <rect
+                        x={x}
+                        y={4}
+                        width={10}
+                        height={7}
+                        rx={2}
+                        fill="#8a9caa"
+                      />
+                      <rect
+                        x={x}
+                        y={109}
+                        width={10}
+                        height={7}
+                        rx={2}
+                        fill="#8a9caa"
+                      />
+                    </g>
+                  );
+                })}
+                <text
+                  x="280"
+                  y="45"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="#d4dce2"
+                  stroke="#2e3d4a"
+                  strokeWidth="0.6"
+                  paintOrder="stroke fill"
+                  fontFamily="var(--font-dcmc)"
+                  fontSize="25"
+                  letterSpacing="1"
+                >
+                  DC's inclusive and (mostly) unpretentious club
+                </text>
+                <text
+                  x="280"
+                  y="78"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="#d4dce2"
+                  stroke="#2e3d4a"
+                  strokeWidth="0.6"
+                  paintOrder="stroke fill"
+                  fontFamily="var(--font-dcmc)"
+                  fontSize="25"
+                  letterSpacing="1"
+                >
+                  for discussing movies and making friends!
+                </text>
+              </svg>
+            </DieCutSticker>
+
+            <TextSticker
+              color="#be7184"
+              strokeWidth={7}
+              elevation="l2"
+              rotate={-3}
+              className="text-2xl uppercase -tracking-[3px] sm:ml-12"
+            >
+              Est 2023
+            </TextSticker>
+
+            <DieCutSticker
+              radius={5}
+              elevation="l2"
+              outlineColor="white"
+              rotate={3}
+              className="sm:ml-4"
+            >
+              <div
+                className="flex items-center justify-center overflow-hidden rounded-sm"
+                style={{ backgroundColor: "#6672ab" }}
+              >
+                <Image
+                  src="/images/audience-white.png"
+                  alt="Movie audience illustration"
+                  width={180}
+                  height={118}
+                  className="h-auto w-auto object-cover"
+                />
+              </div>
+            </DieCutSticker>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-3">
           {pastEventCount > 0 && (
-            <p className="mt-2 text-sm tracking-wide text-muted-foreground">
-              {pastEventCount} events and counting
-            </p>
+            <DieCutSticker
+              radius={2}
+              elevation="l2"
+              rotate={-2}
+              outlineColor="#b4731e"
+            >
+              <div className="flex items-center gap-2 rounded-lg bg-orange px-3 py-2">
+                <CountTicker value={pastEventCount} behind={3} color="cream" />
+                <span className="text-sm uppercase tracking-wide leading-none text-charcoal">
+                  events and counting...
+                </span>
+              </div>
+            </DieCutSticker>
           )}
-          <div className="mt-3 flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             {Object.values(socials).map((link) => (
               <ExternalLink
                 key={link.key}
                 href={link.href}
-                className="text-muted-foreground transition-colors hover:text-rust"
+                className="sketch-subtle text-muted-foreground transition-colors hover:text-rust"
               >
-                <link.icon size={20} />
+                <link.icon size={24} />
               </ExternalLink>
             ))}
           </div>

@@ -1,0 +1,316 @@
+.flip-cell {
+  --flip-w: 2.75rem;
+  --flip-h: 3.75rem;
+  --flip-bg: var(--color-charcoal);
+  --flip-fg: var(--color-cream);
+  --flip-bg-rear: var(--color-charcoal-detail);
+  --flip-hinge: color-mix(in oklch, var(--flip-bg), black 22%);
+  --flip-radius: 4px;
+  --flip-duration: 320ms;
+  --flip-font: var(--font-mono);
+
+  position: relative;
+  width: var(--flip-w);
+  height: var(--flip-h);
+  perspective: 400px;
+  color: var(--flip-fg);
+  font-family: var(--flip-font);
+  font-weight: 700;
+  font-size: calc(var(--flip-h) * 0.78);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  user-select: none;
+}
+
+.flip-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--flip-radius);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  z-index: 6;
+}
+
+.flip-cell.flip-cell--el1 {
+  box-shadow: 0 1px 3px hsl(25 90% 22% / 0.12);
+}
+
+.flip-cell.flip-cell--el2 {
+  box-shadow:
+    0 1px 1px hsl(25 90% 22% / 0.075),
+    0 2px 4px hsl(25 90% 22% / 0.075);
+}
+
+.flip-cell.flip-cell--el3 {
+  box-shadow:
+    0 1px 1px hsl(25 90% 22% / 0.06),
+    0 2px 4px hsl(25 90% 22% / 0.06),
+    0 4px 8px hsl(25 90% 22% / 0.06);
+}
+
+.flip-cell.flip-cell--el4 {
+  box-shadow:
+    0 1px 1px hsl(25 90% 22% / 0.05),
+    0 2px 2px hsl(25 90% 22% / 0.05),
+    0 4px 4px hsl(25 90% 22% / 0.05),
+    0 8px 8px hsl(25 90% 22% / 0.05);
+}
+
+.flip-cell.flip-cell--el5 {
+  box-shadow:
+    0 1px 1px hsl(25 90% 22% / 0.04),
+    0 2px 2px hsl(25 90% 22% / 0.04),
+    0 4px 4px hsl(25 90% 22% / 0.04),
+    0 8px 8px hsl(25 90% 22% / 0.04),
+    0 16px 16px hsl(25 90% 22% / 0.04);
+}
+
+.flip-top,
+.flip-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  height: calc(50% - 0.5px);
+  display: flex;
+  justify-content: center;
+  background: var(--flip-bg);
+}
+
+.flip-top {
+  top: 0;
+  border-radius: var(--flip-radius) var(--flip-radius) 0 0;
+  line-height: var(--flip-h);
+}
+
+.flip-bottom {
+  bottom: 0;
+  border-radius: 0 0 var(--flip-radius) var(--flip-radius);
+  line-height: 0;
+  background: var(--flip-bg-rear);
+}
+
+.flip-hinge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--flip-hinge);
+  transform: translateY(-0.5px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.flip-leaf {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  animation: flip-down var(--flip-duration) cubic-bezier(0.55, 0.055, 0.675, 0.19)
+    forwards;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes flip-down {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-180deg);
+  }
+}
+
+.flip-leaf-front,
+.flip-leaf-rear {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(50% - 0.5px);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  background: var(--flip-bg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-leaf-front {
+  line-height: var(--flip-h);
+  border-radius: var(--flip-radius) var(--flip-radius) 0 0;
+}
+
+.flip-leaf-rear {
+  line-height: 0;
+  border-radius: 0 0 var(--flip-radius) var(--flip-radius);
+  transform: rotateX(-180deg);
+  background: var(--flip-bg-rear);
+}
+
+.flip-leaf-front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  opacity: 0;
+  animation: shade-front var(--flip-duration) ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes shade-front {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.flip-leaf-rear::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  opacity: 1;
+  animation: shade-rear var(--flip-duration) ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes shade-rear {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.flip-row {
+  display: inline-flex;
+  gap: 0.375rem;
+  perspective: 600px;
+}
+
+.flip-row:has(.flip-cell--2xs) {
+  gap: 1px;
+}
+
+.flip-row:has(.flip-cell--xs) {
+  gap: 2px;
+}
+
+.flip-row:has(.flip-cell--sm) {
+  gap: 3px;
+}
+
+.flip-row:has(.flip-cell--lg) {
+  gap: 0.5rem;
+}
+
+.flip-row:has(.flip-cell--xl) {
+  gap: 0.625rem;
+}
+
+.flip-cell.flip-cell--2xs {
+  --flip-w: 0.875rem;
+  --flip-h: 1.25rem;
+  --flip-radius: 2px;
+}
+
+.flip-cell.flip-cell--xs {
+  --flip-w: 1.25rem;
+  --flip-h: 1.75rem;
+  --flip-radius: 2px;
+}
+
+.flip-cell.flip-cell--sm {
+  --flip-w: 1.75rem;
+  --flip-h: 2.5rem;
+  --flip-radius: 3px;
+}
+
+.flip-cell.flip-cell--lg {
+  --flip-w: 4rem;
+  --flip-h: 5.5rem;
+  --flip-radius: 6px;
+}
+
+.flip-cell.flip-cell--xl {
+  --flip-w: 5.5rem;
+  --flip-h: 7.5rem;
+  --flip-radius: 8px;
+}
+
+.flip-cell.flip-cell--rust {
+  --flip-bg: var(--color-rust);
+  --flip-bg-rear: #8a2e08;
+  --flip-fg: var(--color-cream);
+}
+
+.flip-cell.flip-cell--cream {
+  --flip-bg: var(--color-cream);
+  --flip-bg-rear: #e2ddc9;
+  --flip-fg: var(--color-charcoal);
+}
+
+.flip-cell.flip-cell--teal {
+  --flip-bg: var(--color-teal);
+  --flip-bg-rear: #2a4654;
+  --flip-fg: var(--color-cream);
+}
+
+.flip-cell.flip-cell--dcmc {
+  --flip-font: var(--font-dcmc);
+  font-size: calc(var(--flip-h) * 0.88);
+  letter-spacing: 0;
+}
+
+.flip-stripes {
+  position: relative;
+  height: 0.375rem;
+  margin-top: 0.125rem;
+  background: repeating-linear-gradient(
+    to bottom,
+    currentColor 0,
+    currentColor 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  color: var(--color-charcoal);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.flip-colon {
+  align-self: center;
+  padding: 0 0.125rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-charcoal);
+  opacity: 0.6;
+}
+
+.flip-panel {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-muted);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.15);
+}
