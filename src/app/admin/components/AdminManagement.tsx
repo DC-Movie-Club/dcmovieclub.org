@@ -14,6 +14,7 @@ import {
   revokeAdminClaim,
   getAdminUsers,
 } from "@/app/admin/actions/auth";
+import { adminSWRKeys } from "@/app/admin/config";
 import { useAuth } from "@/app/admin/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,9 +60,11 @@ function toE164(input: string): string | null {
 
 export function AdminManagement() {
   const { user } = useAuth();
-  const { data, mutate } = useSWR("adminUsers", getAdminUsers, {
-    suspense: true,
-  });
+  const { data, mutate } = useSWR(
+    adminSWRKeys.adminUsers.swrKey,
+    getAdminUsers,
+    { suspense: true }
+  );
   const [newPhone, setNewPhone] = useState("");
   const [newName, setNewName] = useState("");
   const [adding, setAdding] = useState(false);

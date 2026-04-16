@@ -10,9 +10,9 @@ export function AdminNav() {
 
   return (
     <nav className="flex gap-4 border-b">
-      {adminTabs.map(({ href, label }) => (
+      {Object.values(adminTabs).map(({ key, href, label }) => (
         <Link
-          key={href}
+          key={key}
           href={href}
           className={cn(
             "border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
