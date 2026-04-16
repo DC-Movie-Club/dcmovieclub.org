@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { getUpcomingEvents, getPastEventCount } from "@/lib/data";
 import { getRecentLetterboxdReviews } from "@/lib/data";
 import { Link, ExternalLink } from "@/components/ui/link";
+import { socials } from "@/config/navigation";
 import { Letterboxd } from "@/components/icons/Letterboxd";
 import { ParagraphLong } from "@/components/icons/ParagraphLong";
 import { ParagraphShort } from "@/components/icons/ParagraphShort";
@@ -286,6 +287,17 @@ export default async function Home() {
               {pastEventCount} events and counting
             </p>
           )}
+          <div className="mt-3 flex items-center justify-center gap-4">
+            {Object.values(socials).map((link) => (
+              <ExternalLink
+                key={link.key}
+                href={link.href}
+                className="text-muted-foreground transition-colors hover:text-rust"
+              >
+                <link.icon size={20} />
+              </ExternalLink>
+            ))}
+          </div>
         </div>
       </div>
 
