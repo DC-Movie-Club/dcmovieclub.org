@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { RotateCcw } from "lucide-react";
+
+const HOVER_SHADOW = "drop-shadow(0 8px 20px rgba(0,0,0,0.18)) drop-shadow(0 2px 6px rgba(0,0,0,0.1))";
 
 interface StickerPosition {
   x: number;
@@ -12,8 +15,8 @@ interface StickerPosition {
 
 interface DraggableStickerProps {
   id: string;
-  initialX: number;
-  initialY: number;
+  x: number;
+  y: number;
   children: React.ReactNode;
   z: number;
   rotate: number;
@@ -21,12 +24,14 @@ interface DraggableStickerProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
   onGrab: (id: string) => void;
   onMove: (id: string, x: number, y: number) => void;
+  onHover?: () => void;
+  onUnhover?: () => void;
 }
 
 function DraggableSticker({
   id,
-  initialX,
-  initialY,
+  x,
+  y,
   children,
   z,
   rotate,
@@ -34,9 +39,10 @@ function DraggableSticker({
   containerRef,
   onGrab,
   onMove,
+  onHover,
+  onUnhover,
 }: DraggableStickerProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState({ x: initialX, y: initialY });
   const dragging = useRef(false);
   const dragStart = useRef({ clientX: 0, clientY: 0, x: 0, y: 0 });
 
@@ -46,27 +52,28 @@ function DraggableSticker({
       dragStart.current = {
         clientX: e.clientX,
         clientY: e.clientY,
-        x: pos.x,
-        y: pos.y,
+        x,
+        y,
       };
       ref.current?.setPointerCapture(e.pointerId);
       onGrab(id);
     },
-    [pos, onGrab, id],
+    [x, y, onGrab, id],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (!dragging.current) return;
-      const containerWidth = containerRef.current?.offsetWidth ?? 1;
+      const container = containerRef.current;
+      const cw = container?.offsetWidth ?? 1;
+      const ch = container?.offsetHeight ?? 1;
       const dx = e.clientX - dragStart.current.clientX;
       const dy = e.clientY - dragStart.current.clientY;
-      const x =
-        Math.round((dragStart.current.x + (dx / containerWidth) * 100) * 10) /
-        10;
-      const y = Math.round(dragStart.current.y + dy);
-      setPos({ x, y });
-      onMove(id, x, y);
+      const newX =
+        Math.round((dragStart.current.x + (dx / cw) * 100) * 10) / 10;
+      const newY =
+        Math.round((dragStart.current.y + (dy / ch) * 100) * 10) / 10;
+      onMove(id, newX, newY);
     },
     [id, onMove, containerRef],
   );
@@ -80,16 +87,18 @@ function DraggableSticker({
       ref={ref}
       className="absolute cursor-grab touch-none active:cursor-grabbing"
       style={{
-        left: `calc(50% + ${pos.x}%)`,
-        top: pos.y,
-        transform: `rotate(${rotate}deg) scale(${scale})`,
+        left: `calc(50% + ${x}%)`,
+        top: `calc(50% + ${y}%)`,
+        transform: `rotate(${rotate}deg) scale(calc(${scale} * var(--sticker-scale, 1)))`,
         zIndex: z,
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onMouseEnter={onHover}
+      onMouseLeave={onUnhover}
     >
-      <div className="pointer-events-none">{children}</div>
+      {children}
     </div>
   );
 }
@@ -104,9 +113,14 @@ interface StickerConfig {
   element: React.ReactNode;
 }
 
-export function StickerPlayground({ stickers }: { stickers: StickerConfig[] }) {
+export function StickerPlayground({
+  stickers,
+}: {
+  stickers: StickerConfig[];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [positions, setPositions] = useState<Record<string, StickerPosition>>(
+
+  const initialPositions = useMemo(
     () =>
       Object.fromEntries(
         stickers.map((s, i) => [
@@ -119,12 +133,31 @@ export function StickerPlayground({ stickers }: { stickers: StickerConfig[] }) {
             scale: s.initialScale ?? 1,
           },
         ]),
-      ),
+      ) as Record<string, StickerPosition>,
+    [stickers],
   );
+
+  const [positions, setPositions] =
+    useState<Record<string, StickerPosition>>(initialPositions);
   const [lastGrabbed, setLastGrabbed] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const topZ = useRef(
     Math.max(...stickers.map((s) => s.initialZ ?? 0), stickers.length),
   );
+
+  const isDirty = useMemo(() => {
+    return Object.entries(positions).some(([id, pos]) => {
+      const init = initialPositions[id];
+      return pos.x !== init.x || pos.y !== init.y;
+    });
+  }, [positions, initialPositions]);
+
+  const handleReset = useCallback(() => {
+    setPositions(initialPositions);
+    topZ.current = Math.max(
+      ...Object.values(initialPositions).map((p) => p.z),
+    );
+  }, [initialPositions]);
 
   const handleGrab = useCallback((id: string) => {
     topZ.current += 1;
@@ -148,26 +181,42 @@ export function StickerPlayground({ stickers }: { stickers: StickerConfig[] }) {
           "linear-gradient(to bottom, black 70%, transparent 100%)",
       }}
     >
+      {isDirty && (
+        <button
+          onClick={handleReset}
+          className="group/reset absolute top-4 right-4 z-[200] flex items-center gap-1.5 rounded-full border-2 border-charcoal bg-cream px-3 py-1.5 font-sans text-xs uppercase tracking-wide text-charcoal shadow-md sketch-subtle transition-transform hover:scale-105 hover:sketch-subtle-animated"
+        >
+          <RotateCcw size={12} />
+          Reset
+        </button>
+      )}
+
       <div
         ref={containerRef}
-        className="relative mx-auto h-[100svh] w-full overflow-visible"
+        className="relative mx-auto h-[100svh] w-full overflow-visible [--sticker-scale:0.85] sm:[--sticker-scale:0.95] md:[--sticker-scale:1] lg:[--sticker-scale:1.1]"
       >
-        {stickers.map((s) => (
-          <DraggableSticker
-            key={s.id}
-            id={s.id}
-            initialX={s.initialX}
-            initialY={s.initialY}
-            z={positions[s.id]?.z ?? 0}
-            rotate={positions[s.id]?.rotate ?? 0}
-            scale={positions[s.id]?.scale ?? 1}
-            containerRef={containerRef}
-            onGrab={handleGrab}
-            onMove={handleMove}
-          >
-            {s.element}
-          </DraggableSticker>
-        ))}
+        {stickers.map((s) => {
+          const pos = positions[s.id];
+          const isHovered = hoveredId === s.id;
+          return (
+            <DraggableSticker
+              key={s.id}
+              id={s.id}
+              x={pos?.x ?? s.initialX}
+              y={pos?.y ?? s.initialY}
+              z={isHovered ? 9999 : (pos?.z ?? 0)}
+              rotate={pos?.rotate ?? 0}
+              scale={pos?.scale ?? 1}
+              containerRef={containerRef}
+              onGrab={handleGrab}
+              onMove={handleMove}
+              onHover={() => setHoveredId(s.id)}
+              onUnhover={() => setHoveredId(null)}
+            >
+              {s.element}
+            </DraggableSticker>
+          );
+        })}
       </div>
     </div>
   );

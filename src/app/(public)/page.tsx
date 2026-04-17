@@ -52,6 +52,12 @@ const NEXT_UP_SHADOW = [
   "5px 5px 0 var(--color-charcoal)",
 ].join(", ");
 
+const SECTION_HEADER_SHADOW = [
+  "1px 1px 0 var(--color-charcoal)",
+  "2px 2px 0 var(--color-charcoal)",
+  "3px 3px 0 var(--color-charcoal)",
+].join(", ");
+
 function FeaturedEvent({ event }: { event: CalendarEvent }) {
   const { month, day, weekday } = formatDate(event.start);
   const mapUrl = event.location
@@ -138,7 +144,7 @@ function FeaturedEvent({ event }: { event: CalendarEvent }) {
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group/cta absolute top-0 right-4 z-10 block -translate-y-1/2 transition-transform hover:scale-105 sm:right-6"
+            className="group/cta absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
           >
             <span
               aria-hidden
@@ -157,75 +163,132 @@ function FeaturedEvent({ event }: { event: CalendarEvent }) {
 
 function CompactEventCard({ event }: { event: CalendarEvent }) {
   const { month, day } = formatDate(event.start);
+  const href = event.ticketUrl || event.link;
+  const mapUrl = event.location
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
+    : null;
 
-  return (
-    <div className="group/event flex items-center gap-4 rounded-lg border-2 border-charcoal/10 px-4 py-3 transition-colors hover:border-charcoal/20">
+  const content = (
+    <>
       <div className="flex shrink-0 flex-col items-center text-center">
         <span className="text-[10px] font-medium uppercase tracking-widest text-rust">
           {month}
         </span>
-        <span className="text-xl leading-tight text-rust">{day}</span>
+        <span className="text-2xl leading-none text-rust">{day}</span>
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <h3 className="truncate text-base uppercase tracking-wide">
+        <h3 className="truncate text-base uppercase tracking-wide text-charcoal transition-colors group-hover/event:text-rust">
           {event.title}
         </h3>
-        <div className="flex gap-3 text-xs text-muted-foreground">
-          {!event.allDay && <span>{formatTime(event.start)}</span>}
-          {event.location && (
-            <span className="flex items-center gap-1 truncate">
-              <MapPin size={10} className="shrink-0" />
-              {event.location}
-            </span>
+        <div className="flex min-w-0 gap-3 text-xs uppercase tracking-wider text-charcoal/75">
+          {!event.allDay && (
+            <span className="shrink-0">{formatTime(event.start)}</span>
           )}
+          {event.location &&
+            (mapUrl && href ? (
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative z-10 flex min-w-0 items-center gap-1 rounded-sm hover:text-charcoal hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+              >
+                <MapPin size={10} className="shrink-0" />
+                <span className="truncate">{event.location}</span>
+              </a>
+            ) : (
+              <span className="flex min-w-0 items-center gap-1">
+                <MapPin size={10} className="shrink-0" />
+                <span className="truncate">{event.location}</span>
+              </span>
+            ))}
         </div>
       </div>
 
       {event.ticketUrl ? (
-        <ExternalLink
-          href={event.ticketUrl}
-          className={cn(
-            "shrink-0 text-rust",
-            "sketch-subtle group-hover/event:sketch-subtle-animated",
-          )}
-        >
-          <Ticket size={18} />
-        </ExternalLink>
+        <span className="shrink-0 text-rust sketch-subtle group-hover/event:sketch-subtle-animated">
+          <Ticket size={20} />
+        </span>
       ) : event.link ? (
-        <ExternalLink
-          href={event.link}
-          className="shrink-0 text-muted-foreground"
-        >
+        <span className="shrink-0 text-muted-foreground transition-colors sketch-subtle group-hover/event:text-rust group-hover/event:sketch-subtle-animated">
           <ArrowUpRight size={18} />
-        </ExternalLink>
+        </span>
       ) : null}
+    </>
+  );
+
+  const className = cn(
+    "group/event relative flex items-center gap-4 rounded-lg px-3 py-2 transition-colors sm:gap-5 sm:py-2.5",
+    href && "cursor-pointer hover:bg-charcoal/5",
+  );
+
+  return (
+    <div className={className}>
+      {href && (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={event.title}
+          className="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+        />
+      )}
+      {content}
     </div>
   );
 }
 
 function UpcomingEvents({ events }: { events: CalendarEvent[] }) {
   return (
-    <section className="px-6">
-      <div className="mx-auto max-w-3xl">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm uppercase tracking-widest text-muted-foreground">
-            Upcoming Events
-          </h2>
-          <Link
-            href="/events"
-            className="flex items-center gap-1 text-xs uppercase tracking-wide text-muted-foreground"
+    <section className="px-6 pt-4 pb-4">
+      <div className="relative mx-auto max-w-3xl">
+        <div
+          aria-hidden
+          className="absolute inset-0 rounded-xl border-[3px] border-charcoal bg-cream sketch"
+        />
+
+        <div className="pointer-events-none absolute -top-3 left-6 z-10 sm:-top-4 sm:left-8">
+          <span
+            className="bg-cream px-2 font-dcmc text-2xl uppercase leading-none tracking-wide text-cream sm:text-3xl"
+            style={{
+              textShadow: SECTION_HEADER_SHADOW,
+              WebkitTextStroke: "1.5px var(--color-charcoal)",
+              paintOrder: "stroke fill",
+            }}
           >
-            View all
-            <ArrowRight size={12} />
-          </Link>
+            Other upcoming events
+          </span>
         </div>
 
-        <div className="mt-3 flex flex-col gap-3">
-          {events.map((event) => (
-            <CompactEventCard key={event.id} event={event} />
+        <Link
+          href="/events"
+          className="absolute top-0 right-4 z-10 flex -translate-y-1/2 items-center gap-1 rounded-full border-[2.5px] border-charcoal bg-cream px-3 py-1 text-xs uppercase tracking-widest text-charcoal shadow-sm hover:text-rust focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:right-6"
+        >
+          View all
+          <ArrowRight size={12} />
+        </Link>
+
+        <div className="relative flex flex-col px-4 pt-5 pb-4 sm:px-5 sm:pt-6 sm:pb-5">
+          {events.map((event, i) => (
+            <div key={event.id}>
+              {i > 0 && (
+                <div
+                  aria-hidden
+                  className="my-1 border-t border-dashed border-charcoal/25"
+                />
+              )}
+              <CompactEventCard event={event} />
+            </div>
           ))}
         </div>
+
+        <Link
+          href="/events"
+          className="absolute bottom-0 right-4 z-10 flex translate-y-1/2 items-center gap-1 rounded-full border-[2.5px] border-charcoal bg-cream px-3 py-1 text-xs uppercase tracking-widest text-charcoal shadow-sm hover:text-rust focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:right-6"
+        >
+          View all
+          <ArrowRight size={12} />
+        </Link>
       </div>
     </section>
   );
@@ -250,12 +313,17 @@ export default async function Home() {
           {
             id: "logo",
             initialX: -46.4,
-            initialY: 196,
+            initialY: -19.2,
             initialRotate: -15,
             initialScale: 1,
             initialZ: 130,
             element: (
-              <DieCutSticker radius={6} elevation="l2">
+              <DieCutSticker
+                radius={2}
+                elevation="l2"
+                elevationHover="l4"
+                peel={{ src: "/images/dcmc-logo.png", size: 180 }}
+              >
                 <Image
                   src="/images/dcmc-logo.png"
                   alt="DC Movie Club"
@@ -269,12 +337,17 @@ export default async function Home() {
           {
             id: "tagline",
             initialX: -27.2,
-            initialY: 325,
+            initialY: -4.3,
             initialRotate: -4,
             initialScale: 1,
-            initialZ: 131,
+            initialZ: 134,
             element: (
-              <DieCutSticker radius={1} elevation="l2" outlineColor="#d4cbb0">
+              <DieCutSticker
+                radius={1}
+                elevation="l2"
+                elevationHover="l4"
+                outlineColor="#d4cbb0"
+              >
                 <svg
                   viewBox="0 0 560 120"
                   className="w-[380px] max-w-full"
@@ -352,17 +425,19 @@ export default async function Home() {
           },
           {
             id: "est",
-            initialX: -33.1,
-            initialY: 403,
+            initialX: -32.7,
+            initialY: 6.2,
             initialRotate: 5,
             initialScale: 1.5,
-            initialZ: 132,
+            initialZ: 138,
             element: (
               <TextSticker
                 color="#be7184"
                 strokeWidth={7}
                 elevation="l2"
+                elevationHover="l4"
                 className="text-2xl uppercase -tracking-[3px]"
+                peel={{}}
               >
                 Est 2023
               </TextSticker>
@@ -371,12 +446,17 @@ export default async function Home() {
           {
             id: "audience",
             initialX: 21.8,
-            initialY: 165,
+            initialY: -24.1,
             initialRotate: 8,
             initialScale: 0.8,
             initialZ: 126,
             element: (
-              <DieCutSticker radius={5} elevation="l2" outlineColor="white">
+              <DieCutSticker
+                radius={5}
+                elevation="l2"
+                elevationHover="l4"
+                outlineColor="white"
+              >
                 <div
                   className="flex items-center justify-center overflow-hidden rounded-sm"
                   style={{ backgroundColor: "#6672ab" }}
@@ -394,14 +474,19 @@ export default async function Home() {
           },
           {
             id: "events",
-            initialX: 17.3,
-            initialY: 390,
+            initialX: 16.8,
+            initialY: 4.5,
             initialRotate: -8,
             initialScale: 1.1,
-            initialZ: 133,
+            initialZ: 136,
             element:
               pastEventCount > 0 ? (
-                <DieCutSticker radius={2} elevation="l2" outlineColor="#b4731e">
+                <DieCutSticker
+                  radius={2}
+                  elevation="l2"
+                  elevationHover="l4"
+                  outlineColor="#b4731e"
+                >
                   <div className="flex items-center gap-2 rounded-lg bg-orange px-3 py-2">
                     <CountTicker
                       value={pastEventCount}

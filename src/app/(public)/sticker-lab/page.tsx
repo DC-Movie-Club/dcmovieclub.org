@@ -720,6 +720,108 @@ function RotatedFlap({
   );
 }
 
+interface SvgPeelProps {
+  src: string;
+  size?: number;
+  fold: number;
+  corner?: Corner;
+  duration?: number;
+}
+
+function SvgPeel({
+  src,
+  size = 280,
+  fold,
+  corner = "br",
+  duration = 500,
+}: SvgPeelProps) {
+  const rawId = useRef(Math.random().toString(36).slice(2, 9));
+  const id = rawId.current;
+  const animFold = useSmoothValue(fold, duration);
+  const p = animFold * 0.55;
+  const cut = p * size;
+
+  let frontPolygon = "";
+  let flapPolygon = "";
+  let reflectionMatrix = "";
+
+  switch (corner) {
+    case "br": {
+      const c = 2 * size - cut;
+      frontPolygon = `0,0 ${size},0 ${size},${size - cut} ${size - cut},${size} 0,${size}`;
+      flapPolygon = `${size - cut},${size} ${size},${size - cut} ${size - cut},${size - cut}`;
+      reflectionMatrix = `matrix(0 -1 -1 0 ${c} ${c})`;
+      break;
+    }
+    case "bl": {
+      const k = size - cut;
+      frontPolygon = `0,0 ${size},0 ${size},${size} ${cut},${size} 0,${size - cut}`;
+      flapPolygon = `0,${size - cut} ${cut},${size} ${cut},${size - cut}`;
+      reflectionMatrix = `matrix(0 1 1 0 ${-k} ${k})`;
+      break;
+    }
+    case "tr": {
+      const k = size - cut;
+      frontPolygon = `0,0 ${size - cut},0 ${size},${cut} ${size},${size} 0,${size}`;
+      flapPolygon = `${size - cut},0 ${size},${cut} ${size - cut},${cut}`;
+      reflectionMatrix = `matrix(0 1 1 0 ${k} ${-k})`;
+      break;
+    }
+    case "tl": {
+      frontPolygon = `${cut},0 ${size},0 ${size},${size} 0,${size} 0,${cut}`;
+      flapPolygon = `${cut},0 0,${cut} ${cut},${cut}`;
+      reflectionMatrix = `matrix(0 -1 -1 0 ${cut} ${cut})`;
+      break;
+    }
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ overflow: "visible" }}
+    >
+      <defs>
+        <clipPath id={`front-${id}`}>
+          <polygon points={frontPolygon} />
+        </clipPath>
+        <clipPath id={`flap-${id}`}>
+          <polygon points={flapPolygon} />
+        </clipPath>
+        <filter id={`drop-${id}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="3" floodOpacity="0.22" />
+        </filter>
+      </defs>
+
+      <g filter={`url(#drop-${id})`}>
+        <image
+          href={src}
+          x="0"
+          y="0"
+          width={size}
+          height={size}
+          preserveAspectRatio="xMidYMid meet"
+          clipPath={`url(#front-${id})`}
+        />
+      </g>
+
+      <g clipPath={`url(#flap-${id})`}>
+        <image
+          href={src}
+          x="0"
+          y="0"
+          width={size}
+          height={size}
+          preserveAspectRatio="xMidYMid meet"
+          transform={reflectionMatrix}
+          style={{ filter: "brightness(0.55) saturate(0.6)" }}
+        />
+      </g>
+    </svg>
+  );
+}
+
 interface PeelJsStyleProps {
   src: string;
   size?: number;
@@ -1004,6 +1106,46 @@ const peelAnglePresets = [
   { label: "↖", value: 135 },
 ];
 
+function HeroPeel({
+  mode,
+  peel,
+  corner,
+}: {
+  mode: Mode;
+  peel: number;
+  corner: Corner;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const [autoOpen, setAutoOpen] = useState(false);
+
+  useEffect(() => {
+    if (mode !== "auto") return;
+    const i = setInterval(() => setAutoOpen((o) => !o), 2400);
+    return () => clearInterval(i);
+  }, [mode]);
+
+  const effective =
+    mode === "manual" ? peel : mode === "hover" ? (hovered ? peel : 0) : autoOpen ? peel : 0;
+
+  return (
+    <div
+      className={cn(
+        "flex min-h-[400px] items-center justify-center rounded-2xl border border-charcoal/15 bg-background p-12",
+        mode === "hover" && "cursor-pointer",
+      )}
+      onMouseEnter={mode === "hover" ? () => setHovered(true) : undefined}
+      onMouseLeave={mode === "hover" ? () => setHovered(false) : undefined}
+    >
+      <SvgPeel
+        src="/images/dcmc-logo.png"
+        size={320}
+        fold={effective}
+        corner={corner}
+      />
+    </div>
+  );
+}
+
 export default function StickerLabPage() {
   const [peel, setPeel] = useState(0.5);
   const [peelAngle, setPeelAngle] = useState(45);
@@ -1126,6 +1268,168 @@ export default function StickerLabPage() {
           ))}
         </div>
       </div>
+
+      <section>
+        <HeroPeel mode={mode} peel={peel} corner={corner} />
+        <p className="mt-3 text-center font-sans text-xs text-muted-foreground">
+          Plain DCMC logo PNG with the peel applied directly. SVG masks +
+          reflection — flap silhouette follows the logo outline, no rectangle.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="mb-4 font-sans text-xs uppercase tracking-widest text-muted-foreground">
+          DieCutSticker integrated peel
+        </h2>
+        <p className="mb-4 font-sans text-xs text-muted-foreground">
+          The peel logic baked into the production{" "}
+          <code className="rounded bg-muted px-1">DieCutSticker</code>{" "}
+          component as an opt-in <code className="rounded bg-muted px-1">peel</code>{" "}
+          prop. The white outline filter still wraps the peeled silhouette.
+        </p>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <Swatch
+            title="Default (br, 50%)"
+            subtitle="peel={{src, size:200}} — controlled active driven by mode toggle."
+            mode={mode}
+            peel={peel}
+          >
+            {(p) => (
+              <DieCutSticker
+                radius={6}
+                elevation="l2"
+                peel={{
+                  src: "/images/dcmc-logo.png",
+                  size: 200,
+                  amount: peel,
+                  active: p > 0.01,
+                  corner,
+                }}
+              >
+                <div style={{ width: 200, height: 200 }} />
+              </DieCutSticker>
+            )}
+          </Swatch>
+
+          <Swatch
+            title="No outline"
+            subtitle="outlineColor=transparent — just the peel, no white border."
+            mode={mode}
+            peel={peel}
+          >
+            {(p) => (
+              <DieCutSticker
+                radius={0}
+                elevation="l2"
+                outlineColor="transparent"
+                peel={{
+                  src: "/images/dcmc-logo.png",
+                  size: 200,
+                  amount: peel,
+                  active: p > 0.01,
+                  corner,
+                }}
+              >
+                <div style={{ width: 200, height: 200 }} />
+              </DieCutSticker>
+            )}
+          </Swatch>
+
+          <Swatch
+            title="Always-on (active: true)"
+            subtitle="Force-triggered, ignores hover. Controlled externally — useful for static decoration."
+            mode={mode}
+            peel={peel}
+          >
+            {() => (
+              <DieCutSticker
+                radius={6}
+                elevation="l2"
+                peel={{
+                  src: "/images/dcmc-logo.png",
+                  size: 200,
+                  amount: peel,
+                  active: true,
+                  corner,
+                }}
+              >
+                <div style={{ width: 200, height: 200 }} />
+              </DieCutSticker>
+            )}
+          </Swatch>
+
+          <Swatch
+            title="Slow (1.2s)"
+            subtitle="duration: 1200 — eased tween via the internal useSmoothValue hook."
+            mode={mode}
+            peel={peel}
+          >
+            {(p) => (
+              <DieCutSticker
+                radius={6}
+                elevation="l2"
+                peel={{
+                  src: "/images/dcmc-logo.png",
+                  size: 200,
+                  amount: peel,
+                  duration: 1200,
+                  active: p > 0.01,
+                  corner,
+                }}
+              >
+                <div style={{ width: 200, height: 200 }} />
+              </DieCutSticker>
+            )}
+          </Swatch>
+
+          <Swatch
+            title="With tape"
+            subtitle="Existing tape prop still works alongside peel."
+            mode={mode}
+            peel={peel}
+          >
+            {(p) => (
+              <DieCutSticker
+                radius={6}
+                elevation="l2"
+                tape={{ type: "washi", position: "top" }}
+                peel={{
+                  src: "/images/dcmc-logo.png",
+                  size: 200,
+                  amount: peel,
+                  active: p > 0.01,
+                  corner,
+                }}
+              >
+                <div style={{ width: 200, height: 200 }} />
+              </DieCutSticker>
+            )}
+          </Swatch>
+
+          <Swatch
+            title="Audience PNG"
+            subtitle="Different source — same peel API."
+            mode={mode}
+            peel={peel}
+          >
+            {(p) => (
+              <DieCutSticker
+                radius={6}
+                elevation="l2"
+                peel={{
+                  src: "/images/audience-white.png",
+                  size: 220,
+                  amount: peel,
+                  active: p > 0.01,
+                  corner,
+                }}
+              >
+                <div style={{ width: 220, height: 220 }} />
+              </DieCutSticker>
+            )}
+          </Swatch>
+        </div>
+      </section>
 
       <section>
         <h2 className="mb-4 font-sans text-xs uppercase tracking-widest text-muted-foreground">

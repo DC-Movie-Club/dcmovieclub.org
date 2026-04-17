@@ -84,7 +84,7 @@ function FilmCard({
   );
 
   const cardClass = cn(
-    "group/card relative block w-full transition-transform",
+    "group/card relative block w-full rounded-lg transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rust",
     isSelected ? "-rotate-1 scale-105" : "hover:-rotate-1 hover:scale-105",
   );
 
@@ -137,7 +137,7 @@ function ReviewPanel({
     <div className="relative mt-5">
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[3px] border-charcoal bg-cream sketch"
+        className="absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-cream sketch"
       />
       <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:p-6 sm:pr-12">
         {review.posterUrl && (
@@ -182,7 +182,7 @@ function ReviewPanel({
         type="button"
         onClick={onClose}
         aria-label="Close review"
-        className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full text-charcoal/70 transition-colors hover:bg-charcoal/5 hover:text-charcoal hover:sketch-subtle-animated"
+        className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full text-charcoal/70 transition-colors hover:bg-charcoal/5 hover:text-charcoal hover:sketch-subtle-animated focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
       >
         <X size={18} />
       </button>
@@ -211,7 +211,7 @@ export function RecentlyWatchedRail({
           </h2>
         </div>
 
-        <div className="mt-6 flex gap-4 overflow-x-auto px-1 pt-3 pb-4 sm:gap-5 px-6">
+        <div className="mt-6 flex gap-4 overflow-x-auto px-6 pt-3 pb-4 sm:gap-5">
           {reviews.map((review) => (
             <FilmCard
               key={review.id}

@@ -1,5 +1,201 @@
-import { useId } from "react";
+"use client";
+
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+
+type Corner = "tl" | "tr" | "bl" | "br";
+
+export interface PeelConfig {
+  src?: string;
+  size?: number;
+  corner?: Corner;
+  amount?: number;
+  duration?: number;
+  active?: boolean;
+  backingColor?: string;
+}
+
+function useSmoothValue(target: number, duration: number) {
+  const [value, setValue] = useState(target);
+  const valueRef = useRef(target);
+  useEffect(() => {
+    const start = valueRef.current;
+    const startTime = performance.now();
+    let frame = 0;
+    const step = (now: number) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const v = start + (target - start) * eased;
+      valueRef.current = v;
+      setValue(v);
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [target, duration]);
+  return value;
+}
+
+function PeelImage({
+  src,
+  size,
+  fold,
+  corner,
+  duration,
+}: {
+  src: string;
+  size: number;
+  fold: number;
+  corner: Corner;
+  duration: number;
+}) {
+  const rawId = useId();
+  const id = rawId.replace(/:/g, "");
+  const animFold = useSmoothValue(fold, duration);
+  const p = animFold * 0.55;
+  const cut = p * size;
+
+  let frontPolygon = "";
+  let flapPolygon = "";
+  let reflectionMatrix = "";
+
+  switch (corner) {
+    case "br": {
+      const c = 2 * size - cut;
+      frontPolygon = `0,0 ${size},0 ${size},${size - cut} ${size - cut},${size} 0,${size}`;
+      flapPolygon = `${size - cut},${size} ${size},${size - cut} ${size - cut},${size - cut}`;
+      reflectionMatrix = `matrix(0 -1 -1 0 ${c} ${c})`;
+      break;
+    }
+    case "bl": {
+      const k = size - cut;
+      frontPolygon = `0,0 ${size},0 ${size},${size} ${cut},${size} 0,${size - cut}`;
+      flapPolygon = `0,${size - cut} ${cut},${size} ${cut},${size - cut}`;
+      reflectionMatrix = `matrix(0 1 1 0 ${-k} ${k})`;
+      break;
+    }
+    case "tr": {
+      const k = size - cut;
+      frontPolygon = `0,0 ${size - cut},0 ${size},${cut} ${size},${size} 0,${size}`;
+      flapPolygon = `${size - cut},0 ${size},${cut} ${size - cut},${cut}`;
+      reflectionMatrix = `matrix(0 1 1 0 ${k} ${-k})`;
+      break;
+    }
+    case "tl": {
+      frontPolygon = `${cut},0 ${size},0 ${size},${size} 0,${size} 0,${cut}`;
+      flapPolygon = `${cut},0 0,${cut} ${cut},${cut}`;
+      reflectionMatrix = `matrix(0 -1 -1 0 ${cut} ${cut})`;
+      break;
+    }
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ display: "block", overflow: "visible" }}
+    >
+      <defs>
+        <clipPath id={`peel-front-${id}`}>
+          <polygon points={frontPolygon} />
+        </clipPath>
+        <clipPath id={`peel-flap-${id}`}>
+          <polygon points={flapPolygon} />
+        </clipPath>
+      </defs>
+      <image
+        href={src}
+        x="0"
+        y="0"
+        width={size}
+        height={size}
+        preserveAspectRatio="xMidYMid meet"
+        clipPath={`url(#peel-front-${id})`}
+      />
+      <g clipPath={`url(#peel-flap-${id})`}>
+        <image
+          href={src}
+          x="0"
+          y="0"
+          width={size}
+          height={size}
+          preserveAspectRatio="xMidYMid meet"
+          transform={reflectionMatrix}
+          style={{ filter: "brightness(0.55) saturate(0.6)" }}
+        />
+      </g>
+    </svg>
+  );
+}
+
+function cssPeelClips(corner: Corner, cutPct: number) {
+  const c = `${cutPct}%`;
+  const r = `${100 - cutPct}%`;
+
+  switch (corner) {
+    case "br":
+      return {
+        front: `polygon(0% 0%, 100% 0%, 100% ${r}, ${r} 100%, 0% 100%)`,
+        flap: `polygon(${r} 100%, 100% ${r}, 100% 100%)`,
+        flapGradient: "linear-gradient(225deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 100%)",
+      };
+    case "bl":
+      return {
+        front: `polygon(0% 0%, 100% 0%, 100% 100%, ${c} 100%, 0% ${r})`,
+        flap: `polygon(0% ${r}, ${c} 100%, 0% 100%)`,
+        flapGradient: "linear-gradient(315deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 100%)",
+      };
+    case "tr":
+      return {
+        front: `polygon(0% 0%, ${r} 0%, 100% ${c}, 100% 100%, 0% 100%)`,
+        flap: `polygon(${r} 0%, 100% ${c}, 100% 0%)`,
+        flapGradient: "linear-gradient(135deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 100%)",
+      };
+    case "tl":
+      return {
+        front: `polygon(${c} 0%, 100% 0%, 100% 100%, 0% 100%, 0% ${c})`,
+        flap: `polygon(${c} 0%, 0% ${c}, 0% 0%)`,
+        flapGradient: "linear-gradient(45deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 100%)",
+      };
+  }
+}
+
+function CssPeel({
+  children,
+  fold,
+  corner,
+  duration,
+  backingColor = "#e8e5d8",
+}: {
+  children: React.ReactNode;
+  fold: number;
+  corner: Corner;
+  duration: number;
+  backingColor?: string;
+}) {
+  const animFold = useSmoothValue(fold, duration);
+  const cutPct = animFold * 30;
+  const clips = cssPeelClips(corner, cutPct);
+
+  return (
+    <div className="relative">
+      <div style={{ clipPath: clips.front }}>
+        {children}
+      </div>
+      {cutPct > 0 && (
+        <div
+          className="absolute inset-0"
+          style={{
+            clipPath: clips.flap,
+            backgroundColor: backingColor,
+            backgroundImage: clips.flapGradient,
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 const SHADOW_COLOR = "#6b2e06";
 
@@ -66,10 +262,12 @@ interface DieCutStickerProps {
   children: React.ReactNode;
   radius?: number;
   elevation?: Elevation;
+  elevationHover?: Elevation;
   outlineColor?: string;
   tape?: TapeConfig;
   rotate?: number;
   className?: string;
+  peel?: PeelConfig;
 }
 
 function buildFilterSvg(
@@ -172,23 +370,61 @@ export function DieCutSticker({
   children,
   radius = 4,
   elevation = "none",
+  elevationHover,
   outlineColor = "white",
   tape,
   rotate,
   className,
+  peel,
 }: DieCutStickerProps) {
   const rawId = useId();
-  const filterId = `die-cut${rawId.replace(/:/g, "")}`;
-  const layers = elevations[elevation].layers;
+  const baseFilterId = `die-cut${rawId.replace(/:/g, "")}`;
+  const hoverFilterId = `die-cut-hover${rawId.replace(/:/g, "")}`;
+  const baseLayers = elevations[elevation].layers;
+  const hoverLayers = elevationHover ? elevations[elevationHover].layers : null;
+
+  const [hovered, setHovered] = useState(false);
+  const peelEnabled = peel !== undefined;
+  const controlled = peelEnabled && peel.active !== undefined;
+  const peeledNow = controlled ? !!peel.active : hovered;
+  const fold = peelEnabled && peeledNow ? peel.amount ?? 0.5 : 0;
+
+  const needsHover = !!elevationHover || (peelEnabled && !controlled);
+  const activeFilterId = elevationHover && hovered ? hoverFilterId : baseFilterId;
 
   return (
     <div
       className={cn("relative inline-block select-none", className)}
       style={rotate ? { transform: `rotate(${rotate}deg)` } : undefined}
+      onMouseEnter={needsHover ? () => setHovered(true) : undefined}
+      onMouseLeave={needsHover ? () => setHovered(false) : undefined}
     >
-      <div dangerouslySetInnerHTML={{ __html: buildFilterSvg(filterId, radius, layers, outlineColor) }} />
-      <div className="pointer-events-none" style={{ filter: `url(#${filterId})` }}>
-        {children}
+      <div dangerouslySetInnerHTML={{
+        __html:
+          buildFilterSvg(baseFilterId, radius, baseLayers, outlineColor) +
+          (hoverLayers ? buildFilterSvg(hoverFilterId, radius, hoverLayers, outlineColor) : ""),
+      }} />
+      <div className="pointer-events-none" style={{ filter: `url(#${activeFilterId})` }}>
+        {peelEnabled && peel.src ? (
+          <PeelImage
+            src={peel.src}
+            size={peel.size ?? 200}
+            corner={peel.corner ?? "br"}
+            duration={peel.duration ?? 280}
+            fold={fold}
+          />
+        ) : peelEnabled ? (
+          <CssPeel
+            fold={fold}
+            corner={peel.corner ?? "br"}
+            duration={peel.duration ?? 280}
+            backingColor={peel.backingColor}
+          >
+            {children}
+          </CssPeel>
+        ) : (
+          children
+        )}
       </div>
       {tape && <Tape {...tape} />}
     </div>

@@ -50,7 +50,7 @@ export function ExpandableDescription({
             type="button"
             onClick={() => setExpanded((v) => !v)}
             className={cn(
-              "text-xs uppercase tracking-wider hover:underline hover:sketch-subtle-animated",
+              "rounded-sm text-xs uppercase tracking-wider hover:underline hover:sketch-subtle-animated focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream",
               actionClassName,
             )}
           >
