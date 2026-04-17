@@ -191,7 +191,7 @@ export function BottomNav() {
         <Link
           href={routes.home.href}
           className={cn(
-            "absolute left-1/2 -translate-x-1/2 transition-transform hover:scale-105",
+            "absolute mt-0.5 left-1/2 -translate-x-1/2 transition-transform hover:scale-105",
             LOGO_SIZE,
           )}
           {...logoHoverProps}

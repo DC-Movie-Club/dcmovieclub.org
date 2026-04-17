@@ -14,6 +14,7 @@ import { Link, ExternalLink } from "@/components/ui/link";
 import { socials } from "@/config/navigation";
 import type { CalendarEvent } from "@/types/event";
 import { DieCutSticker } from "@/components/DieCutSticker";
+import { RectSticker } from "@/components/RectSticker";
 import { TextSticker } from "@/components/TextSticker";
 import { CountTicker } from "@/components/CountTicker";
 import { HomeBackgroundArt } from "@/components/HomeBackgroundArt";
@@ -319,7 +320,7 @@ export default async function Home() {
             initialZ: 130,
             element: (
               <DieCutSticker
-                radius={2}
+                radius={3}
                 elevation="l2"
                 elevationHover="l4"
                 peel={{ src: "/images/dcmc-logo.png", size: 180 }}
@@ -342,15 +343,20 @@ export default async function Home() {
             initialScale: 1,
             initialZ: 134,
             element: (
-              <DieCutSticker
-                radius={1}
+              <RectSticker
+                width={380}
+                height={82}
+                borderColor="#d4cbb0"
+                borderWidth={5}
+                radius={8}
                 elevation="l2"
                 elevationHover="l4"
-                outlineColor="#d4cbb0"
+                peel={{ corner: "tr", backingColor: "#d4cbb0", amount: 0.06 }}
               >
                 <svg
                   viewBox="0 0 560 120"
-                  className="w-[380px] max-w-full"
+                  preserveAspectRatio="xMidYMid slice"
+                  className="block h-full w-full"
                   role="img"
                   aria-label="An inclusive and (mostly) unpretentious club to discuss movies and make friends!"
                 >
@@ -420,7 +426,7 @@ export default async function Home() {
                     for discussing movies and making friends!
                   </text>
                 </svg>
-              </DieCutSticker>
+              </RectSticker>
             ),
           },
           {
@@ -437,7 +443,6 @@ export default async function Home() {
                 elevation="l2"
                 elevationHover="l4"
                 className="text-2xl uppercase -tracking-[3px]"
-                peel={{}}
               >
                 Est 2023
               </TextSticker>
@@ -451,25 +456,35 @@ export default async function Home() {
             initialScale: 0.8,
             initialZ: 126,
             element: (
-              <DieCutSticker
-                radius={5}
+              <RectSticker
+                width={180}
+                height={250}
+                borderColor="white"
+                borderWidth={8}
+                radius={4}
                 elevation="l2"
                 elevationHover="l4"
-                outlineColor="white"
+                peel={{
+                  corner: "bl",
+                  backingColor: "white",
+                  amount: 0.06,
+                  startDelay: 1400,
+                  duration: 1800,
+                }}
               >
                 <div
-                  className="flex items-center justify-center overflow-hidden rounded-sm"
+                  className="relative flex h-full w-full items-center justify-center"
                   style={{ backgroundColor: "#6672ab" }}
                 >
                   <Image
                     src="/images/audience-white.png"
                     alt="Movie audience illustration"
-                    width={180}
-                    height={118}
-                    className="h-auto w-auto object-cover"
+                    fill
+                    sizes="150px"
+                    className="object-cover"
                   />
                 </div>
-              </DieCutSticker>
+              </RectSticker>
             ),
           },
           {
@@ -481,13 +496,17 @@ export default async function Home() {
             initialZ: 136,
             element:
               pastEventCount > 0 ? (
-                <DieCutSticker
-                  radius={2}
+                <RectSticker
+                  width={210}
+                  height={44}
+                  borderColor="#b4731e"
+                  borderWidth={4}
+                  radius={10}
                   elevation="l2"
                   elevationHover="l4"
-                  outlineColor="#b4731e"
+                  peel={{ corner: "br", backingColor: "#b4731e", amount: 0.06 }}
                 >
-                  <div className="flex items-center gap-2 rounded-lg bg-orange px-3 py-2">
+                  <div className="flex h-full w-full items-center gap-2 bg-orange px-3">
                     <CountTicker
                       value={pastEventCount}
                       behind={3}
@@ -497,7 +516,7 @@ export default async function Home() {
                       events and counting...
                     </span>
                   </div>
-                </DieCutSticker>
+                </RectSticker>
               ) : null,
           },
         ]}

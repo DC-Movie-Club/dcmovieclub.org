@@ -3,7 +3,8 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 
-const HOVER_SHADOW = "drop-shadow(0 8px 20px rgba(0,0,0,0.18)) drop-shadow(0 2px 6px rgba(0,0,0,0.1))";
+const HOVER_SHADOW =
+  "drop-shadow(0 8px 20px rgba(0,0,0,0.18)) drop-shadow(0 2px 6px rgba(0,0,0,0.1))";
 
 interface StickerPosition {
   x: number;
@@ -113,11 +114,7 @@ interface StickerConfig {
   element: React.ReactNode;
 }
 
-export function StickerPlayground({
-  stickers,
-}: {
-  stickers: StickerConfig[];
-}) {
+export function StickerPlayground({ stickers }: { stickers: StickerConfig[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const initialPositions = useMemo(
@@ -154,9 +151,7 @@ export function StickerPlayground({
 
   const handleReset = useCallback(() => {
     setPositions(initialPositions);
-    topZ.current = Math.max(
-      ...Object.values(initialPositions).map((p) => p.z),
-    );
+    topZ.current = Math.max(...Object.values(initialPositions).map((p) => p.z));
   }, [initialPositions]);
 
   const handleGrab = useCallback((id: string) => {
