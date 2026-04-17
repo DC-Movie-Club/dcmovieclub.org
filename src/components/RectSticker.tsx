@@ -68,9 +68,11 @@ function computePeelStyles({
   peel: number;
   borderRadius: number;
 }) {
-  const size = Math.sqrt(width * width + height * height);
-  const offsetTop = (size - height) / 2;
-  const offsetLeft = (size - width) / 2;
+  const r = (n: number) => Math.round(n * 1000) / 1000;
+
+  const size = r(Math.sqrt(width * width + height * height));
+  const offsetTop = r((size - height) / 2);
+  const offsetLeft = r((size - width) / 2);
 
   let rotationAngleFix = 90 - peelAngle;
   if (peelAngle > 90) rotationAngleFix = peelAngle - 90;
@@ -94,14 +96,14 @@ function computePeelStyles({
   const offsetBack = offset - size;
   const peelTranslate = (size - offset * 2) * peel;
 
-  const clipX = offset + peelTranslate;
+  const clipX = r(offset + peelTranslate);
   const frontFactor = -offset - peelTranslate;
-  const frontX = frontFactor * Math.cos(peelAngle * DEG);
-  const frontY = frontFactor * Math.sin(peelAngle * DEG);
+  const frontX = r(frontFactor * Math.cos(peelAngle * DEG));
+  const frontY = r(frontFactor * Math.sin(peelAngle * DEG));
 
   const backOs = offsetBack + peelTranslate;
-  const backX = backOs * Math.cos(angleFixBack * DEG);
-  const backY = backOs * Math.sin(angleFixBack * DEG);
+  const backX = r(backOs * Math.cos(angleFixBack * DEG));
+  const backY = r(backOs * Math.sin(angleFixBack * DEG));
 
   return {
     container: {
