@@ -179,7 +179,7 @@ export function StickerPlayground({ stickers }: { stickers: StickerConfig[] }) {
       {isDirty && (
         <button
           onClick={handleReset}
-          className="group/reset absolute top-4 right-4 z-[200] flex items-center gap-1.5 rounded-full border-2 border-charcoal bg-cream px-3 py-1.5 font-sans text-xs uppercase tracking-wide text-charcoal shadow-md sketch-subtle transition-transform hover:scale-105 hover:sketch-subtle-animated"
+          className="group/reset absolute top-4 right-4 z-200 flex items-center gap-1.5 rounded-full border-2 border-charcoal bg-cream px-3 py-1.5 font-sans text-xs uppercase tracking-wide text-charcoal shadow-md sketch-subtle transition-transform hover:scale-105 hover:sketch-subtle-animated"
         >
           <RotateCcw size={12} />
           Reset
@@ -188,7 +188,7 @@ export function StickerPlayground({ stickers }: { stickers: StickerConfig[] }) {
 
       <div
         ref={containerRef}
-        className="relative mx-auto h-[100svh] w-full overflow-visible [--sticker-scale:0.85] sm:[--sticker-scale:0.95] md:[--sticker-scale:1] lg:[--sticker-scale:1.1]"
+        className="relative mx-auto h-svh w-full overflow-visible [--sticker-scale:0.85] sm:[--sticker-scale:0.95] md:[--sticker-scale:1] lg:[--sticker-scale:1.1]"
       >
         {stickers.map((s) => {
           const pos = positions[s.id];
