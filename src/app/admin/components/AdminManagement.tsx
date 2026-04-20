@@ -10,10 +10,7 @@ import {
 } from "firebase/firestore";
 import useSWR from "swr";
 import { db } from "@/lib/firebase";
-import {
-  revokeAdminClaim,
-  getAdminUsers,
-} from "@/app/admin/actions/auth";
+import { revokeAdminClaim } from "@/app/admin/actions/auth";
 import { adminSWRKeys } from "@/app/admin/config";
 import { useAuth } from "@/app/admin/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -44,6 +41,20 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil } from "lucide-react";
 
+type AdminUsersResponse = {
+  phones: { phone: string; name: string; addedAt: string | null }[];
+  loginInfo: Record<
+    string,
+    { lastSignIn: string | null; created: string | null }
+  >;
+};
+
+async function fetchAdminUsers(): Promise<AdminUsersResponse> {
+  const res = await fetch("/api/admin/users");
+  if (!res.ok) throw new Error("Failed to load admins");
+  return res.json();
+}
+
 function toE164(input: string): string | null {
   let digits = input.replace(/\D/g, "");
   if (digits.length === 11 && digits.startsWith("1")) {
@@ -62,7 +73,7 @@ export function AdminManagement() {
   const { user } = useAuth();
   const { data, mutate } = useSWR(
     adminSWRKeys.adminUsers.swrKey,
-    getAdminUsers,
+    fetchAdminUsers,
     { suspense: true }
   );
   const [newPhone, setNewPhone] = useState("");
