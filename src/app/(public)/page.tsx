@@ -481,6 +481,7 @@ export default async function Home() {
                     alt="Movie audience illustration"
                     fill
                     sizes="150px"
+                    priority
                     className="object-cover"
                   />
                 </div>

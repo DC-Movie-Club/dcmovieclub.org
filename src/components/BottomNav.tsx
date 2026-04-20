@@ -201,6 +201,7 @@ export function BottomNav() {
             alt="DC Movie Club"
             width={NAV_LOGO_SIZE}
             height={NAV_LOGO_SIZE}
+            priority
             className={cn(LOGO_SIZE, logoHovered && "sketch-subtle-animated")}
           />
         </Link>
