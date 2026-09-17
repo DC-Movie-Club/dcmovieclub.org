@@ -12,9 +12,9 @@ import {
   COMMAND_PRIORITY_LOW,
 } from "lexical";
 import { $isCodeNode } from "@lexical/code";
-import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
+import { $isLinkNode } from "@lexical/link";
 import { $findMatchingParent } from "@lexical/utils";
-import { Bold, Italic, Link as LinkIcon, Unlink } from "lucide-react";
+import { Bold, Italic, Link as LinkIcon } from "lucide-react";
 import { insertLink } from "@/app/admin/components/FloatingLinkEditorPlugin";
 import { cn } from "@/lib/utils";
 
@@ -132,10 +132,10 @@ export function FloatingTextFormatToolbar({
       {format.link ? (
         <FormatButton
           active
-          label="Remove link"
-          onClick={() => editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)}
+          label="Edit link"
+          onClick={() => setIsLinkEditMode(true)}
         >
-          <Unlink className="size-3.5" />
+          <LinkIcon className="size-3.5" />
         </FormatButton>
       ) : (
         <FormatButton

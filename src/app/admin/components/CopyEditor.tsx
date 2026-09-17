@@ -5,8 +5,10 @@ import Link from "next/link";
 import { diffWords, type Change } from "diff";
 import {
   $createParagraphNode,
+  $getRoot,
   $getSelection,
   $isRangeSelection,
+  createEditor,
   FORMAT_TEXT_COMMAND,
 } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -79,14 +81,13 @@ import {
   INSERT_DETAILS_COMMAND,
 } from "@/app/admin/components/DetailsNode";
 import {
-  INSERT_YOUTUBE_COMMAND,
+  InsertYouTubeDialog,
   YOUTUBE,
   YouTubeNode,
   YouTubePlugin,
 } from "@/app/admin/components/YouTubeNode";
 import { Youtube } from "@/components/icons/Youtube";
 import { markdownStyles } from "@/components/markdownStyles";
-import { parseYouTubeId } from "@/lib/youtube";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -120,6 +121,33 @@ const SHORTCUT_TRANSFORMERS = [
 // answers can contain any other block.
 const DETAILS = createDetailsTransformer(() => TRANSFORMERS);
 const TRANSFORMERS = [DETAILS, YOUTUBE, ...SHORTCUT_TRANSFORMERS];
+
+const NODES = [
+  HeadingNode,
+  QuoteNode,
+  ListNode,
+  ListItemNode,
+  LinkNode,
+  AutoLinkNode,
+  YouTubeNode,
+  DetailsNode,
+  DetailsSummaryNode,
+  DetailsContentNode,
+];
+
+// The conflict diff compares text the way admins see it, without markdown syntax
+function markdownToPlainText(markdown: string): string {
+  const editor = createEditor({
+    nodes: NODES,
+    onError: (e) => {
+      throw e;
+    },
+  });
+  editor.update(() => $convertFromMarkdownString(markdown, TRANSFORMERS), {
+    discrete: true,
+  });
+  return editor.getEditorState().read(() => $getRoot().getTextContent());
+}
 
 const HEADING_LABEL = cn(
   markdownStyles.h2,
@@ -177,16 +205,7 @@ function Toolbar({
     });
   };
 
-  const promptYouTube = () => {
-    const url = window.prompt("Paste a YouTube link");
-    if (!url) return;
-    const videoId = parseYouTubeId(url);
-    if (!videoId) {
-      window.alert("That doesn't look like a YouTube video link.");
-      return;
-    }
-    editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, videoId);
-  };
+  const [isYouTubeDialogOpen, setIsYouTubeDialogOpen] = useState(false);
 
   return (
     <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-b bg-card px-3 py-2">
@@ -229,12 +248,16 @@ function Toolbar({
       <ToolbarButton
         icon={<Youtube />}
         label="YouTube video"
-        onClick={promptYouTube}
+        onClick={() => setIsYouTubeDialogOpen(true)}
       />
       <ToolbarButton
         icon={<ListCollapse />}
         label="Collapsible"
         onClick={() => editor.dispatchCommand(INSERT_DETAILS_COMMAND, undefined)}
+      />
+      <InsertYouTubeDialog
+        open={isYouTubeDialogOpen}
+        onOpenChange={setIsYouTubeDialogOpen}
       />
     </div>
   );
@@ -318,7 +341,10 @@ export function CopyEditor({
       } else {
         setConflict({
           theirs: result.conflict,
-          diff: diffWords(result.conflict.content, markdown),
+          diff: diffWords(
+            markdownToPlainText(result.conflict.content),
+            markdownToPlainText(markdown)
+          ),
         });
       }
     } catch {
@@ -359,18 +385,7 @@ export function CopyEditor({
   const initialConfig = {
     namespace: `copy-${slot.key}`,
     theme: themeFor(slot),
-    nodes: [
-      HeadingNode,
-      QuoteNode,
-      ListNode,
-      ListItemNode,
-      LinkNode,
-      AutoLinkNode,
-      YouTubeNode,
-      DetailsNode,
-      DetailsSummaryNode,
-      DetailsContentNode,
-    ],
+    nodes: NODES,
     editorState: () => $convertFromMarkdownString(saved.content, TRANSFORMERS),
     onError: (e: Error) => {
       throw e;

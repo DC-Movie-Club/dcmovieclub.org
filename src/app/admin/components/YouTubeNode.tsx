@@ -2,7 +2,7 @@
 
 // Adapted from the Lexical playground's YouTubeNode and YouTubePlugin (v0.43.0)
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { JSX } from "react";
 import {
   COMMAND_PRIORITY_EDITOR,
@@ -24,7 +24,17 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $insertNodeToNearestRoot } from "@lexical/utils";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { markdownStyles } from "@/components/markdownStyles";
-import { youTubeWatchUrl } from "@/lib/youtube";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { parseYouTubeId, youTubeWatchUrl } from "@/lib/youtube";
 
 export type SerializedYouTubeNode = Spread<
   { videoID: string },
@@ -120,6 +130,72 @@ export const YOUTUBE: ElementTransformer = {
 export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand(
   "INSERT_YOUTUBE_COMMAND"
 );
+
+// Adapted from the playground's AutoEmbedDialog: Embed stays disabled until the link parses
+export function InsertYouTubeDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [editor] = useLexicalComposerContext();
+  const [text, setText] = useState("");
+  const videoId = parseYouTubeId(text);
+
+  const close = () => {
+    setText("");
+    onOpenChange(false);
+  };
+
+  const embed = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!videoId) return;
+    editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, videoId);
+    close();
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) close();
+      }}
+    >
+      <DialogContent>
+        <form onSubmit={embed} className="flex flex-col gap-4">
+          <DialogHeader>
+            <DialogTitle>Embed YouTube video</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="youtube-url">Video link</Label>
+            <Input
+              id="youtube-url"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              placeholder="https://www.youtube.com/watch?v=…"
+              aria-invalid={text.trim() !== "" && !videoId}
+              autoFocus
+            />
+            {text.trim() !== "" && !videoId && (
+              <p className="text-xs text-destructive">
+                That doesn&apos;t look like a YouTube video link.
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={close}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!videoId}>
+              Embed
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function YouTubePlugin(): null {
   const [editor] = useLexicalComposerContext();
