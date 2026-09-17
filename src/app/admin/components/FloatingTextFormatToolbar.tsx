@@ -15,11 +15,16 @@ import { $isCodeNode } from "@lexical/code";
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
 import { $findMatchingParent } from "@lexical/utils";
 import { Bold, Italic, Link as LinkIcon, Unlink } from "lucide-react";
+import { insertLink } from "@/app/admin/components/FloatingLinkEditorPlugin";
 import { cn } from "@/lib/utils";
 
 type Position = { top: number; left: number };
 
-export function FloatingTextFormatToolbar() {
+export function FloatingTextFormatToolbar({
+  setIsLinkEditMode,
+}: {
+  setIsLinkEditMode: (isLinkEditMode: boolean) => void;
+}) {
   const [editor] = useLexicalComposerContext();
   const isEditable = useLexicalEditable();
   const [position, setPosition] = useState<Position | null>(null);
@@ -102,12 +107,6 @@ export function FloatingTextFormatToolbar() {
 
   if (!position || !isEditable) return null;
 
-  const promptLink = () => {
-    const url = window.prompt("Enter URL");
-    if (url === null) return;
-    editor.dispatchCommand(TOGGLE_LINK_COMMAND, url.trim() || null);
-  };
-
   return createPortal(
     <div
       ref={ref}
@@ -139,7 +138,10 @@ export function FloatingTextFormatToolbar() {
           <Unlink className="size-3.5" />
         </FormatButton>
       ) : (
-        <FormatButton label="Link" onClick={promptLink}>
+        <FormatButton
+          label="Link"
+          onClick={() => insertLink(editor, setIsLinkEditMode)}
+        >
           <LinkIcon className="size-3.5" />
         </FormatButton>
       )}

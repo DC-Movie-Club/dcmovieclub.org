@@ -21,11 +21,8 @@ import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
-import { LinkNode, AutoLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
-import {
-  AutoLinkPlugin,
-  createLinkMatcherWithRegExp,
-} from "@lexical/react/LexicalAutoLinkPlugin";
+import { LinkNode, AutoLinkNode } from "@lexical/link";
+import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin";
 import { ClickableLinkPlugin } from "@lexical/react/LexicalClickableLinkPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
@@ -61,6 +58,13 @@ import {
 import { TableActionMenuPlugin } from "@/app/admin/components/TableActionMenu";
 import { FloatingTextFormatToolbar } from "@/app/admin/components/FloatingTextFormatToolbar";
 import {
+  FloatingLinkEditorPlugin,
+  insertLink,
+} from "@/app/admin/components/FloatingLinkEditorPlugin";
+import { DiffView } from "@/app/admin/components/DiffView";
+import { ToolbarButton } from "@/app/admin/components/ToolbarButton";
+import { LINK_MATCHERS } from "@/app/admin/components/linkMatchers";
+import {
   getResources,
   saveResources,
   type ResourcesDoc,
@@ -85,7 +89,6 @@ import {
   ListOrdered,
   ListChecks,
   Link as LinkIcon,
-  Unlink,
   Pilcrow,
   Info,
   Code as CodeIcon,
@@ -124,18 +127,6 @@ const theme = {
   tableCell: "editor-table-cell",
   tableCellHeader: "editor-table-cell editor-table-cell-header",
 };
-
-const URL_REGEX =
-  /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
-const EMAIL_REGEX =
-  /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
-
-const LINK_MATCHERS = [
-  createLinkMatcherWithRegExp(URL_REGEX, (text) =>
-    text.startsWith("http") ? text : `https://${text}`
-  ),
-  createLinkMatcherWithRegExp(EMAIL_REGEX, (text) => `mailto:${text}`),
-];
 
 function extractPlainText(serialized: string): string {
   if (!serialized) return "";
@@ -177,7 +168,11 @@ function EditableController({ editable }: { editable: boolean }) {
   return null;
 }
 
-function Toolbar() {
+function Toolbar({
+  setIsLinkEditMode,
+}: {
+  setIsLinkEditMode: (isLinkEditMode: boolean) => void;
+}) {
   const [editor] = useLexicalComposerContext();
 
   const format = (tag: "h1" | "h2" | "p" | "quote") => {
@@ -191,12 +186,6 @@ function Toolbar() {
         return $createParagraphNode();
       });
     });
-  };
-
-  const promptLink = () => {
-    const url = window.prompt("Enter URL");
-    if (url === null) return;
-    editor.dispatchCommand(TOGGLE_LINK_COMMAND, url.trim() || null);
   };
 
   return (
@@ -298,60 +287,12 @@ function Toolbar() {
       <ToolbarButton
         icon={<LinkIcon />}
         label="Link"
-        onClick={promptLink}
-      />
-      <ToolbarButton
-        icon={<Unlink />}
-        label="Remove link"
-        onClick={() =>
-          editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
-        }
+        onClick={() => insertLink(editor, setIsLinkEditMode)}
       />
     </div>
   );
 }
 
-function ToolbarButton({
-  icon,
-  label,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon-xs"
-      aria-label={label}
-      title={label}
-      onMouseDown={(e) => e.preventDefault()}
-      onClick={onClick}
-    >
-      {icon}
-    </Button>
-  );
-}
-
-function DiffView({ diff }: { diff: Change[] }) {
-  return (
-    <pre className="whitespace-pre-wrap break-words text-xs border rounded bg-muted/50 p-3 max-h-72 overflow-auto">
-      {diff.map((part, i) => (
-        <span
-          key={i}
-          className={cn(
-            part.added && "bg-green-500/20",
-            part.removed && "bg-red-500/20 line-through"
-          )}
-        >
-          {part.value}
-        </span>
-      ))}
-    </pre>
-  );
-}
 
 export function ResourcesEditor({
   initialData,
@@ -377,6 +318,9 @@ export function ResourcesEditor({
     diff: Change[];
   } | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const [floatingAnchorElem, setFloatingAnchorElem] =
+    useState<HTMLDivElement | null>(null);
+  const [isLinkEditMode, setIsLinkEditMode] = useState(false);
   const editorRef = useRef<LexicalEditor | null>(null);
 
   const baseline = data;
@@ -548,8 +492,8 @@ export function ResourcesEditor({
               : "border-transparent px-0 py-0"
           )}
         >
-          {isEditing && <Toolbar />}
-          <div className="relative">
+          {isEditing && <Toolbar setIsLinkEditMode={setIsLinkEditMode} />}
+          <div ref={setFloatingAnchorElem} className="relative">
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
@@ -575,7 +519,14 @@ export function ResourcesEditor({
         <CheckListPlugin />
         <TablePlugin hasCellBackgroundColor={false} />
         <TableActionMenuPlugin />
-        <FloatingTextFormatToolbar />
+        <FloatingTextFormatToolbar setIsLinkEditMode={setIsLinkEditMode} />
+        {floatingAnchorElem && (
+          <FloatingLinkEditorPlugin
+            anchorElem={floatingAnchorElem}
+            isLinkEditMode={isLinkEditMode}
+            setIsLinkEditMode={setIsLinkEditMode}
+          />
+        )}
         <HorizontalRulePlugin />
         <AutoLinkPlugin matchers={LINK_MATCHERS} />
         <ClickableLinkPlugin />

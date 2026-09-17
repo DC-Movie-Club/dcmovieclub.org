@@ -16,7 +16,7 @@ export function AdminNav() {
           href={href}
           className={cn(
             "border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
-            pathname === href
+            pathname.startsWith(href)
               ? "border-foreground text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"
           )}
