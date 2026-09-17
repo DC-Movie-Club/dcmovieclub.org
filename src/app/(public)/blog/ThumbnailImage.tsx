@@ -7,19 +7,29 @@ import { cn } from "@/lib/utils";
 type Props = {
   src: string;
   blurDataUrl: string | null;
+  sizes: string;
+  priority?: boolean;
+  className?: string;
 };
 
-export function ThumbnailImage({ src, blurDataUrl }: Props) {
+export function ThumbnailImage({
+  src,
+  blurDataUrl,
+  sizes,
+  priority,
+  className,
+}: Props) {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className="relative aspect-wide w-full shrink-0 overflow-hidden rounded-lg sm:aspect-square sm:w-36">
+    <div className={cn("relative overflow-hidden", className)}>
       <Image
         src={src}
         alt=""
         fill
-        sizes="(min-width: 640px) 144px, 100vw"
-        className="object-cover transition-transform group-hover/post:scale-105"
+        sizes={sizes}
+        priority={priority}
+        className="object-cover"
         onLoad={() => setLoaded(true)}
       />
       {blurDataUrl && (

@@ -1,6 +1,6 @@
 import type { CalendarEvent } from "@/types/event"
 
-const TIME_ZONE = "America/New_York"
+export const TIME_ZONE = "America/New_York"
 
 // All-day starts are bare dates ("2026-10-06") that parse as UTC midnight,
 // so formatting them in Eastern time would roll back to the previous day.
