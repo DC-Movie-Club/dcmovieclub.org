@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ["127.0.0.1"],
+  // LAN addresses and Bonjour names let a phone load the dev server; without
+  // them the page renders but never hydrates
+  allowedDevOrigins: ["127.0.0.1", "192.168.*.*", "*.local"],
   devIndicators: false,
   headers: async () => [
     {

@@ -35,30 +35,35 @@ export function BottomNav() {
   }, [pathname]);
 
   const itemHoverProps = {
-    onMouseEnter: () => setHovered(true),
-    onMouseLeave: () => setHovered(false),
+    onPointerEnter: () => setHovered(true),
+    onPointerLeave: () => setHovered(false),
   };
 
   const logoHoverProps = {
-    onMouseEnter: () => {
+    onPointerEnter: () => {
       setHovered(true);
       setLogoHovered(true);
     },
-    onMouseLeave: () => {
+    onPointerLeave: () => {
       setHovered(false);
       setLogoHovered(false);
     },
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in select-none motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
       <div className="relative flex items-center justify-center gap-4 px-4 py-2 xs:px-6 xs:py-3">
-        <div
-          className={cn(
-            "absolute inset-0 border-t-2 border-charcoal/20 bg-surface sketch xs:border-2 xs:rounded-full",
-            hovered && "sketch-animated",
-          )}
-        />
+        {/* Full-width on phones, the bar runs past the screen edges so the
+            sketch filter's wobble can't open a gap along them. The wrapper
+            clips that overhang without clipping the logo. */}
+        <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
+          <div
+            className={cn(
+              "absolute -inset-x-2 top-2 bottom-0 border-t-2 border-charcoal/20 bg-surface sketch xs:inset-0 xs:border-2 xs:rounded-full",
+              hovered && "sketch-animated",
+            )}
+          />
+        </div>
         <NavLink
           route={routes.blog}
           active={pathname === routes.blog.href}
@@ -217,13 +222,13 @@ const WATERCOLOR_CLASSES = [
 function NavLink({
   route,
   active,
-  onMouseEnter,
-  onMouseLeave,
+  onPointerEnter,
+  onPointerLeave,
 }: {
   route: (typeof routes)[keyof typeof routes];
   active: boolean;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
 }) {
   const Icon = route.icon;
   return (
@@ -236,8 +241,8 @@ function NavLink({
           ? "text-logo-red"
           : "text-foreground hover:scale-110 hover:text-rust",
       )}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     >
       <Icon
         className={cn(

@@ -1,7 +1,7 @@
 import { Children } from "react";
 import type { Components, ExtraProps } from "react-markdown";
 import { cn } from "@/lib/utils";
-import { CardSurface } from "@/components/CreamCard";
+import { CardSurface } from "@/components/CardSurface";
 
 function textContent(node: ExtraProps["node"]): string {
   if (!node) return "";

@@ -1,4 +1,5 @@
 import { BottomNav } from "@/components/BottomNav";
+import { PageReveal } from "@/components/PageReveal";
 import { SketchFilter } from "@/components/SketchFilter";
 import { WatercolorFilter } from "@/components/WatercolorFilter";
 
@@ -13,6 +14,7 @@ export default function PublicLayout({
       <WatercolorFilter />
       <main className="pb-24 animate-page-fade-in">{children}</main>
       <BottomNav />
+      <PageReveal />
     </div>
   );
 }

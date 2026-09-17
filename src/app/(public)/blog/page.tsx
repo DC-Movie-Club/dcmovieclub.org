@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 import { getRecentPosts } from "@/lib/data";
 import { TIME_ZONE } from "@/lib/event-format";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
-import { CardSurface, CreamCard } from "@/components/CreamCard";
+import { CardSurface } from "@/components/CardSurface";
+import { CreamCard } from "@/components/CreamCard";
 import type { SubstackPost } from "@/types/post";
 import { ThumbnailImage } from "./ThumbnailImage";
 
@@ -74,7 +75,7 @@ function OpensOverlay({
 function LatestPostCard({ post }: { post: SubstackPost }) {
   return (
     <div className="group/card relative">
-      <CardSurface className="card-hover:border-rose-dark" />
+      <CardSurface className="card-hover:stroke-rose-dark" />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
           focusable CTA, so this one stays out of the tab order. */}

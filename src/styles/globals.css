@@ -4,9 +4,31 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tailwind only applies hover on devices that can hover; :active gives touch
+   screens the same styles while a finger is down. group-hover builds on this. */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &:active {
+    @slot;
+  }
+}
+
 /* Hover styles for a clickable card that stay off while pointing at a button
    inside it (e.g. an inline "Read more" toggle), which does its own thing. */
-@custom-variant card-hover (&:is(:where(.group\/card):hover:not(:has(button:hover)) *));
+@custom-variant card-hover {
+  @media (hover: hover) {
+    &:is(:where(.group\/card):hover:not(:has(button:hover)) *) {
+      @slot;
+    }
+  }
+  &:is(:where(.group\/card):active:not(:has(button:active)) *) {
+    @slot;
+  }
+}
 
 @font-face {
   font-family: "DCMC";
@@ -35,11 +57,12 @@
     }
   }
 
-  /* Easing is a sampled underdamped spring (~8% overshoot). Fill is backwards,
-     not both, so no transform lingers on the fixed nav once it lands. */
-  --animate-nav-spring-in: nav-spring-in 900ms
-    linear(0, 0.057 3%, 0.195 7%, 0.368 10%, 0.545 13%, 0.706 17%, 0.84 20%, 0.942 23%, 1.013 27%, 1.056 30%, 1.078 33%, 1.083 37%, 1.078 40%, 1.066 43%, 1.052 47%, 1.037 50%, 1.024 53%, 1.013 57%, 1.004 60%, 0.999 63%, 0.994 73%, 1)
-    380ms backwards;
+  /* A cubic-bezier with ~4% overshoot stands in for a spring: Safari versions
+     without threaded animations run linear() easing on the main thread, where
+     it stutters while the page paints. Fill is backwards, not both, so no
+     transform lingers on the fixed nav once it lands. */
+  --animate-nav-spring-in: nav-spring-in 500ms cubic-bezier(0.3, 1.35, 0.5, 1)
+    150ms backwards;
 
   @keyframes nav-spring-in {
     from {
@@ -134,12 +157,24 @@ html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+}
+
 body {
   font-family: var(--font-dcmc);
   background-color: var(--color-background);
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Entrances wait on their first frame (page transparent, nav offscreen) while
+   the root layout's script marks the document as loading; see PageReveal */
+html[data-loading] .animate-page-fade-in,
+html[data-loading] .animate-nav-spring-in {
+  animation-play-state: paused;
 }
 
 @utility h-screen-mobile {

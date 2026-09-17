@@ -87,18 +87,18 @@ export default async function Home() {
     <div className="flex flex-col gap-10 pb-10">
       <section className="flex flex-col items-center pt-8">
         <AudienceMarquee />
-        <h1 className="relative -mt-4 px-4 text-center text-[15vw] whitespace-nowrap uppercase leading-none text-teal sm:-mt-9 sm:text-8xl">
+        <h1 className="relative -mt-4 px-4 text-center text-[3.5rem] whitespace-nowrap uppercase leading-none text-teal max-[349px]:text-5xl sm:-mt-9 sm:text-8xl">
           DC Movie Club
         </h1>
-        <p className="mt-5 flex flex-col items-center px-4 text-center text-base uppercase tracking-wide text-cream sm:mt-7 sm:text-xl">
+        <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-cream sm:mt-7 sm:gap-1 sm:text-xl">
           <TaglineBanner className="-rotate-2">
             DC’s inclusive and
             <span className="max-sm:hidden"> (mostly) unpretentious community</span>
           </TaglineBanner>
-          <TaglineBanner className="rotate-2 sm:hidden">
+          <TaglineBanner className="rotate-1 sm:hidden">
             (mostly) unpretentious community
           </TaglineBanner>
-          <TaglineBanner className="-rotate-3 sm:rotate-2">
+          <TaglineBanner className="-rotate-1 sm:rotate-[1.5deg]">
             to discuss movies and make friends!
           </TaglineBanner>
         </p>

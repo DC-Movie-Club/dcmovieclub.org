@@ -6,7 +6,7 @@ import { EventTime } from "@/components/EventTime";
 import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { CalendarDate } from "@/components/events/CalendarDate";
 import { getEventCta, getMapUrl } from "@/components/events/event-links";
-import { CardSurface } from "@/components/CreamCard";
+import { CardSurface } from "@/components/CardSurface";
 import type { CalendarEvent } from "@/types/event";
 
 // TODO: detect if the featured event is sold out via Ticket Tailor API and
@@ -20,7 +20,7 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
 
   return (
     <div className="group/card relative">
-      <CardSurface className={cn(cta && "card-hover:border-orange-dark")} />
+      <CardSurface className={cn(cta && "card-hover:stroke-orange-dark")} />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
           focusable CTA, so this one stays out of the tab order. */}
