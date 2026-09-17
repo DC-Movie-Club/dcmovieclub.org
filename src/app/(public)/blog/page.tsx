@@ -60,7 +60,7 @@ function OpensOverlay({
         className,
       )}
     >
-      <div className={cn("absolute inset-0 bg-sky-dark/80", washClassName)} />
+      <div className={cn("absolute inset-0 bg-rose-dark/80", washClassName)} />
       <ArrowUpRight
         size={32}
         strokeWidth={2.5}
@@ -75,7 +75,7 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
     <div className="group/card relative">
       <div
         aria-hidden
-        className="absolute inset-0 rounded-2xl border-[3px] border-charcoal bg-cream shadow-xl transition-colors sketch card-hover:border-sky-dark"
+        className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl transition-colors sketch card-hover:border-rose-dark"
       />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
@@ -91,7 +91,7 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
 
       <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
         <span
-          className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream [--outline-ink:var(--color-charcoal)] card-hover:[--outline-ink:var(--color-sky-dark)] sm:text-5xl"
+          className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outline-ink-page-ink card-hover:outline-ink-rose-dark sm:text-5xl"
           style={outlinedTextStyle}
         >
           Latest
@@ -139,9 +139,9 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
       >
         <span
           aria-hidden
-          className="absolute inset-0 rounded-full border-[3px] border-sky-dark bg-sky shadow-lg sketch card-hover:sketch-animated"
+          className="absolute inset-0 rounded-full border-[3px] border-rose-dark bg-rose shadow-lg sketch card-hover:sketch-animated"
         />
-        <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-sky-dark sm:px-6 sm:py-3 sm:text-base">
+        <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-rose-dark sm:px-6 sm:py-3 sm:text-base">
           <span className="sm:hidden">Read</span>
           <span className="hidden sm:inline">Read on Substack</span>
           <ArrowUpRight size={18} className="shrink-0" />
@@ -161,7 +161,7 @@ function PostTile({ post }: { post: SubstackPost }) {
     >
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-charcoal bg-cream transition-colors sketch group-hover/tile:border-sky-dark"
+        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream transition-colors sketch group-hover/tile:border-rose-dark"
       />
       <div
         className={cn(
@@ -204,12 +204,12 @@ export default async function Blog() {
   return (
     // The negative margin cancels the layout's bottom padding (reserved for the
     // nav) so the color runs to the bottom edge; pb-36 re-adds that clearance.
-    <div className="-mb-24 min-h-screen bg-rose-dusty px-6 pt-14 pb-36 sm:pt-20">
+    <div className="-mb-24 min-h-screen bg-charcoal page-ink-rose page-edge-charcoal-light px-6 pt-14 pb-36 sm:pt-20">
       <div className="mx-auto flex max-w-3xl flex-col gap-14">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-4">
             <h1
-              className="text-5xl uppercase leading-none tracking-wide text-cream [--outline-ink:var(--color-charcoal)] sm:text-6xl"
+              className="text-5xl uppercase leading-none tracking-wide text-cream outline-ink-rose sm:text-6xl"
               style={outlinedTextStyle}
             >
               Blog
@@ -241,7 +241,7 @@ export default async function Blog() {
           <div className="relative">
             <div
               aria-hidden
-              className="absolute inset-0 rounded-2xl border-[3px] border-charcoal bg-cream shadow-xl sketch"
+              className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl sketch"
             />
             <p className="relative px-6 py-8 text-center text-lg uppercase tracking-wide text-charcoal/80">
               No posts yet. Check back soon!

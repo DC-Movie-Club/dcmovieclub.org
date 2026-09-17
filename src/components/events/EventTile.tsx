@@ -14,7 +14,7 @@ export function EventTile({ event }: { event: CalendarEvent }) {
     <>
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-charcoal bg-cream sketch"
+        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream sketch"
       />
       <div className="relative grid h-full grid-cols-[auto_1fr_auto] items-center gap-x-4 px-4 py-3 sm:grid-cols-[1fr_auto] sm:grid-rows-[auto_1fr] sm:items-start sm:gap-y-2 sm:p-4">
         <CalendarDate

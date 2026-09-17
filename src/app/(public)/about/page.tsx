@@ -1,17 +1,118 @@
-{/* About DC Movie Club: mission, story, how to get involved.
-    Will include photos, links to socials (Instagram, Discord, Substack),
-    and info on volunteering/joining. Static content, Abbie will provide copy. */}
+import { Children } from "react";
+import NextLink from "next/link";
+import type { Components } from "react-markdown";
+import { ArrowRight, Plus } from "lucide-react";
+import { Markdown } from "@/components/Markdown";
+import { sectionCardOverrides } from "@/components/section-cards";
+import { outlinedTextStyle } from "@/components/events/outlined-text";
+import { copySlots } from "@/config/copy";
+import { cn } from "@/lib/utils";
+import { getCopy } from "@/lib/copy";
 
-export default function About() {
+const aboutOverrides = sectionCardOverrides("outline-ink-page-ink");
+
+// Styles the FAQ's `:::details[Question]` blocks as expandable rows. The height
+// animation uses ::details-content where supported; elsewhere it just toggles.
+const faqOverrides: Components = {
+  details: ({ children }) => {
+    const [summary, ...answer] = Children.toArray(children);
+    return (
+      // The card is drawn with ::before because any child element other than
+      // <summary> lands in ::details-content, which is hidden while closed.
+      <details className="group/faq relative [interpolate-size:allow-keywords] before:absolute before:inset-0 before:rounded-xl before:border-[2.5px] before:border-page-edge before:bg-cream before:shadow-lg before:content-[''] before:sketch [&::details-content]:h-0 [&::details-content]:overflow-hidden [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto">
+        {summary}
+        <div className="relative mx-5 border-t border-dashed border-charcoal/20 pt-4 pb-6 sm:mx-6">
+          {answer}
+        </div>
+      </details>
+    );
+  },
+  summary: ({ children }) => (
+    <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:px-6 [&::-webkit-details-marker]:hidden">
+      <span className="text-lg uppercase leading-snug tracking-wider text-charcoal sm:text-xl">
+        {children}
+      </span>
+      <span className="relative flex size-8 shrink-0 items-center justify-center text-cream">
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full border-2 border-rust-dark bg-rust sketch-subtle group-hover/faq:sketch-subtle-animated"
+        />
+        <Plus
+          size={16}
+          strokeWidth={3}
+          className="relative transition-transform duration-300 group-open/faq:rotate-45"
+        />
+      </span>
+    </summary>
+  ),
+};
+
+export default async function About() {
+  const [about, faq] = await Promise.all([
+    getCopy(copySlots.about.key),
+    getCopy(copySlots.faq.key),
+  ]);
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-4xl uppercase tracking-wide">About</h1>
-      <p className="mt-6 text-lg text-muted-foreground">
-        DC Movie Club is a community of film lovers in Washington, DC.
-      </p>
-      <p className="mt-4 text-muted-foreground">
-        Content coming soon — Abbie will provide copy about mission, story, and how to get involved.
-      </p>
+    // The negative margin cancels the layout's bottom padding (reserved for the
+    // nav) so the color runs to the bottom edge; pb-36 re-adds that clearance.
+    <div className="-mb-24 min-h-screen bg-sky page-ink-sky-dark page-edge-sky-light px-6 pt-14 pb-36 sm:pt-20">
+      <div className="mx-auto flex max-w-3xl flex-col gap-16">
+        <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <h1
+            className={cn(
+              "text-5xl uppercase leading-none tracking-wide text-cream sm:text-6xl",
+              "outline-ink-sky-dark",
+            )}
+            style={outlinedTextStyle}
+          >
+            About
+          </h1>
+          <NextLink
+            href="/code-of-conduct"
+            className="group/cta relative self-start rounded-full sm:self-auto transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+          >
+            <span
+              aria-hidden
+              className="absolute inset-0 rounded-full border-[3px] border-rust-dark bg-rust shadow-lg sketch group-hover/cta:sketch-animated"
+            />
+            <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-cream sm:px-6 sm:py-3 sm:text-base">
+              Read our Code of Conduct
+              <ArrowRight size={18} className="shrink-0" />
+            </span>
+          </NextLink>
+        </header>
+
+        {about.content.trim() && (
+          <Markdown
+            sections={{ depth: 2 }}
+            overrides={aboutOverrides}
+            className="flex flex-col gap-16"
+          >
+            {about.content}
+          </Markdown>
+        )}
+
+        {faq.content.trim() && (
+          <section id="faq" className="flex scroll-mt-8 flex-col gap-8">
+            <h2
+              className={cn(
+                "text-4xl uppercase leading-none tracking-wide text-cream sm:text-5xl",
+                "outline-ink-sky-dark",
+              )}
+              style={outlinedTextStyle}
+            >
+              FAQ
+            </h2>
+            <Markdown
+              overrides={faqOverrides}
+              className="flex flex-col gap-4"
+            >
+              {faq.content}
+            </Markdown>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

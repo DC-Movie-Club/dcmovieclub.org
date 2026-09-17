@@ -22,7 +22,7 @@ function CreamPanel({ children }: { children: React.ReactNode }) {
     <div className="relative">
       <div
         aria-hidden
-        className="absolute inset-0 rounded-2xl border-[3px] border-charcoal bg-cream shadow-xl sketch"
+        className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl sketch"
       />
       <div className="relative px-6 py-8 sm:px-8">{children}</div>
     </div>
@@ -41,11 +41,11 @@ export default async function Events() {
   return (
     // The negative margin cancels the layout's bottom padding (reserved for the
     // nav) so the teal runs to the bottom edge; pb-36 re-adds that clearance.
-    <div className="-mb-24 min-h-screen bg-teal px-6 pt-14 pb-36 sm:pt-20">
+    <div className="-mb-24 min-h-screen bg-teal page-ink-teal-dark page-edge-teal-light px-6 pt-14 pb-36 sm:pt-20">
       <div className="mx-auto flex max-w-3xl flex-col gap-14">
         <header className="flex flex-col gap-4">
           <h1
-            className="text-5xl uppercase leading-none tracking-wide text-cream [--outline-ink:var(--color-charcoal)] sm:text-6xl"
+            className="text-5xl uppercase leading-none tracking-wide text-cream outline-ink-teal-dark sm:text-6xl"
             style={outlinedTextStyle}
           >
             Events

@@ -1,9 +1,12 @@
 import ReactMarkdown, { type Components, type ExtraProps } from "react-markdown";
+import remarkDirective from "remark-directive";
 import { cn } from "@/lib/utils";
 import { parseYouTubeId } from "@/lib/youtube";
 import { Link, ExternalLink } from "@/components/ui/link";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { markdownStyles } from "@/components/markdownStyles";
+import { rehypeSections, type SectionsOptions } from "@/lib/rehype-sections";
+import { remarkDetails } from "@/lib/remark-details";
 
 // A paragraph that is only a link to a YouTube video, e.g. `<https://www.youtube.com/watch?v=…>`
 function embeddedVideoId(node: ExtraProps["node"]): string | null {
@@ -36,6 +39,12 @@ const components: Components = {
     <blockquote className={markdownStyles.blockquote}>{children}</blockquote>
   ),
   hr: () => <hr className={markdownStyles.hr} />,
+  details: ({ children }) => (
+    <details className={markdownStyles.details}>{children}</details>
+  ),
+  summary: ({ children }) => (
+    <summary className={markdownStyles.summary}>{children}</summary>
+  ),
   strong: ({ children }) => (
     <strong className={markdownStyles.bold}>{children}</strong>
   ),
@@ -67,14 +76,21 @@ export function Markdown({
   children,
   className,
   overrides,
+  sections,
 }: {
   children: string;
   className?: string;
   overrides?: Components;
+  // Groups each heading at `depth` with its content (see rehypeSections)
+  sections?: SectionsOptions;
 }) {
   return (
     <div className={cn("text-charcoal", className)}>
-      <ReactMarkdown components={{ ...components, ...overrides }}>
+      <ReactMarkdown
+        components={{ ...components, ...overrides }}
+        remarkPlugins={[remarkDirective, remarkDetails]}
+        rehypePlugins={sections ? [[rehypeSections, sections]] : []}
+      >
         {children}
       </ReactMarkdown>
     </div>

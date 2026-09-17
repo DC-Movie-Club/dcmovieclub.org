@@ -25,11 +25,15 @@
 
   /* --- Brand: Main --- */
   --color-rust: #a2390a;
+  --color-rust-dark: #551e05;
+  --color-rust-light: #dcbfaa;
   --color-sienna: #b24d2a;
   --color-cream: #efecdf;
   --color-teal: #375b6d;
   --color-teal-dark: #1c303a;
+  --color-teal-light: #c1c8c2;
   --color-charcoal: #393a3e;
+  --color-charcoal-light: #c2c0b7;
   --color-charcoal-detail: #4e505a;
   --color-rust-wash: #e8cfc5;
   --color-logo-red: #92312b;
@@ -37,13 +41,25 @@
   /* --- Brand: Secondary --- */
   --color-rose: #ca6c84;
   --color-rose-dusty: #be7184;
+  --color-rose-dusty-dark: #6d3240;
+  --color-rose-dusty-light: #e3cdc8;
+  --color-rose-dark: #431823;
   --color-orange: #eca344;
   --color-orange-dark: #6e430b;
   --color-olive: #b1ad26;
   --color-olive-dark: #43420e;
   --color-sky: #57a7cc;
   --color-sky-dark: #183d4e;
+  --color-sky-light: #c9dbda;
   --color-purple: #6372af;
+  --color-purple-dark: #313a5f;
+  --color-purple-light: #ccced3;
+
+  /* --- Page colors: pages set them with page-ink-* and page-edge-* --- */
+  /* Ink: outlines on lettering labels */
+  --color-page-ink: var(--page-ink, var(--color-charcoal));
+  /* Edge: card and tile borders */
+  --color-page-edge: var(--page-edge, var(--color-charcoal));
 
   /* --- Semantic --- */
   --color-background: #f5f3e8;
@@ -110,6 +126,20 @@ body {
   text-wrap: balance;
 }
 
+
+/* Set a page's ink and edge colors (see --color-page-ink, --color-page-edge) */
+@utility page-ink-* {
+  --page-ink: --value(--color-*);
+}
+
+@utility page-edge-* {
+  --page-edge: --value(--color-*);
+}
+
+/* Sets the ink for outlined lettering (see components/events/outlined-text.ts) */
+@utility outline-ink-* {
+  --outline-ink: --value(--color-*);
+}
 
 @utility sketch {
   filter: url(#sketch);

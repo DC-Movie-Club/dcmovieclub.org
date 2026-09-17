@@ -23,7 +23,7 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
       <div
         aria-hidden
         className={cn(
-          "absolute inset-0 rounded-2xl border-[3px] border-charcoal bg-cream shadow-xl transition-colors sketch",
+          "absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl transition-colors sketch",
           cta && "card-hover:border-orange-dark",
         )}
       />
@@ -44,8 +44,8 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
       <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
         <span
           className={cn(
-            "font-dcmc text-4xl uppercase leading-none tracking-wide text-cream [--outline-ink:var(--color-charcoal)] sm:text-5xl",
-            cta && "card-hover:[--outline-ink:var(--color-orange-dark)]",
+            "font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outline-ink-page-ink sm:text-5xl",
+            cta && "card-hover:outline-ink-orange-dark",
           )}
           style={outlinedTextStyle}
         >
