@@ -9,11 +9,11 @@ function watercolorFilter(id: string, seedLg: number, seedMd: number) {
   return `<filter id="${id}" x="-40%" y="-40%" width="180%" height="180%">
     <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="5" seed="${seedLg}" result="noise-lg" />
     <feTurbulence type="turbulence" baseFrequency="0.12" numOctaves="3" seed="${seedMd}" result="noise-md" />
-    <feDisplacementMap in="SourceGraphic" in2="noise-lg" scale="15" xChannelSelector="R" yChannelSelector="G" result="d1" />
-    <feDisplacementMap in="d1" in2="noise-md" scale="6" xChannelSelector="B" yChannelSelector="R" result="d2" />
-    <feGaussianBlur in="d2" stdDeviation="1" result="blurred" />
+    <feDisplacementMap in="SourceGraphic" in2="noise-lg" scale="5" xChannelSelector="R" yChannelSelector="G" result="d1" />
+    <feDisplacementMap in="d1" in2="noise-md" scale="2" xChannelSelector="B" yChannelSelector="R" result="d2" />
+    <feGaussianBlur in="d2" stdDeviation="0.6" result="blurred" />
     <feComponentTransfer in="blurred">
-      <feFuncA type="discrete" tableValues="0 0.3 0.6 0.8 1" />
+      <feFuncA type="discrete" tableValues="0 1" />
     </feComponentTransfer>
   </filter>`;
 }

@@ -62,14 +62,12 @@ export function BottomNav() {
         <NavLink
           route={routes.blog}
           active={pathname === routes.blog.href}
-          watercolorIndex={0}
           {...(pathname === routes.blog.href ? {} : itemHoverProps)}
         />
 
         <NavLink
           route={routes.events}
           active={pathname === routes.events.href}
-          watercolorIndex={1}
           {...(pathname === routes.events.href ? {} : itemHoverProps)}
         />
 
@@ -78,7 +76,6 @@ export function BottomNav() {
         <NavLink
           route={routes.partnerships}
           active={pathname === routes.partnerships.href}
-          watercolorIndex={2}
           {...(pathname === routes.partnerships.href ? {} : itemHoverProps)}
         />
 
@@ -121,7 +118,7 @@ export function BottomNav() {
                             preserveAspectRatio="none"
                           >
                             <path
-                              d="M15,12 L30,5 L45,14 L55,4 L70,8 L85,12 L95,25 L92,45 L96,60 L88,75 L78,88 L60,92 L40,95 L25,88 L12,75 L5,58 L8,35 L6,20Z"
+                              d="M20,10 L40,5 L60,6 L78,10 L91,24 L95,45 L93,65 L85,82 L66,93 L45,95 L24,89 L10,74 L5,52 L8,30Z"
                               fill="#e8cfc5"
                             />
                           </svg>
@@ -220,13 +217,11 @@ const WATERCOLOR_CLASSES = [
 function NavLink({
   route,
   active,
-  watercolorIndex = 0,
   onMouseEnter,
   onMouseLeave,
 }: {
   route: (typeof routes)[keyof typeof routes];
   active: boolean;
-  watercolorIndex?: number;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }) {
@@ -238,37 +233,28 @@ function NavLink({
         "group/item relative flex flex-col items-center gap-0.5 transition-all",
         ITEM_PADDING,
         active
-          ? "text-rust"
+          ? "text-logo-red"
           : "text-foreground hover:scale-110 hover:text-rust",
       )}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="relative">
-        {active && (
-          <svg
-            className={cn(
-              "absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)] overflow-visible",
-              WATERCOLOR_CLASSES[watercolorIndex],
-            )}
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M15,12 L30,5 L45,14 L55,4 L70,8 L85,12 L95,25 L92,45 L96,60 L88,75 L78,88 L60,92 L40,95 L25,88 L12,75 L5,58 L8,35 L6,20Z"
-              className="fill-rust-wash"
-            />
-          </svg>
+      <Icon
+        className={cn(
+          ICON_SIZE,
+          "sketch-subtle",
+          !active && "group-hover/item:sketch-subtle-animated",
         )}
-        <Icon
-          className={cn(
-            ICON_SIZE,
-            "relative sketch-subtle",
-            !active && "group-hover/item:sketch-subtle-animated",
-          )}
-        />
-      </div>
-      <span className={cn(LABEL_SIZE, "relative uppercase tracking-wide")}>
+      />
+      <span
+        className={cn(
+          LABEL_SIZE,
+          // Padding is always applied (and cancelled by negative margins) so
+          // only color and rotation change when the tag appears.
+          "-mx-1 -my-px rounded-[3px] px-1 py-px uppercase tracking-wide transition-[background-color,color,rotate] duration-300 ease-out",
+          active && "-rotate-1 bg-logo-red text-cream sketch-subtle",
+        )}
+      >
         {route.labelShort}
       </span>
     </Link>
