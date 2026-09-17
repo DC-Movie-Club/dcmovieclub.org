@@ -64,11 +64,7 @@ import {
 import { DiffView } from "@/app/admin/components/DiffView";
 import { ToolbarButton } from "@/app/admin/components/ToolbarButton";
 import { LINK_MATCHERS } from "@/app/admin/components/linkMatchers";
-import {
-  getResources,
-  saveResources,
-  type ResourcesDoc,
-} from "@/app/admin/actions/resources";
+import { saveResources, type ResourcesDoc } from "@/app/admin/actions/resources";
 import { adminSWRKeys } from "@/app/admin/config";
 import { Button } from "@/components/ui/button";
 import {
@@ -158,6 +154,12 @@ function extractPlainText(serialized: string): string {
   } catch {
     return "";
   }
+}
+
+async function fetchResources(): Promise<ResourcesDoc> {
+  const res = await fetch("/api/admin/resources", { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to load resources");
+  return res.json();
 }
 
 function EditableController({ editable }: { editable: boolean }) {
@@ -301,7 +303,7 @@ export function ResourcesEditor({
 }) {
   const { data, mutate } = useSWR(
     adminSWRKeys.resources.swrKey,
-    getResources,
+    fetchResources,
     {
       fallbackData: initialData,
       revalidateOnMount: false,

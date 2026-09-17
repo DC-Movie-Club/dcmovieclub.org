@@ -25,12 +25,20 @@ export async function verifyAndSetAdminClaim(idToken: string) {
   return { success: true };
 }
 
-export async function revokeAdminClaim(phoneNumber: string) {
-  await requireAdmin();
-  const auth = getAdminAuth();
-  const users = await auth.getUsers([{ phoneNumber }]);
-
-  if (users.users.length > 0) {
-    await auth.setCustomUserClaims(users.users[0].uid, { admin: false });
+export async function removeAdmin(phoneNumber: string) {
+  const token = await requireAdmin();
+  if (token.phone_number === phoneNumber) {
+    throw new Error("Admins can't remove themselves");
   }
+
+  // Revoke before deleting the allowlist entry, so a failure leaves nothing half-removed.
+  // Revoking refresh tokens makes getAdminToken reject their existing session right away.
+  const auth = getAdminAuth();
+  const { users } = await auth.getUsers([{ phoneNumber }]);
+  for (const user of users) {
+    await auth.setCustomUserClaims(user.uid, { admin: false });
+    await auth.revokeRefreshTokens(user.uid);
+  }
+
+  await getAdminDb().collection("allowedPhones").doc(phoneNumber).delete();
 }

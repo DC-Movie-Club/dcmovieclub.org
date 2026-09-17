@@ -4,13 +4,12 @@ import { useState } from "react";
 import {
   doc,
   setDoc,
-  deleteDoc,
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import useSWR from "swr";
 import { db } from "@/lib/firebase";
-import { revokeAdminClaim } from "@/app/admin/actions/auth";
+import { removeAdmin } from "@/app/admin/actions/auth";
 import { adminSWRKeys } from "@/app/admin/config";
 import { useAuth } from "@/app/admin/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -136,8 +135,7 @@ export function AdminManagement() {
 
     setRemoving(true);
     try {
-      await deleteDoc(doc(db, "allowedPhones", focusedPhone));
-      await revokeAdminClaim(focusedPhone);
+      await removeAdmin(focusedPhone);
       setFocusedPhone(null);
       mutate();
     } catch {
