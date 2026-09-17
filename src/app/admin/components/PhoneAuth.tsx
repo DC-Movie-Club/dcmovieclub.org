@@ -35,13 +35,13 @@ function toE164(input: string): string {
   return `+${digits}`;
 }
 
-export function PhoneAuth({ onSuccess }: { onSuccess: () => void }) {
+export function PhoneAuth({ notice }: { notice?: string }) {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(
     null
   );
-  const [error, setError] = useState("");
+  const [error, setError] = useState(notice ?? "");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const recaptchaRef = useRef<HTMLDivElement>(null);
@@ -100,14 +100,8 @@ export function PhoneAuth({ onSuccess }: { onSuccess: () => void }) {
         return;
       }
 
+      // Refreshing picks up the admin claim; the layout then creates the server session
       await result.user.getIdToken(true);
-
-      await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${await result.user.getIdToken()}` },
-      });
-
-      onSuccess();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to verify code"

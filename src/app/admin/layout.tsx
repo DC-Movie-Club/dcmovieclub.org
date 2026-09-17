@@ -2,6 +2,7 @@
 
 import "@/styles/admin.css";
 import { useAuth } from "@/app/admin/hooks/useAuth";
+import { useAdminSession } from "@/app/admin/hooks/useAdminSession";
 import { PhoneAuth } from "@/app/admin/components/PhoneAuth";
 import { AdminNav } from "@/app/admin/components/AdminNav";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,10 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { loading, isAdmin, signOut } = useAuth();
+  const { loading, user, isAdmin, signOut } = useAuth();
+  const session = useAdminSession(user, isAdmin);
 
-  if (loading) {
+  if (loading || (isAdmin && !session.active)) {
     return (
       <div className="min-h-screen bg-background text-foreground antialiased">
         <div className="flex min-h-screen items-center justify-center">
@@ -27,7 +29,7 @@ export default function AdminLayout({
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-background text-foreground antialiased">
-        <PhoneAuth onSuccess={() => window.location.reload()} />
+        <PhoneAuth notice={session.error} />
       </div>
     );
   }

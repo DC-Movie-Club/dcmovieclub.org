@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { onAuthStateChanged, type User } from "firebase/auth";
+import { onIdTokenChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export function useAuth() {
@@ -10,7 +10,8 @@ export function useAuth() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (firebaseUser) => {
+    // Fires on token refreshes too, so a newly granted admin claim shows up without a reload
+    return onIdTokenChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
 
       if (firebaseUser) {

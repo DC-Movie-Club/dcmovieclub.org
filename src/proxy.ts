@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "next-firebase-auth-edge/lib/next/middleware";
 import { authConfig } from "@/lib/auth-config";
+import { ADMIN_DEFAULT_TAB } from "@/app/admin/config";
 
 const ADMIN_LOGIN = "/admin";
 
@@ -18,6 +19,10 @@ export async function proxy(request: NextRequest) {
     },
     handleValidToken: async ({ decodedToken }, headers) => {
       const path = request.nextUrl.pathname;
+
+      if (path === ADMIN_LOGIN && decodedToken.admin) {
+        return NextResponse.redirect(new URL(ADMIN_DEFAULT_TAB, request.url));
+      }
 
       if (
         path.startsWith("/admin") &&

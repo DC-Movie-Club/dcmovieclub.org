@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
-import { ADMIN_DEFAULT_TAB } from "@/app/admin/config";
-
+// The layout shows the login form here; with an admin session the proxy redirects to the default tab
 export default function AdminPage() {
-  redirect(ADMIN_DEFAULT_TAB);
+  return null;
 }
