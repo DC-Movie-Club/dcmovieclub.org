@@ -1,0 +1,9 @@
+# Dependencies' install scripts must be explicitly allowed or denied: pnpm v11, which the
+# App Hosting builder uses, fails the install otherwise (ERR_PNPM_IGNORED_BUILDS).
+allowBuilds:
+  "@firebase/util": true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+  # Mock API tooling pulled in by a dependency, not needed to build the site
+  msw: false
