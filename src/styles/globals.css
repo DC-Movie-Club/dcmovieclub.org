@@ -136,6 +136,19 @@ body {
   --page-edge: --value(--color-*);
 }
 
+/* Poster-style outline + stacked hard shadow; the class form of
+   components/events/outlined-text.ts, for places that can only take classes
+   (e.g. the copy editor's Lexical theme) */
+@utility outlined-lettering {
+  text-shadow:
+    2px 2px 0 var(--outline-ink, var(--color-charcoal)),
+    3px 3px 0 var(--outline-ink, var(--color-charcoal)),
+    4px 4px 0 var(--outline-ink, var(--color-charcoal)),
+    5px 5px 0 var(--outline-ink, var(--color-charcoal));
+  -webkit-text-stroke: 1.5px var(--outline-ink, var(--color-charcoal));
+  paint-order: stroke fill;
+}
+
 /* Sets the ink for outlined lettering (see components/events/outlined-text.ts) */
 @utility outline-ink-* {
   --outline-ink: --value(--color-*);
