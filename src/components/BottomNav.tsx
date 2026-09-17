@@ -51,7 +51,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
       <div className="relative flex items-center justify-center gap-4 px-4 py-2 xs:px-6 xs:py-3">
         <div
           className={cn(

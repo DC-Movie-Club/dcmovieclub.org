@@ -11,7 +11,7 @@ export default function PublicLayout({
     <div className="min-h-screen bg-background text-foreground antialiased">
       <SketchFilter />
       <WatercolorFilter />
-      <main className="pb-24">{children}</main>
+      <main className="pb-24 animate-page-fade-in">{children}</main>
       <BottomNav />
     </div>
   );

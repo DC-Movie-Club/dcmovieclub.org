@@ -26,6 +26,27 @@
       transform: translateX(-50%);
     }
   }
+
+  --animate-page-fade-in: page-fade-in 600ms ease-out backwards;
+
+  @keyframes page-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Easing is a sampled underdamped spring (~8% overshoot). Fill is backwards,
+     not both, so no transform lingers on the fixed nav once it lands. */
+  --animate-nav-spring-in: nav-spring-in 900ms
+    linear(0, 0.057 3%, 0.195 7%, 0.368 10%, 0.545 13%, 0.706 17%, 0.84 20%, 0.942 23%, 1.013 27%, 1.056 30%, 1.078 33%, 1.083 37%, 1.078 40%, 1.066 43%, 1.052 47%, 1.037 50%, 1.024 53%, 1.013 57%, 1.004 60%, 0.999 63%, 0.994 73%, 1)
+    380ms backwards;
+
+  @keyframes nav-spring-in {
+    from {
+      /* Clears the logo, which pokes up above the bar */
+      transform: translateY(calc(100% + 4rem));
+    }
+  }
 }
 
 @theme inline {
