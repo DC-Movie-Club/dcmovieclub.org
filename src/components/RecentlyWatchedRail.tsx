@@ -182,7 +182,7 @@ function FilmPoster({
   const badges = (
     <>
       {review.diaryDate && (
-        <PosterSticker className="-top-3 left-1/2 -translate-x-1/2 px-2.5 py-1.5 text-xs uppercase leading-none tracking-wider text-charcoal/70">
+        <PosterSticker className="-top-3.5 left-1/2 -translate-x-1/2 px-3 py-1.5 text-sm uppercase leading-none tracking-wider text-charcoal/70">
           {formatDiaryDate(review.diaryDate)}
         </PosterSticker>
       )}
@@ -326,7 +326,7 @@ export function RecentlyWatchedRail({
           </h2>
         </div>
 
-        <div className="mt-8 grid auto-rows-fr grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-8 px-6 sm:grid-cols-4 sm:gap-x-5">
+        <div className="mt-8 grid auto-rows-fr grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-8 px-6 xs:grid-cols-3 sm:gap-x-5 md:grid-cols-4">
           {reviews.slice(0, MAX_FILMS).map((review) =>
             review.review ? (
               <div
