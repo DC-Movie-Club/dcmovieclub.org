@@ -2,30 +2,12 @@ import { MapPin, Clock, CalendarDays, Ticket, ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { getUpcomingEvents } from "@/lib/data";
 import { ExternalLink } from "@/components/ui/link";
+import { formatEventDate } from "@/lib/event-format";
+import { EventTime } from "@/components/EventTime";
 import type { CalendarEvent } from "@/types/event";
 
-function formatDate(iso: string) {
-  const date = new Date(iso);
-  return {
-    month: date.toLocaleDateString("en-US", { month: "short" }),
-    day: date.getDate(),
-    weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
-  };
-}
-
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function formatTimeRange(start: string, end: string) {
-  return `${formatTime(start)} – ${formatTime(end)}`;
-}
-
 function EventCard({ event }: { event: CalendarEvent }) {
-  const { month, day, weekday } = formatDate(event.start);
+  const { month, day, weekday } = formatEventDate(event);
 
   return (
     <div className="group/event flex gap-5 rounded-xl border-2 border-charcoal/15 p-5 transition-colors hover:border-charcoal/30">
@@ -47,7 +29,7 @@ function EventCard({ event }: { event: CalendarEvent }) {
         {!event.allDay && (
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock size={14} className="shrink-0" />
-            {formatTimeRange(event.start, event.end)}
+            <EventTime start={event.start} end={event.end} />
           </p>
         )}
 

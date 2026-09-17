@@ -1,4 +1,5 @@
 import Image from "next/image";
+import NextLink from "next/link";
 import {
   MapPin,
   Clock,
@@ -6,40 +7,37 @@ import {
   Ticket,
   ArrowUpRight,
   ArrowRight,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getUpcomingEvents, getPastEventCount } from "@/lib/data";
+import { getUpcomingEvents } from "@/lib/data";
 import { getRecentLetterboxdReviews } from "@/lib/data";
-import { Link, ExternalLink } from "@/components/ui/link";
+import { ExternalLink } from "@/components/ui/link";
 import { socials } from "@/config/navigation";
+import { formatEventDate } from "@/lib/event-format";
+import { EventTime } from "@/components/EventTime";
 import type { CalendarEvent } from "@/types/event";
-import { DieCutSticker } from "@/components/DieCutSticker";
-import { RectSticker } from "@/components/RectSticker";
-import { TextSticker } from "@/components/TextSticker";
-import { CountTicker } from "@/components/CountTicker";
-import { HomeBackgroundArt } from "@/components/HomeBackgroundArt";
 import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
-import { StickerPlayground } from "./StickerPlayground";
 
-function formatDate(iso: string) {
-  const date = new Date(iso);
-  return {
-    month: date.toLocaleDateString("en-US", { month: "short" }),
-    day: date.getDate(),
-    weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
-  };
+const UPCOMING_TILE_COUNT = 3;
+
+function getMapUrl(location: string | null) {
+  return location
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`
+    : null;
 }
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function formatTimeRange(start: string, end: string) {
-  return `${formatTime(start)} – ${formatTime(end)}`;
+function getEventCta(
+  event: CalendarEvent,
+): { href: string; label: string; icon: LucideIcon } | null {
+  if (event.ticketUrl) {
+    return { href: event.ticketUrl, label: "Get Tickets", icon: Ticket };
+  }
+  if (event.link) {
+    return { href: event.link, label: "View on Calendar", icon: ArrowUpRight };
+  }
+  return null;
 }
 
 // TODO: detect if the featured event is sold out via Ticket Tailor API and
@@ -47,481 +45,325 @@ function formatTimeRange(start: string, end: string) {
 // moved to a separate section). For now we always show the first upcoming event.
 
 const NEXT_UP_SHADOW = [
-  "2px 2px 0 var(--color-charcoal)",
-  "3px 3px 0 var(--color-charcoal)",
-  "4px 4px 0 var(--color-charcoal)",
-  "5px 5px 0 var(--color-charcoal)",
+  "2px 2px 0 var(--next-up-ink)",
+  "3px 3px 0 var(--next-up-ink)",
+  "4px 4px 0 var(--next-up-ink)",
+  "5px 5px 0 var(--next-up-ink)",
 ].join(", ");
 
-const SECTION_HEADER_SHADOW = [
-  "1px 1px 0 var(--color-charcoal)",
-  "2px 2px 0 var(--color-charcoal)",
-  "3px 3px 0 var(--color-charcoal)",
-].join(", ");
+const CALENDAR_VARIANTS = {
+  tall: {
+    key: "tall",
+    width: "w-18 sm:w-22",
+    radius: "rounded-lg",
+    border: "border-[2.5px]",
+    shadow: "translate-x-1 translate-y-1",
+    direction: "flex-col",
+    strip: "h-8 sm:h-9",
+    month: "h-8 pt-0.5 text-base sm:h-9 sm:text-lg",
+    day: "py-2 text-center text-4xl sm:text-5xl",
+  },
+  wide: {
+    key: "wide",
+    width: "w-fit",
+    radius: "rounded",
+    border: "border-[1.5px]",
+    shadow: null,
+    direction: "flex-row",
+    strip: "w-9",
+    month: "w-9 text-[11px]",
+    day: "flex items-center px-1.5 pt-1.5 pb-0.5 text-sm",
+  },
+} as const;
 
-function FeaturedEvent({ event }: { event: CalendarEvent }) {
-  const { month, day, weekday } = formatDate(event.start);
-  const mapUrl = event.location
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
-    : null;
+function CalendarDate({
+  month,
+  day,
+  variant,
+  className,
+}: {
+  month: string;
+  day: string;
+  variant: keyof typeof CALENDAR_VARIANTS;
+  className?: string;
+}) {
+  const v = CALENDAR_VARIANTS[variant];
 
   return (
-    <section className="px-6 pt-5 pb-2">
-      <div className="relative mx-auto max-w-3xl">
+    <div className={cn("relative shrink-0", v.width, className)}>
+      {v.shadow && (
         <div
           aria-hidden
-          className="absolute inset-0 rounded-xl border-[3px] border-charcoal sketch"
-          style={{ backgroundColor: "#2a4a5e" }}
+          className={cn(
+            "absolute inset-0 bg-charcoal sketch-subtle",
+            v.radius,
+            v.shadow,
+          )}
         />
+      )}
+      <div
+        aria-hidden
+        className={cn(
+          "absolute inset-0 flex overflow-hidden border-charcoal bg-cream sketch-subtle",
+          v.direction,
+          v.radius,
+          v.border,
+        )}
+      >
+        <div className={cn("bg-rust", v.strip)} />
+      </div>
+      {/* Transparent border matches the face's border so the month text
+          lines up with the rust strip inside it. */}
+      <div
+        className={cn("relative flex border-transparent", v.direction, v.border)}
+      >
+        <span
+          className={cn(
+            "flex items-center justify-center leading-none uppercase tracking-widest text-cream",
+            v.month,
+          )}
+        >
+          {month}
+        </span>
+        <span className={cn("leading-none text-charcoal", v.day)}>{day}</span>
+      </div>
+    </div>
+  );
+}
 
-        <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-[4deg] sm:-top-6 sm:left-8">
-          <span
-            className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream sm:text-5xl"
-            style={{
-              textShadow: NEXT_UP_SHADOW,
-              WebkitTextStroke: "1.5px var(--color-charcoal)",
-              paintOrder: "stroke fill",
-            }}
-          >
-            Next Up
-          </span>
+function FeaturedEvent({ event }: { event: CalendarEvent }) {
+  const { month, day, weekday } = formatEventDate(event);
+  const cta = getEventCta(event);
+  const mapUrl = getMapUrl(event.location);
+
+  return (
+    <div className="group/card relative">
+      <div
+        aria-hidden
+        className={cn(
+          "absolute inset-0 rounded-2xl border-[3px] border-charcoal bg-cream shadow-xl transition-colors sketch",
+          cta && "card-hover:border-orange-dark",
+        )}
+      />
+
+      {/* Stretched link makes the whole card clickable; the pill below is the
+          focusable CTA, so this one stays out of the tab order. */}
+      {cta && (
+        <a
+          href={cta.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          tabIndex={-1}
+          aria-hidden
+          className="absolute inset-0 rounded-2xl"
+        />
+      )}
+
+      <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
+        <span
+          className={cn(
+            "font-dcmc text-4xl uppercase leading-none tracking-wide text-cream [--next-up-ink:var(--color-charcoal)] sm:text-5xl",
+            cta && "card-hover:[--next-up-ink:var(--color-orange-dark)]",
+          )}
+          style={{
+            textShadow: NEXT_UP_SHADOW,
+            WebkitTextStroke: "1.5px var(--next-up-ink)",
+            paintOrder: "stroke fill",
+          }}
+        >
+          Next Up
+        </span>
+      </div>
+
+      <div className="pointer-events-none relative flex items-start gap-4 px-5 pt-10 pb-8 sm:gap-5 sm:px-6 sm:pt-12 sm:pb-9">
+        <CalendarDate month={month} day={day} variant="tall" />
+
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <h2 className="text-2xl uppercase leading-tight tracking-wide text-charcoal sm:text-3xl">
+            {event.title}
+          </h2>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm uppercase tracking-wider text-charcoal/70">
+            <span className="flex items-center gap-1.5">
+              <CalendarDays size={14} className="shrink-0" />
+              {weekday}
+            </span>
+            {!event.allDay && (
+              <span className="flex items-center gap-1.5">
+                <Clock size={14} className="shrink-0" />
+                <EventTime start={event.start} end={event.end} />
+              </span>
+            )}
+            {event.location && mapUrl && (
+              <ExternalLink
+                href={mapUrl}
+                className="pointer-events-auto flex items-center gap-1.5 underline decoration-charcoal/30 underline-offset-4 hover:decoration-rust"
+              >
+                <MapPin size={14} className="shrink-0" />
+                {event.location}
+              </ExternalLink>
+            )}
+          </div>
+
+          {event.description && (
+            <ExpandableDescription
+              html={event.description}
+              className="mt-2 border-t border-dashed border-charcoal/20 pt-3 text-sm text-charcoal/85 [&_a]:pointer-events-auto [&_a]:text-charcoal/60 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-charcoal"
+              actionClassName="pointer-events-auto absolute bottom-0 left-1/2 mt-0 -translate-x-1/2 translate-y-1/2"
+            />
+          )}
         </div>
+      </div>
 
-        <div className="relative flex px-5 pt-10 pb-5 sm:px-6 sm:pt-12 sm:pb-6">
-          <div className="flex items-start gap-4 sm:gap-5">
-            <div className="relative shrink-0 shadow-md">
-              <div
-                aria-hidden
-                className="absolute inset-0 rounded-lg bg-cream sketch"
-              />
-              <div className="relative flex flex-col items-center px-4 py-3 text-center">
-                <span className="text-sm font-medium uppercase tracking-widest text-rust">
-                  {month}
-                </span>
-                <span className="text-4xl leading-none text-rust">{day}</span>
-              </div>
-            </div>
+      {cta && (
+        <a
+          href={cta.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform card-hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full border-[3px] border-orange-dark bg-orange shadow-lg sketch card-hover:sketch-animated"
+          />
+          <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-orange-dark sm:px-6 sm:py-3 sm:text-base">
+            <cta.icon size={18} className="shrink-0" />
+            {cta.label}
+          </span>
+        </a>
+      )}
+    </div>
+  );
+}
 
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <h2 className="text-2xl uppercase leading-tight tracking-wide text-cream sm:text-3xl">
-                {event.title}
-              </h2>
+function EventTile({ event }: { event: CalendarEvent }) {
+  const { month, day, weekday } = formatEventDate(event);
+  const cta = getEventCta(event);
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm uppercase tracking-wider text-cream/75">
-                <span className="flex items-center gap-1.5">
-                  <CalendarDays size={14} className="shrink-0" />
-                  {weekday}
-                </span>
-                {!event.allDay && (
-                  <span className="flex items-center gap-1.5">
-                    <Clock size={14} className="shrink-0" />
-                    {formatTimeRange(event.start, event.end)}
-                  </span>
-                )}
-                {event.location && mapUrl && (
-                  <ExternalLink
-                    href={mapUrl}
-                    className="flex items-center gap-1.5 underline underline-offset-4 decoration-cream/50 hover:text-cream! hover:decoration-cream"
-                  >
-                    <MapPin size={14} className="shrink-0" />
-                    {event.location}
-                  </ExternalLink>
-                )}
-              </div>
-
-              {event.description && (
-                <ExpandableDescription
-                  html={event.description}
-                  className="mt-2 border-t border-dashed border-cream/25 pt-3 text-sm text-cream/90 [&_a]:text-cream [&_a]:underline"
-                  actionClassName="text-orange"
-                />
+  const content = (
+    <>
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-xl border-[2.5px] border-charcoal bg-cream sketch"
+      />
+      <div className="relative grid h-full grid-cols-[auto_1fr_auto] items-center gap-x-4 px-4 py-3 sm:grid-cols-[1fr_auto] sm:grid-rows-[auto_1fr] sm:items-start sm:gap-y-2 sm:p-4">
+        <CalendarDate
+          month={month}
+          day={day}
+          variant="wide"
+          className="sm:col-start-1 sm:row-start-1"
+        />
+        <div className="flex h-full min-w-0 flex-col gap-1 sm:col-span-2 sm:row-start-2 sm:gap-2">
+          <h3 className="truncate text-base uppercase leading-tight tracking-wide text-charcoal transition-colors group-hover/tile:text-rust sm:line-clamp-2 sm:text-lg sm:whitespace-normal">
+            {event.title}
+          </h3>
+          <div className="flex min-w-0 flex-col gap-0.5 text-xs uppercase tracking-wider text-charcoal/70 sm:mt-auto">
+            <span className="truncate">
+              {weekday}
+              {!event.allDay && (
+                <>
+                  {" · "}
+                  <EventTime start={event.start} />
+                </>
               )}
-            </div>
+            </span>
+            {event.location && (
+              <span className="flex min-w-0 items-center gap-1">
+                <MapPin size={10} className="shrink-0" />
+                <span className="truncate">{event.location}</span>
+              </span>
+            )}
           </div>
         </div>
+        {cta && (
+          <cta.icon
+            size={16}
+            className="shrink-0 text-rust sketch-subtle group-hover/tile:sketch-subtle-animated sm:col-start-2 sm:row-start-1 sm:self-center"
+          />
+        )}
+        {cta && <span className="sr-only">{cta.label}</span>}
+      </div>
+    </>
+  );
 
-        {event.ticketUrl && (
-          <a
-            href={event.ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group/cta absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
-          >
-            <span
-              aria-hidden
-              className="absolute inset-0 rounded-full border-[3px] border-charcoal bg-orange shadow-lg sketch group-hover/cta:sketch-animated"
-            />
-            <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-charcoal sm:px-6 sm:py-3 sm:text-base">
-              <Ticket size={18} className="shrink-0" />
-              Get Tickets
-            </span>
-          </a>
+  const className =
+    "group/tile relative block h-full rounded-xl transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
+
+  return cta ? (
+    <a
+      href={cta.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(className, "hover:-rotate-1 hover:scale-102")}
+    >
+      {content}
+    </a>
+  ) : (
+    <div className={className}>{content}</div>
+  );
+}
+
+function EventsSection({ events }: { events: CalendarEvent[] }) {
+  const [featured, ...rest] = events;
+  const upcoming = rest.slice(0, UPCOMING_TILE_COUNT);
+
+  return (
+    <section className="bg-teal px-6 pt-16 pb-14">
+      <div className="mx-auto flex max-w-3xl flex-col gap-10">
+        <FeaturedEvent event={featured} />
+
+        {upcoming.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl uppercase tracking-wide text-cream sm:text-2xl">
+                Also coming up
+              </h2>
+              <NextLink
+                href="/events"
+                className="group/view-all relative rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border-2 border-cream/70 transition-colors sketch-subtle group-hover/view-all:border-cream group-hover/view-all:bg-cream group-hover/view-all:sketch-subtle-animated"
+                />
+                <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-cream transition-colors group-hover/view-all:text-charcoal">
+                  View all
+                  <ArrowRight size={14} />
+                </span>
+              </NextLink>
+            </div>
+            <ul className="grid gap-4 sm:grid-cols-3">
+              {upcoming.map((event) => (
+                <li key={event.id}>
+                  <EventTile event={event} />
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </section>
   );
 }
 
-function CompactEventCard({ event }: { event: CalendarEvent }) {
-  const { month, day } = formatDate(event.start);
-  const href = event.ticketUrl || event.link;
-  const mapUrl = event.location
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
-    : null;
-
-  const content = (
-    <>
-      <div className="flex shrink-0 flex-col items-center text-center">
-        <span className="text-[10px] font-medium uppercase tracking-widest text-rust">
-          {month}
-        </span>
-        <span className="text-2xl leading-none text-rust">{day}</span>
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <h3 className="truncate text-base uppercase tracking-wide text-charcoal transition-colors group-hover/event:text-rust">
-          {event.title}
-        </h3>
-        <div className="flex min-w-0 gap-3 text-xs uppercase tracking-wider text-charcoal/75">
-          {!event.allDay && (
-            <span className="shrink-0">{formatTime(event.start)}</span>
-          )}
-          {event.location &&
-            (mapUrl && href ? (
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative z-10 flex min-w-0 items-center gap-1 rounded-sm hover:text-charcoal hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
-              >
-                <MapPin size={10} className="shrink-0" />
-                <span className="truncate">{event.location}</span>
-              </a>
-            ) : (
-              <span className="flex min-w-0 items-center gap-1">
-                <MapPin size={10} className="shrink-0" />
-                <span className="truncate">{event.location}</span>
-              </span>
-            ))}
-        </div>
-      </div>
-
-      {event.ticketUrl ? (
-        <span className="shrink-0 text-rust sketch-subtle group-hover/event:sketch-subtle-animated">
-          <Ticket size={20} />
-        </span>
-      ) : event.link ? (
-        <span className="shrink-0 text-muted-foreground transition-colors sketch-subtle group-hover/event:text-rust group-hover/event:sketch-subtle-animated">
-          <ArrowUpRight size={18} />
-        </span>
-      ) : null}
-    </>
-  );
-
-  const className = cn(
-    "group/event relative flex items-center gap-4 rounded-lg px-3 py-2 transition-colors sm:gap-5 sm:py-2.5",
-    href && "cursor-pointer hover:bg-charcoal/5",
-  );
-
-  return (
-    <div className={className}>
-      {href && (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={event.title}
-          className="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
-        />
-      )}
-      {content}
-    </div>
-  );
-}
-
-function UpcomingEvents({ events }: { events: CalendarEvent[] }) {
-  return (
-    <section className="px-6 pt-4 pb-4">
-      <div className="relative mx-auto max-w-3xl">
-        <div
-          aria-hidden
-          className="absolute inset-0 rounded-xl border-[3px] border-charcoal bg-cream sketch"
-        />
-
-        <div className="pointer-events-none absolute -top-3 left-6 z-10 sm:-top-4 sm:left-8">
-          <span
-            className="bg-cream px-2 font-dcmc text-2xl uppercase leading-none tracking-wide text-cream sm:text-3xl"
-            style={{
-              textShadow: SECTION_HEADER_SHADOW,
-              WebkitTextStroke: "1.5px var(--color-charcoal)",
-              paintOrder: "stroke fill",
-            }}
-          >
-            Other upcoming events
-          </span>
-        </div>
-
-        <Link
-          href="/events"
-          className="absolute top-0 right-4 z-10 flex -translate-y-1/2 items-center gap-1 rounded-full border-[2.5px] border-charcoal bg-cream px-3 py-1 text-xs uppercase tracking-widest text-charcoal shadow-sm hover:text-rust focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:right-6"
-        >
-          View all
-          <ArrowRight size={12} />
-        </Link>
-
-        <div className="relative flex flex-col px-4 pt-5 pb-4 sm:px-5 sm:pt-6 sm:pb-5">
-          {events.map((event, i) => (
-            <div key={event.id}>
-              {i > 0 && (
-                <div
-                  aria-hidden
-                  className="my-1 border-t border-dashed border-charcoal/25"
-                />
-              )}
-              <CompactEventCard event={event} />
-            </div>
-          ))}
-        </div>
-
-        <Link
-          href="/events"
-          className="absolute bottom-0 right-4 z-10 flex translate-y-1/2 items-center gap-1 rounded-full border-[2.5px] border-charcoal bg-cream px-3 py-1 text-xs uppercase tracking-widest text-charcoal shadow-sm hover:text-rust focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:right-6"
-        >
-          View all
-          <ArrowRight size={12} />
-        </Link>
-      </div>
-    </section>
-  );
-}
-
 export default async function Home() {
-  const [events, reviews, pastEventCount] = await Promise.all([
+  const [events, reviews] = await Promise.all([
     getUpcomingEvents(),
     getRecentLetterboxdReviews(),
-    getPastEventCount(),
   ]);
 
-  const [featuredEvent, ...remainingEvents] = events;
-
   return (
-    <div className="relative isolate flex flex-col gap-10 pb-10">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <HomeBackgroundArt className="top-[25svh]" />
-      </div>
-      <StickerPlayground
-        stickers={[
-          {
-            id: "logo",
-            initialX: -46.4,
-            initialY: -19.2,
-            initialRotate: -15,
-            initialScale: 1,
-            initialZ: 130,
-            element: (
-              <DieCutSticker
-                radius={3}
-                elevation="l2"
-                elevationHover="l4"
-                peel={{ src: "/images/dcmc-logo.png", size: 180 }}
-              >
-                <Image
-                  src="/images/dcmc-logo.png"
-                  alt="DC Movie Club"
-                  width={180}
-                  height={180}
-                  priority
-                />
-              </DieCutSticker>
-            ),
-          },
-          {
-            id: "tagline",
-            initialX: -27.2,
-            initialY: -4.3,
-            initialRotate: -4,
-            initialScale: 1,
-            initialZ: 134,
-            element: (
-              <RectSticker
-                width={380}
-                height={82}
-                borderColor="#d4cbb0"
-                borderWidth={5}
-                radius={8}
-                elevation="l2"
-                elevationHover="l4"
-                peel={{ corner: "tr", backingColor: "#d4cbb0", amount: 0.06 }}
-              >
-                <svg
-                  viewBox="0 0 560 120"
-                  preserveAspectRatio="xMidYMid slice"
-                  className="block h-full w-full"
-                  role="img"
-                  aria-label="An inclusive and (mostly) unpretentious club to discuss movies and make friends!"
-                >
-                  <defs>
-                    <filter
-                      id="sprocket-shadow"
-                      x="-20%"
-                      y="-40%"
-                      width="140%"
-                      height="200%"
-                    >
-                      <feDropShadow
-                        dx="0"
-                        dy="0.8"
-                        stdDeviation="0.6"
-                        floodColor="#5a543e"
-                        floodOpacity="0.3"
-                      />
-                    </filter>
-                  </defs>
-                  <rect width="560" height="120" rx="6" fill="#efecdf" />
-                  {Array.from({ length: 32 }, (_, i) => {
-                    const x = 5 + i * 17.5;
-                    return (
-                      <g key={i} filter="url(#sprocket-shadow)">
-                        <rect
-                          x={x}
-                          y={4}
-                          width={10}
-                          height={7}
-                          rx={2}
-                          fill="#c9c1a5"
-                        />
-                        <rect
-                          x={x}
-                          y={109}
-                          width={10}
-                          height={7}
-                          rx={2}
-                          fill="#c9c1a5"
-                        />
-                      </g>
-                    );
-                  })}
-                  <text
-                    x="280"
-                    y="45"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#393a3e"
-                    fontFamily="var(--font-dcmc)"
-                    fontSize="25"
-                    letterSpacing="1"
-                  >
-                    DC's inclusive and (mostly) unpretentious club
-                  </text>
-                  <text
-                    x="280"
-                    y="78"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#393a3e"
-                    fontFamily="var(--font-dcmc)"
-                    fontSize="25"
-                    letterSpacing="1"
-                  >
-                    for discussing movies and making friends!
-                  </text>
-                </svg>
-              </RectSticker>
-            ),
-          },
-          {
-            id: "est",
-            initialX: -32.7,
-            initialY: 6.2,
-            initialRotate: 5,
-            initialScale: 1.5,
-            initialZ: 138,
-            element: (
-              <TextSticker
-                color="#be7184"
-                strokeWidth={7}
-                elevation="l2"
-                elevationHover="l4"
-                className="text-2xl uppercase -tracking-[3px]"
-              >
-                Est 2023
-              </TextSticker>
-            ),
-          },
-          {
-            id: "audience",
-            initialX: 21.8,
-            initialY: -24.1,
-            initialRotate: 8,
-            initialScale: 0.8,
-            initialZ: 126,
-            element: (
-              <RectSticker
-                width={180}
-                height={250}
-                borderColor="white"
-                borderWidth={8}
-                radius={4}
-                elevation="l2"
-                elevationHover="l4"
-                peel={{
-                  corner: "bl",
-                  backingColor: "white",
-                  amount: 0.06,
-                  startDelay: 1400,
-                  duration: 1800,
-                }}
-              >
-                <div
-                  className="relative flex h-full w-full items-center justify-center"
-                  style={{ backgroundColor: "#6672ab" }}
-                >
-                  <Image
-                    src="/images/audience-white.png"
-                    alt="Movie audience illustration"
-                    fill
-                    sizes="150px"
-                    priority
-                    className="object-cover"
-                  />
-                </div>
-              </RectSticker>
-            ),
-          },
-          {
-            id: "events",
-            initialX: 16.8,
-            initialY: 4.5,
-            initialRotate: -8,
-            initialScale: 1.1,
-            initialZ: 136,
-            element:
-              pastEventCount > 0 ? (
-                <RectSticker
-                  width={210}
-                  height={44}
-                  borderColor="#b4731e"
-                  borderWidth={4}
-                  radius={10}
-                  elevation="l2"
-                  elevationHover="l4"
-                  peel={{ corner: "br", backingColor: "#b4731e", amount: 0.06 }}
-                >
-                  <div className="flex h-full w-full items-center gap-2 bg-orange px-3">
-                    <CountTicker
-                      value={pastEventCount}
-                      behind={3}
-                      color="cream"
-                    />
-                    <span className="text-sm uppercase tracking-wide leading-none text-charcoal">
-                      events and counting...
-                    </span>
-                  </div>
-                </RectSticker>
-              ) : null,
-          },
-        ]}
-      />
+    <div className="flex flex-col gap-10 pb-10">
+      <section className="flex justify-center px-6 pt-12">
+        <Image
+          src="/images/dcmc-logo.svg"
+          alt="DC Movie Club"
+          width={810}
+          height={810}
+          priority
+          className="h-auto w-56 sm:w-72"
+        />
+      </section>
 
       <div className="flex items-center justify-center gap-4">
         {Object.values(socials).map((link) => (
@@ -535,13 +377,9 @@ export default async function Home() {
         ))}
       </div>
 
-      {featuredEvent && <FeaturedEvent event={featuredEvent} />}
+      {events.length > 0 && <EventsSection events={events} />}
 
       {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
-
-      {remainingEvents.length > 0 && (
-        <UpcomingEvents events={remainingEvents} />
-      )}
     </div>
   );
 }

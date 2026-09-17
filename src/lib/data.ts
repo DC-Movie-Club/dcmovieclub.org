@@ -1,6 +1,7 @@
 import type { CalendarEvent } from "@/types/event"
 import type { LetterboxdReview } from "@/types/letterboxd"
 import type { SubstackPost } from "@/types/post"
+import { extractTicket, isHoldEvent } from "@/lib/event-description"
 
 const CALENDAR_ID =
   "5a3c273aeca64dfd79ebc3784f4249046a77febbc71d5281e4a92a71c2f5c5c8@group.calendar.google.com"
@@ -17,49 +18,6 @@ type GoogleCalendarEvent = {
 
 type GoogleCalendarResponse = {
   items?: GoogleCalendarEvent[]
-}
-
-// TODO: use Ticket Tailor API (TICKET_TAILOR_API_KEY) to fetch event images (images.header / images.thumbnail) for events with a TT link
-const TICKET_TAILOR_RE = /https?:\/\/(?:(?:www\.|app\.)?tickettailor\.com|buytickets\.at)\/[^\s<"']*/i
-
-function extractTicketUrl(description?: string): string | null {
-  if (!description) return null
-  const match = description.match(TICKET_TAILOR_RE)
-  return match ? match[0] : null
-}
-
-export async function getPastEventCount(): Promise<number> {
-  const apiKey = process.env.GOOGLE_CALENDAR_API_KEY
-  if (!apiKey) return 0
-
-  let count = 0
-  let pageToken: string | undefined
-
-  try {
-    do {
-      const params = new URLSearchParams({
-        key: apiKey,
-        timeMax: new Date().toISOString(),
-        singleEvents: "true",
-        maxResults: "2500",
-        fields: "nextPageToken,items(id)",
-      })
-      if (pageToken) params.set("pageToken", pageToken)
-
-      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?${params}`
-      const res = await fetch(url, { next: { revalidate: 3600 } })
-      if (!res.ok) return count
-
-      const data: { items?: { id: string }[]; nextPageToken?: string } =
-        await res.json()
-      count += data.items?.length ?? 0
-      pageToken = data.nextPageToken
-    } while (pageToken)
-
-    return count
-  } catch {
-    return count
-  }
 }
 
 export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
@@ -83,17 +41,18 @@ export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
     const data: GoogleCalendarResponse = await res.json()
     if (!data.items) return []
 
-    return data.items.map((item) => ({
-      id: item.id,
-      title: item.summary ?? "Untitled Event",
-      description: item.description ?? null,
-      location: item.location ?? null,
-      start: item.start.dateTime ?? item.start.date ?? "",
-      end: item.end.dateTime ?? item.end.date ?? "",
-      allDay: !item.start.dateTime,
-      link: item.htmlLink ?? null,
-      ticketUrl: extractTicketUrl(item.description),
-    }))
+    return data.items
+      .filter((item) => !isHoldEvent(item.summary))
+      .map((item) => ({
+        id: item.id,
+        title: item.summary ?? "Untitled Event",
+        location: item.location ?? null,
+        start: item.start.dateTime ?? item.start.date ?? "",
+        end: item.end.dateTime ?? item.end.date ?? "",
+        allDay: !item.start.dateTime,
+        link: item.htmlLink ?? null,
+        ...extractTicket(item.description),
+      }))
   } catch {
     return []
   }

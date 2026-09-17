@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Hover styles for a clickable card that stay off while pointing at a button
+   inside it (e.g. an inline "Read more" toggle), which does its own thing. */
+@custom-variant card-hover (&:is(:where(.group\/card):hover:not(:has(button:hover)) *));
+
 @font-face {
   font-family: "DCMC";
   src: url("/fonts/dcmc.otf") format("opentype");
@@ -31,6 +35,7 @@
   /* --- Brand: Secondary --- */
   --color-rose: #ca6c84;
   --color-orange: #eca344;
+  --color-orange-dark: #6e430b;
   --color-olive: #b1ad26;
   --color-sky: #57a7cc;
   --color-purple: #6372af;
