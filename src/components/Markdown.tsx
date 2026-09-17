@@ -66,13 +66,17 @@ const components: Components = {
 export function Markdown({
   children,
   className,
+  overrides,
 }: {
   children: string;
   className?: string;
+  overrides?: Components;
 }) {
   return (
     <div className={cn("text-charcoal", className)}>
-      <ReactMarkdown components={components}>{children}</ReactMarkdown>
+      <ReactMarkdown components={{ ...components, ...overrides }}>
+        {children}
+      </ReactMarkdown>
     </div>
   );
 }
