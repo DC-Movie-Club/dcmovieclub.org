@@ -26,7 +26,6 @@
   /* --- Brand: Main --- */
   --color-rust: #a2390a;
   --color-rust-dark: #551e05;
-  --color-rust-light: #dcbfaa;
   --color-sienna: #b24d2a;
   --color-cream: #efecdf;
   --color-teal: #375b6d;
@@ -40,9 +39,6 @@
 
   /* --- Brand: Secondary --- */
   --color-rose: #ca6c84;
-  --color-rose-dusty: #be7184;
-  --color-rose-dusty-dark: #6d3240;
-  --color-rose-dusty-light: #e3cdc8;
   --color-rose-dark: #431823;
   --color-orange: #eca344;
   --color-orange-dark: #6e430b;
@@ -136,9 +132,9 @@ body {
   --page-edge: --value(--color-*);
 }
 
-/* Poster-style outline + stacked hard shadow; the class form of
-   components/events/outlined-text.ts, for places that can only take classes
-   (e.g. the copy editor's Lexical theme) */
+/* Poster-style lettering: an outline plus a stacked hard shadow, both in
+   --outline-ink (set with outline-ink-*), so a parent state like hover can
+   recolor them together */
 @utility outlined-lettering {
   text-shadow:
     2px 2px 0 var(--outline-ink, var(--color-charcoal)),
@@ -149,7 +145,7 @@ body {
   paint-order: stroke fill;
 }
 
-/* Sets the ink for outlined lettering (see components/events/outlined-text.ts) */
+/* Sets the ink for outlined-lettering */
 @utility outline-ink-* {
   --outline-ink: --value(--color-*);
 }

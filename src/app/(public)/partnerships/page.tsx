@@ -3,7 +3,7 @@ import { Markdown } from "@/components/Markdown";
 import { sectionCardOverrides } from "@/components/section-cards";
 import { copySlots } from "@/config/copy";
 import { getCopy } from "@/lib/copy";
-import { outlinedTextStyle } from "@/components/events/outlined-text";
+import { ColorPage, PageTitle } from "@/components/ColorPage";
 
 const markdownOverrides: Components = {
   ...sectionCardOverrides("outline-ink-page-ink"),
@@ -26,25 +26,19 @@ export default async function Partnerships() {
   const { content } = await getCopy(copySlots.partnerships.key);
 
   return (
-    // The negative margin cancels the layout's bottom padding (reserved for the
-    // nav) so the color runs to the bottom edge; pb-36 re-adds that clearance.
-    <div className="-mb-24 min-h-screen bg-purple page-ink-purple-dark page-edge-purple-light px-6 pt-14 pb-36 sm:pt-20">
-      <div className="mx-auto flex max-w-3xl flex-col gap-16">
-        <h1
-          className="text-4xl uppercase leading-none tracking-wide text-cream outline-ink-purple-dark sm:text-6xl"
-          style={outlinedTextStyle}
-        >
-          Partnerships
-        </h1>
+    <ColorPage
+      className="bg-purple page-ink-purple-dark page-edge-purple-light"
+      contentClassName="gap-16"
+    >
+      <PageTitle className="text-4xl">Partnerships</PageTitle>
 
-        <Markdown
-          sections={{ depth: 2 }}
-          overrides={markdownOverrides}
-          className="flex flex-col gap-16"
-        >
-          {content.trim() || "Partnership details coming soon."}
-        </Markdown>
-      </div>
-    </div>
+      <Markdown
+        sections={{ depth: 2 }}
+        overrides={markdownOverrides}
+        className="flex flex-col gap-16"
+      >
+        {content.trim() || "Partnership details coming soon."}
+      </Markdown>
+    </ColorPage>
   );
 }

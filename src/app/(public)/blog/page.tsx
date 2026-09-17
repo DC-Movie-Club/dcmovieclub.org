@@ -2,7 +2,8 @@ import { ArrowUpRight, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getRecentPosts } from "@/lib/data";
 import { TIME_ZONE } from "@/lib/event-format";
-import { outlinedTextStyle } from "@/components/events/outlined-text";
+import { ColorPage, PageTitle } from "@/components/ColorPage";
+import { CardSurface, CreamCard } from "@/components/CreamCard";
 import type { SubstackPost } from "@/types/post";
 import { ThumbnailImage } from "./ThumbnailImage";
 
@@ -73,10 +74,7 @@ function OpensOverlay({
 function LatestPostCard({ post }: { post: SubstackPost }) {
   return (
     <div className="group/card relative">
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl transition-colors sketch card-hover:border-rose-dark"
-      />
+      <CardSurface className="card-hover:border-rose-dark" />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
           focusable CTA, so this one stays out of the tab order. */}
@@ -90,10 +88,7 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
       />
 
       <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
-        <span
-          className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outline-ink-page-ink card-hover:outline-ink-rose-dark sm:text-5xl"
-          style={outlinedTextStyle}
-        >
+        <span className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink card-hover:outline-ink-rose-dark sm:text-5xl">
           Latest
         </span>
       </div>
@@ -202,68 +197,55 @@ export default async function Blog() {
   const [latest, ...older] = posts;
 
   return (
-    // The negative margin cancels the layout's bottom padding (reserved for the
-    // nav) so the color runs to the bottom edge; pb-36 re-adds that clearance.
-    <div className="-mb-24 min-h-screen bg-charcoal page-ink-rose page-edge-charcoal-light px-6 pt-14 pb-36 sm:pt-20">
-      <div className="mx-auto flex max-w-3xl flex-col gap-14">
-        <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex flex-col gap-4">
-            <h1
-              className="text-5xl uppercase leading-none tracking-wide text-cream outline-ink-rose sm:text-6xl"
-              style={outlinedTextStyle}
-            >
-              Blog
-            </h1>
-            <p className="text-xl uppercase tracking-wide text-cream">
-              Updates and interviews from our newsletter
-            </p>
-          </div>
-          <a
-            href={SUBSTACK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group/subscribe relative self-start rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:self-auto"
-          >
-            <span
-              aria-hidden
-              className="absolute inset-0 rounded-full border-2 border-cream transition-colors sketch-subtle group-hover/subscribe:bg-cream group-hover/subscribe:sketch-subtle-animated"
-            />
-            <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-cream transition-colors group-hover/subscribe:text-charcoal">
-              <Mail size={14} />
-              Subscribe
-            </span>
-          </a>
-        </header>
+    <ColorPage className="bg-charcoal page-ink-rose page-edge-charcoal-light">
+      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4">
+          <PageTitle>Blog</PageTitle>
+          <p className="text-xl uppercase tracking-wide text-cream">
+            Updates and interviews from our newsletter
+          </p>
+        </div>
+        <a
+          href={SUBSTACK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group/subscribe relative self-start rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:self-auto"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full border-2 border-cream transition-colors sketch-subtle group-hover/subscribe:bg-cream group-hover/subscribe:sketch-subtle-animated"
+          />
+          <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-cream transition-colors group-hover/subscribe:text-charcoal">
+            <Mail size={14} />
+            Subscribe
+          </span>
+        </a>
+      </header>
 
-        {latest ? (
-          <LatestPostCard post={latest} />
-        ) : (
-          <div className="relative">
-            <div
-              aria-hidden
-              className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl sketch"
-            />
-            <p className="relative px-6 py-8 text-center text-lg uppercase tracking-wide text-charcoal/80">
-              No posts yet. Check back soon!
-            </p>
-          </div>
-        )}
+      {latest ? (
+        <LatestPostCard post={latest} />
+      ) : (
+        <CreamCard>
+          <p className="text-center text-lg uppercase tracking-wide text-charcoal/80">
+            No posts yet. Check back soon!
+          </p>
+        </CreamCard>
+      )}
 
-        {older.length > 0 && (
-          <section className="flex flex-col gap-6">
-            <h2 className="text-xl uppercase tracking-wide text-cream sm:text-2xl">
-              Older posts
-            </h2>
-            <ul className="grid gap-x-4 gap-y-6 sm:grid-cols-3">
-              {older.map((post) => (
-                <li key={post.link}>
-                  <PostTile post={post} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
-    </div>
+      {older.length > 0 && (
+        <section className="flex flex-col gap-6">
+          <h2 className="text-xl uppercase tracking-wide text-cream sm:text-2xl">
+            Older posts
+          </h2>
+          <ul className="grid gap-x-4 gap-y-6 sm:grid-cols-3">
+            {older.map((post) => (
+              <li key={post.link}>
+                <PostTile post={post} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </ColorPage>
   );
 }

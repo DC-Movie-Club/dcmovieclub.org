@@ -4,9 +4,8 @@ import type { Components } from "react-markdown";
 import { ArrowRight, Plus } from "lucide-react";
 import { Markdown } from "@/components/Markdown";
 import { sectionCardOverrides } from "@/components/section-cards";
-import { outlinedTextStyle } from "@/components/events/outlined-text";
+import { ColorPage, PageTitle } from "@/components/ColorPage";
 import { copySlots } from "@/config/copy";
-import { cn } from "@/lib/utils";
 import { getCopy } from "@/lib/copy";
 
 const aboutOverrides = sectionCardOverrides("outline-ink-page-ink");
@@ -54,65 +53,47 @@ export default async function About() {
   ]);
 
   return (
-    // The negative margin cancels the layout's bottom padding (reserved for the
-    // nav) so the color runs to the bottom edge; pb-36 re-adds that clearance.
-    <div className="-mb-24 min-h-screen bg-sky page-ink-sky-dark page-edge-sky-light px-6 pt-14 pb-36 sm:pt-20">
-      <div className="mx-auto flex max-w-3xl flex-col gap-16">
-        <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <h1
-            className={cn(
-              "text-5xl uppercase leading-none tracking-wide text-cream sm:text-6xl",
-              "outline-ink-sky-dark",
-            )}
-            style={outlinedTextStyle}
-          >
-            About
-          </h1>
-          <NextLink
-            href="/code-of-conduct"
-            className="group/cta relative self-start rounded-full sm:self-auto transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
-          >
-            <span
-              aria-hidden
-              className="absolute inset-0 rounded-full border-[3px] border-rust-dark bg-rust shadow-lg sketch group-hover/cta:sketch-animated"
-            />
-            <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-cream sm:px-6 sm:py-3 sm:text-base">
-              Read our Code of Conduct
-              <ArrowRight size={18} className="shrink-0" />
-            </span>
-          </NextLink>
-        </header>
+    <ColorPage
+      className="bg-sky page-ink-sky-dark page-edge-sky-light"
+      contentClassName="gap-16"
+    >
+      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <PageTitle>About</PageTitle>
+        <NextLink
+          href="/code-of-conduct"
+          className="group/cta relative self-start rounded-full sm:self-auto transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full border-[3px] border-rust-dark bg-rust shadow-lg sketch group-hover/cta:sketch-animated"
+          />
+          <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-cream sm:px-6 sm:py-3 sm:text-base">
+            Read our Code of Conduct
+            <ArrowRight size={18} className="shrink-0" />
+          </span>
+        </NextLink>
+      </header>
 
-        {about.content.trim() && (
-          <Markdown
-            sections={{ depth: 2 }}
-            overrides={aboutOverrides}
-            className="flex flex-col gap-16"
-          >
-            {about.content}
+      {about.content.trim() && (
+        <Markdown
+          sections={{ depth: 2 }}
+          overrides={aboutOverrides}
+          className="flex flex-col gap-16"
+        >
+          {about.content}
+        </Markdown>
+      )}
+
+      {faq.content.trim() && (
+        <section id="faq" className="flex scroll-mt-8 flex-col gap-8">
+          <h2 className="text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-5xl">
+            FAQ
+          </h2>
+          <Markdown overrides={faqOverrides} className="flex flex-col gap-4">
+            {faq.content}
           </Markdown>
-        )}
-
-        {faq.content.trim() && (
-          <section id="faq" className="flex scroll-mt-8 flex-col gap-8">
-            <h2
-              className={cn(
-                "text-4xl uppercase leading-none tracking-wide text-cream sm:text-5xl",
-                "outline-ink-sky-dark",
-              )}
-              style={outlinedTextStyle}
-            >
-              FAQ
-            </h2>
-            <Markdown
-              overrides={faqOverrides}
-              className="flex flex-col gap-4"
-            >
-              {faq.content}
-            </Markdown>
-          </section>
-        )}
-      </div>
-    </div>
+        </section>
+      )}
+    </ColorPage>
   );
 }

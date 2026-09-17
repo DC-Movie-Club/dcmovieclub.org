@@ -1,7 +1,7 @@
 import { Children } from "react";
 import type { Components, ExtraProps } from "react-markdown";
 import { cn } from "@/lib/utils";
-import { outlinedTextStyle } from "@/components/events/outlined-text";
+import { CardSurface } from "@/components/CreamCard";
 
 function textContent(node: ExtraProps["node"]): string {
   if (!node) return "";
@@ -32,10 +32,7 @@ export function sectionCardOverrides(inkClassName: string): Components {
       const [heading, body] = parts.length > 1 ? parts : [null, parts[0]];
       return (
         <section className="relative flex flex-col items-start">
-          <div
-            aria-hidden
-            className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream shadow-xl sketch"
-          />
+          <CardSurface />
           {heading}
           <div
             className={cn(
@@ -53,13 +50,10 @@ export function sectionCardOverrides(inkClassName: string): Components {
     h2: ({ node, children }) => (
       <h2
         className={cn(
-          "relative -mt-2.5 ml-4 mr-4 origin-bottom-left text-3xl uppercase leading-none tracking-wide text-cream sm:-mt-3 sm:ml-6 sm:text-4xl",
+          "relative -mt-2.5 ml-4 mr-4 origin-bottom-left text-3xl uppercase leading-none tracking-wide text-cream outlined-lettering sm:-mt-3 sm:ml-6 sm:text-4xl",
           inkClassName,
         )}
-        style={{
-          ...outlinedTextStyle,
-          rotate: `${headingTilt(textContent(node))}deg`,
-        }}
+        style={{ rotate: `${headingTilt(textContent(node))}deg` }}
       >
         {children}
       </h2>
