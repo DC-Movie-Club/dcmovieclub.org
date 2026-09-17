@@ -21,7 +21,7 @@ import {
   type SerializedDecoratorBlockNode,
 } from "@lexical/react/LexicalDecoratorBlockNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $insertNodeToNearestRoot } from "@lexical/utils";
+import { $insertBlockNode } from "@/app/admin/components/insertBlockNode";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { markdownStyles } from "@/components/markdownStyles";
 import { Button } from "@/components/ui/button";
@@ -208,7 +208,7 @@ export function YouTubePlugin(): null {
     return editor.registerCommand<string>(
       INSERT_YOUTUBE_COMMAND,
       (payload) => {
-        $insertNodeToNearestRoot($createYouTubeNode(payload));
+        $insertBlockNode($createYouTubeNode(payload));
         return true;
       },
       COMMAND_PRIORITY_EDITOR

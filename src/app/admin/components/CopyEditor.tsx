@@ -208,7 +208,7 @@ function Toolbar({
   const [isYouTubeDialogOpen, setIsYouTubeDialogOpen] = useState(false);
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-b bg-card px-3 py-2">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b bg-card px-3 py-2">
       <ToolbarButton
         icon={<Bold />}
         label="Bold"

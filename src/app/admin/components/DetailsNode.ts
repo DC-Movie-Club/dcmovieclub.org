@@ -25,7 +25,8 @@ import {
   type Transformer,
 } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $findMatchingParent, $insertNodeToNearestRoot, mergeRegister } from "@lexical/utils";
+import { $findMatchingParent, mergeRegister } from "@lexical/utils";
+import { $insertBlockNode } from "./insertBlockNode.ts";
 
 type DetailsTheme = {
   details?: string;
@@ -261,7 +262,7 @@ export function DetailsPlugin(): null {
             ? $findMatchingParent(selection.anchor.getNode(), $isDetailsNode)
             : null;
           if (enclosing) enclosing.insertAfter(details);
-          else $insertNodeToNearestRoot(details);
+          else $insertBlockNode(details);
           if (!details.getNextSibling()) details.insertAfter($createParagraphNode());
           // Select the placeholder so typing replaces it
           placeholder.select(0, placeholder.getTextContentSize());
