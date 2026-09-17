@@ -1,8 +1,7 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { getTokens } from "next-firebase-auth-edge/lib/next/tokens";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/admin-session";
 
 const DOC_PATH = { collection: "admin", docId: "resources" } as const;
 
@@ -20,24 +19,8 @@ async function resolveName(phone: string | null): Promise<string | null> {
   return name?.trim() || null;
 }
 
-async function getCurrentPhone(): Promise<string | null> {
-  const tokens = await getTokens(await cookies(), {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-    cookieName: "AdminSession",
-    cookieSignatureKeys: [process.env.COOKIE_SECRET!],
-    serviceAccount: {
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL!,
-      privateKey: (process.env.FIREBASE_ADMIN_PRIVATE_KEY ?? "").replace(
-        /\\n/g,
-        "\n"
-      ),
-    },
-  });
-  return tokens?.decodedToken.phone_number ?? null;
-}
-
 export async function getResources(): Promise<ResourcesDoc> {
+  await requireAdmin();
   const snap = await getAdminDb()
     .collection(DOC_PATH.collection)
     .doc(DOC_PATH.docId)
@@ -71,7 +54,7 @@ export async function saveResources(input: {
   content: string;
   force?: boolean;
 }): Promise<SaveResult> {
-  const phone = await getCurrentPhone();
+  const phone = (await requireAdmin()).phone_number ?? null;
   const ref = getAdminDb()
     .collection(DOC_PATH.collection)
     .doc(DOC_PATH.docId);

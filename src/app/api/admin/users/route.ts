@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
+import { getAdminToken } from "@/lib/admin-session";
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
 
+// The proxy only redirects /admin pages, so API routes must check the session themselves
 export async function GET() {
+  if (!(await getAdminToken())) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 });
+  }
+
   const db = getAdminDb();
   const snapshot = await db.collection("allowedPhones").get();
 
