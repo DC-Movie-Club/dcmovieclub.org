@@ -1,4 +1,4 @@
-{/* Simple contact page. Likely a form or mailto link to abbie@dcmovieclub.org.
+{/* Simple contact page. Likely a form or mailto link to hello@dcmovieclub.org.
     May also surface social links and Discord invite. */}
 
 import { ExternalLink } from "@/components/ui/link";
@@ -11,10 +11,10 @@ export default function Contact() {
         Get in touch with DC Movie Club.
       </p>
       <ExternalLink
-        href="mailto:abbie@dcmovieclub.org"
+        href="mailto:hello@dcmovieclub.org"
         className="mt-6 inline-block text-lg text-primary underline underline-offset-4"
       >
-        abbie@dcmovieclub.org
+        hello@dcmovieclub.org
       </ExternalLink>
     </div>
   );
