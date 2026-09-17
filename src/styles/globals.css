@@ -18,6 +18,14 @@
 
 @theme {
   --font-heading: "DCMC", Georgia, serif;
+
+  --animate-marquee: marquee 60s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @theme inline {

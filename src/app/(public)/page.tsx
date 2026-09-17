@@ -1,4 +1,3 @@
-import Image from "next/image";
 import NextLink from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getUpcomingEvents } from "@/lib/data";
@@ -9,8 +8,31 @@ import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import type { CalendarEvent } from "@/types/event";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
+import { AudienceMarquee } from "@/components/AudienceMarquee";
+import { cn } from "@/lib/utils";
 
 const UPCOMING_TILE_COUNT = 3;
+
+function TaglineBanner({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className={cn("relative px-3 py-1.5 text-balance sm:px-5 sm:py-2.5", className)}>
+      {/* Separate shadow layer: an offset box-shadow would be clipped by the
+          sketch filter's region */}
+      <span
+        aria-hidden
+        className="absolute inset-0 translate-x-1 translate-y-1 bg-teal sketch sm:translate-x-1.5 sm:translate-y-1.5"
+      />
+      <span aria-hidden className="absolute inset-0 bg-purple sketch" />
+      <span className="relative">{children}</span>
+    </span>
+  );
+}
 
 function EventsSection({ events }: { events: CalendarEvent[] }) {
   const [featured, ...rest] = events;
@@ -63,15 +85,23 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-10 pb-10">
-      <section className="flex justify-center px-6 pt-12">
-        <Image
-          src="/images/dcmc-logo.svg"
-          alt="DC Movie Club"
-          width={810}
-          height={810}
-          priority
-          className="h-auto w-56 sm:w-72"
-        />
+      <section className="flex flex-col items-center pt-8">
+        <AudienceMarquee />
+        <h1 className="relative -mt-4 px-4 text-center text-[15vw] whitespace-nowrap uppercase leading-none text-teal sm:-mt-9 sm:text-8xl">
+          DC Movie Club
+        </h1>
+        <p className="mt-5 flex flex-col items-center px-4 text-center text-base uppercase tracking-wide text-cream sm:mt-7 sm:text-xl">
+          <TaglineBanner className="-rotate-2">
+            DC’s inclusive and
+            <span className="max-sm:hidden"> (mostly) unpretentious community</span>
+          </TaglineBanner>
+          <TaglineBanner className="rotate-2 sm:hidden">
+            (mostly) unpretentious community
+          </TaglineBanner>
+          <TaglineBanner className="-rotate-3 sm:rotate-2">
+            to discuss movies and make friends!
+          </TaglineBanner>
+        </p>
       </section>
 
       <div className="flex items-center justify-center gap-4">
