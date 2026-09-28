@@ -4,6 +4,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
 import {
   isColorRoleKey,
+  isHexColor,
   pageTemplates,
   type PageColors,
   type PageKey,
@@ -27,15 +28,19 @@ export type PageSection =
   | (SectionBase & { kind: "links"; items: LinkItem[] })
   | (SectionBase & { kind: "faq"; items: FaqItem[] });
 
+export type PageCta = { label: string; href: string };
+
+// `updatedAt`/`updatedByName` cover the page's own fields (title, CTA, colors);
+// each section tracks its own
 export type PageContent = {
   key: PageKey;
   title: string;
-  cta: { label: string; href: string } | null;
+  cta: PageCta | null;
   colors: PageColors;
   sections: PageSection[];
+  updatedAt: string | null;
+  updatedByName: string | null;
 };
-
-const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object"
@@ -95,14 +100,14 @@ function toSection(
   }
 }
 
-// Reads the page doc into its template's shape, so a missing or malformed
-// field renders as empty instead of breaking the page
-async function fetchPage(key: PageKey): Promise<PageContent> {
-  const snap = await getAdminDb().collection(PAGES_COLLECTION).doc(key).get();
-  const data = record(snap.data());
-  const sections = record(data.sections);
+// Reads a page doc into its template's shape, so a missing or malformed field
+// renders as empty instead of breaking the page
+export function pageFromData(
+  key: PageKey,
+  data: Record<string, unknown>,
+): PageContent {
   const cta = record(data.cta);
-
+  const sections = record(data.sections);
   return {
     key,
     title: text(data.title),
@@ -112,14 +117,21 @@ async function fetchPage(key: PageKey): Promise<PageContent> {
         : null,
     colors: Object.fromEntries(
       Object.entries(record(data.colors)).filter(
-        ([role, hex]) =>
-          isColorRoleKey(role) && typeof hex === "string" && HEX_COLOR.test(hex),
+        ([role, hex]) => isColorRoleKey(role) && isHexColor(hex),
       ),
     ) as PageColors,
     sections: Object.values(pageTemplates[key].sections).map((section) =>
       toSection(section.key, section.kind, record(sections[section.key])),
     ),
+    updatedAt: isoDate(data.updatedAt),
+    updatedByName: text(data.updatedByName) || null,
   };
+}
+
+// Uncached, for the admin; the public site reads through getPage
+export async function readPage(key: PageKey): Promise<PageContent> {
+  const snap = await getAdminDb().collection(PAGES_COLLECTION).doc(key).get();
+  return pageFromData(key, record(snap.data()));
 }
 
 export function pageTag(key: PageKey) {
@@ -129,7 +141,7 @@ export function pageTag(key: PageKey) {
 // Saving a page calls updateTag(pageTag(key)), but Next's cache is per server
 // instance, so other instances pick up the edit when `revalidate` runs out
 export const getPage = cache((key: PageKey) =>
-  unstable_cache(() => fetchPage(key), ["page", key], {
+  unstable_cache(() => readPage(key), ["page", key], {
     tags: [pageTag(key)],
     revalidate: 1800,
   })(),

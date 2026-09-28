@@ -19,7 +19,7 @@ function LinkListItem({ item }: { item: LinkItem }) {
 
 // The height animation uses ::details-content where supported; elsewhere it
 // just toggles
-function FaqEntry({ item }: { item: FaqItem }) {
+export function FaqEntry({ item }: { item: FaqItem }) {
   return (
     // The card is drawn with ::before because any child element other than
     // <summary> lands in ::details-content, which is hidden while closed.

@@ -396,11 +396,11 @@ export function CopyEditor({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <Link
-          href="/admin/content"
+          href="/admin/pages"
           className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Content
+          Pages
         </Link>
         <h2 className="font-semibold">{slot.label}</h2>
       </div>

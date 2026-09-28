@@ -19,6 +19,12 @@ export function isColorRoleKey(value: string): value is ColorRoleKey {
   return Object.hasOwn(colorRoles, value);
 }
 
+const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+export function isHexColor(value: unknown): value is string {
+  return typeof value === "string" && HEX_COLOR.test(value);
+}
+
 export function colorVars(colors: PageColors): CSSProperties {
   return Object.fromEntries(
     Object.entries(colors).map(([role, hex]) => [
@@ -39,23 +45,30 @@ export type SectionKind = keyof typeof sectionKinds;
 type PageTemplate = {
   key: string;
   label: string;
-  sections: Record<string, { key: string; kind: SectionKind }>;
+  href: string;
+  sections: Record<string, { key: string; label: string; kind: SectionKind }>;
 };
 
-// The structure of each page, in render order. Everything shown in it (titles,
-// labels, content, colors) lives in Firestore at pages/{key}.
+// The structure of each page, in render order. Labels here only name things in
+// the admin; everything shown on the page (titles, headings, content, colors)
+// lives in Firestore at pages/{key}.
 export const pageTemplates = {
   about: {
     key: "about",
     label: "About",
+    href: "/about",
     sections: {
-      intro: { key: "intro", kind: "text" },
-      mission: { key: "mission", kind: "text" },
-      news: { key: "news", kind: "links" },
-      follow: { key: "follow", kind: "text" },
-      faq: { key: "faq", kind: "faq" },
+      intro: { key: "intro", label: "Intro", kind: "text" },
+      mission: { key: "mission", label: "Mission", kind: "text" },
+      news: { key: "news", label: "In the News", kind: "links" },
+      follow: { key: "follow", label: "Follow Us", kind: "text" },
+      faq: { key: "faq", label: "FAQ", kind: "faq" },
     },
   },
 } as const satisfies Record<string, PageTemplate>;
 
 export type PageKey = keyof typeof pageTemplates;
+
+export function isPageKey(value: string): value is PageKey {
+  return Object.hasOwn(pageTemplates, value);
+}
