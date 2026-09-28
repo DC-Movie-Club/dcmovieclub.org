@@ -2,8 +2,6 @@
 // can preview them the same way: "labels" are outlined card labels
 // (sectionCardOverrides), "plain" is the default Markdown heading.
 export const copySlots = {
-  about: { key: "about", label: "About", headings: "labels" },
-  faq: { key: "faq", label: "FAQ", headings: "plain" },
   events: { key: "events", label: "Events", headings: "plain" },
   partnerships: { key: "partnerships", label: "Partnerships", headings: "labels" },
   conduct: { key: "conduct", label: "Code of Conduct", headings: "plain" },

@@ -103,11 +103,18 @@
   --color-purple-dark: #313a5f;
   --color-purple-light: #ccced3;
 
-  /* --- Page colors: pages set them with page-ink-* and page-edge-* --- */
+  /* --- Page colors: ColorPage sets them from the page's Firestore doc (see
+     colorRoles), or pages without one set them with page-ink-* and page-edge-*.
+     The fallbacks are neutral, for a color that isn't set. --- */
+  --color-page-bg: var(--page-bg, var(--color-background));
   /* Ink: outlines on lettering labels */
   --color-page-ink: var(--page-ink, var(--color-charcoal));
   /* Edge: card and tile borders */
   --color-page-edge: var(--page-edge, var(--color-charcoal));
+  /* Accent: buttons */
+  --color-page-accent: var(--page-accent, var(--color-charcoal));
+  --color-page-accent-edge: var(--page-accent-edge, var(--color-charcoal));
+  --color-page-accent-text: var(--page-accent-text, var(--color-cream));
 
   /* --- Semantic --- */
   --color-background: #f5f3e8;
