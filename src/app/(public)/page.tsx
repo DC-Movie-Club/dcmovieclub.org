@@ -99,7 +99,7 @@ export default async function Home() {
             (mostly) unpretentious community
           </TaglineBanner>
           <TaglineBanner className="-rotate-1 sm:rotate-[1.5deg]">
-            to discuss movies and make friends!
+            for discussing movies and making friends!
           </TaglineBanner>
         </p>
       </section>
