@@ -13,29 +13,17 @@ import {
 
 export const PAGES_COLLECTION = "pages";
 
-type SectionBase = {
-  key: string;
-  label: string;
-  updatedAt: string | null;
-  updatedByName: string | null;
-};
-
 export type LinkItem = { key: string; title: string; url: string };
 export type FaqItem = { key: string; question: string; answer: string };
 
 export type PageSection =
-  | (SectionBase & { kind: "text"; content: string })
-  | (SectionBase & { kind: "links"; items: LinkItem[] })
-  | (SectionBase & { kind: "faq"; items: FaqItem[] });
+  | { key: string; kind: "text"; label: string; content: string }
+  | { key: string; kind: "links"; label: string; items: LinkItem[] }
+  | { key: string; kind: "faq"; label: string; items: FaqItem[] };
 
-export type PageCta = { label: string; href: string };
-
-// `updatedAt`/`updatedByName` cover the page's own fields (title, CTA, colors);
-// each section tracks its own
 export type PageContent = {
   key: PageKey;
   title: string;
-  cta: PageCta | null;
   colors: PageColors;
   sections: PageSection[];
   updatedAt: string | null;
@@ -68,12 +56,7 @@ function toSection(
   kind: SectionKind,
   raw: Record<string, unknown>,
 ): PageSection {
-  const base = {
-    key,
-    label: text(raw.label),
-    updatedAt: isoDate(raw.updatedAt),
-    updatedByName: text(raw.updatedByName) || null,
-  };
+  const base = { key, label: text(raw.label) };
   switch (kind) {
     case "text":
       return { ...base, kind, content: text(raw.content) };
@@ -106,15 +89,10 @@ export function pageFromData(
   key: PageKey,
   data: Record<string, unknown>,
 ): PageContent {
-  const cta = record(data.cta);
   const sections = record(data.sections);
   return {
     key,
     title: text(data.title),
-    cta:
-      text(cta.label) && text(cta.href)
-        ? { label: text(cta.label), href: text(cta.href) }
-        : null,
     colors: Object.fromEntries(
       Object.entries(record(data.colors)).filter(
         ([role, hex]) => isColorRoleKey(role) && isHexColor(hex),

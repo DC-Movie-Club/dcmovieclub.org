@@ -63,6 +63,7 @@ export const pageTemplates = {
       news: { key: "news", label: "In the News", kind: "links" },
       follow: { key: "follow", label: "Follow Us", kind: "text" },
       faq: { key: "faq", label: "FAQ", kind: "faq" },
+      conduct: { key: "conduct", label: "Code of Conduct", kind: "text" },
     },
   },
 } as const satisfies Record<string, PageTemplate>;

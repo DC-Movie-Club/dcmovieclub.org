@@ -4,7 +4,6 @@
 export const copySlots = {
   events: { key: "events", label: "Events", headings: "plain" },
   partnerships: { key: "partnerships", label: "Partnerships", headings: "labels" },
-  conduct: { key: "conduct", label: "Code of Conduct", headings: "plain" },
 } as const;
 
 export type CopySlotKey = keyof typeof copySlots;

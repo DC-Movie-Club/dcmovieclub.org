@@ -3,90 +3,26 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { diffWords, type Change } from "diff";
-import {
-  $createParagraphNode,
-  $getRoot,
-  $getSelection,
-  $isRangeSelection,
-  createEditor,
-  FORMAT_TEXT_COMMAND,
-} from "lexical";
+import { $getRoot, createEditor } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { AutoLinkPlugin } from "@lexical/react/LexicalAutoLinkPlugin";
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  HeadingNode,
-  QuoteNode,
-  $createHeadingNode,
-  $createQuoteNode,
-} from "@lexical/rich-text";
-import {
-  ListNode,
-  ListItemNode,
-  INSERT_UNORDERED_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-} from "@lexical/list";
-import { LinkNode, AutoLinkNode } from "@lexical/link";
-import { $setBlocksType } from "@lexical/selection";
-import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
-  BOLD_ITALIC_STAR,
-  BOLD_ITALIC_UNDERSCORE,
-  BOLD_STAR,
-  BOLD_UNDERSCORE,
-  HEADING,
-  ITALIC_STAR,
-  ITALIC_UNDERSCORE,
-  LINK,
-  ORDERED_LIST,
-  QUOTE,
-  UNORDERED_LIST,
 } from "@lexical/markdown";
-import {
-  ArrowLeft,
-  Bold,
-  Heading2,
-  Heading3,
-  Italic,
-  Link as LinkIcon,
-  List,
-  ListCollapse,
-  ListOrdered,
-  Pilcrow,
-  Quote,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { saveCopy } from "@/app/admin/actions/copy";
 import { DiffView } from "@/app/admin/components/DiffView";
-import { FloatingTextFormatToolbar } from "@/app/admin/components/FloatingTextFormatToolbar";
 import {
-  FloatingLinkEditorPlugin,
-  insertLink,
-} from "@/app/admin/components/FloatingLinkEditorPlugin";
-import { ToolbarButton } from "@/app/admin/components/ToolbarButton";
-import { LINK_MATCHERS } from "@/app/admin/components/linkMatchers";
-import {
-  createDetailsTransformer,
-  DetailsContentNode,
-  DetailsNode,
-  DetailsPlugin,
-  DetailsSummaryNode,
-  INSERT_DETAILS_COMMAND,
-} from "@/app/admin/components/DetailsNode";
-import {
-  InsertYouTubeDialog,
-  YOUTUBE,
-  YouTubeNode,
-  YouTubePlugin,
-} from "@/app/admin/components/YouTubeNode";
-import { Youtube } from "@/components/icons/Youtube";
+  editorTheme,
+  MarkdownEditorPlugins,
+  MarkdownToolbar,
+  NODES,
+  TRANSFORMERS,
+} from "@/app/admin/components/markdownEditor";
 import { markdownStyles } from "@/components/markdownStyles";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,40 +36,6 @@ import {
 import { cn } from "@/lib/utils";
 import type { CopySlotKey, copySlots } from "@/config/copy";
 import type { CopyDoc } from "@/lib/copy";
-
-// Only what the public markdown renderer can display
-const SHORTCUT_TRANSFORMERS = [
-  HEADING,
-  QUOTE,
-  UNORDERED_LIST,
-  ORDERED_LIST,
-  BOLD_ITALIC_STAR,
-  BOLD_ITALIC_UNDERSCORE,
-  BOLD_STAR,
-  BOLD_UNDERSCORE,
-  ITALIC_STAR,
-  ITALIC_UNDERSCORE,
-  LINK,
-];
-
-// Collapsibles and YouTube only convert on load and save; as typing shortcuts
-// they'd fire mid-line. The details transformer reads TRANSFORMERS lazily so
-// answers can contain any other block.
-const DETAILS = createDetailsTransformer(() => TRANSFORMERS);
-const TRANSFORMERS = [DETAILS, YOUTUBE, ...SHORTCUT_TRANSFORMERS];
-
-const NODES = [
-  HeadingNode,
-  QuoteNode,
-  ListNode,
-  ListItemNode,
-  LinkNode,
-  AutoLinkNode,
-  YouTubeNode,
-  DetailsNode,
-  DetailsSummaryNode,
-  DetailsContentNode,
-];
 
 // The conflict diff compares text the way admins see it, without markdown syntax
 function markdownToPlainText(markdown: string): string {
@@ -154,114 +56,8 @@ const HEADING_LABEL = cn(
   "text-3xl text-cream outlined-lettering sm:text-4xl"
 );
 
-const themeFor = (slot: (typeof copySlots)[CopySlotKey]) => ({
-  embedBlock: {
-    base: "",
-    focus: "rounded-xl outline-2 outline-offset-2 outline-rust",
-  },
-  paragraph: markdownStyles.p,
-  heading: {
-    h1: markdownStyles.h1,
-    h2: slot.headings === "labels" ? HEADING_LABEL : markdownStyles.h2,
-    h3: markdownStyles.h3,
-  },
-  list: {
-    ul: markdownStyles.ul,
-    ol: markdownStyles.ol,
-    nested: { listitem: "list-none" },
-  },
-  quote: markdownStyles.blockquote,
-  details: markdownStyles.details,
-  detailsSummary: cn(
-    markdownStyles.summary,
-    "cursor-text border-b border-dashed border-charcoal/20 pb-2"
-  ),
-  detailsContent: "mt-3",
-  link: markdownStyles.link,
-  text: {
-    bold: markdownStyles.bold,
-    italic: markdownStyles.italic,
-  },
-});
-
-type BlockType = "p" | "h2" | "h3" | "quote";
-
-function Toolbar({
-  setIsLinkEditMode,
-}: {
-  setIsLinkEditMode: (isLinkEditMode: boolean) => void;
-}) {
-  const [editor] = useLexicalComposerContext();
-
-  const setBlock = (type: BlockType) => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
-      $setBlocksType(selection, () => {
-        if (type === "h2" || type === "h3") return $createHeadingNode(type);
-        if (type === "quote") return $createQuoteNode();
-        return $createParagraphNode();
-      });
-    });
-  };
-
-  const [isYouTubeDialogOpen, setIsYouTubeDialogOpen] = useState(false);
-
-  return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b bg-card px-3 py-2">
-      <ToolbarButton
-        icon={<Bold />}
-        label="Bold"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
-      />
-      <ToolbarButton
-        icon={<Italic />}
-        label="Italic"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
-      />
-      <div className="mx-1 h-5 w-px bg-border" />
-      <ToolbarButton icon={<Pilcrow />} label="Paragraph" onClick={() => setBlock("p")} />
-      <ToolbarButton icon={<Heading2 />} label="Heading" onClick={() => setBlock("h2")} />
-      <ToolbarButton icon={<Heading3 />} label="Subheading" onClick={() => setBlock("h3")} />
-      <ToolbarButton icon={<Quote />} label="Quote" onClick={() => setBlock("quote")} />
-      <div className="mx-1 h-5 w-px bg-border" />
-      <ToolbarButton
-        icon={<List />}
-        label="Bulleted list"
-        onClick={() =>
-          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-        }
-      />
-      <ToolbarButton
-        icon={<ListOrdered />}
-        label="Numbered list"
-        onClick={() =>
-          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-        }
-      />
-      <div className="mx-1 h-5 w-px bg-border" />
-      <ToolbarButton
-        icon={<LinkIcon />}
-        label="Link"
-        onClick={() => insertLink(editor, setIsLinkEditMode)}
-      />
-      <ToolbarButton
-        icon={<Youtube />}
-        label="YouTube video"
-        onClick={() => setIsYouTubeDialogOpen(true)}
-      />
-      <ToolbarButton
-        icon={<ListCollapse />}
-        label="Collapsible"
-        onClick={() => editor.dispatchCommand(INSERT_DETAILS_COMMAND, undefined)}
-      />
-      <InsertYouTubeDialog
-        open={isYouTubeDialogOpen}
-        onOpenChange={setIsYouTubeDialogOpen}
-      />
-    </div>
-  );
-}
+const themeFor = (slot: (typeof copySlots)[CopySlotKey]) =>
+  editorTheme(slot.headings === "labels" ? HEADING_LABEL : markdownStyles.h2);
 
 function MarkdownSyncPlugin({
   onChange,
@@ -407,7 +203,11 @@ export function CopyEditor({
 
       <LexicalComposer key={editorKey} initialConfig={initialConfig}>
         <div className="rounded-lg border border-input bg-card">
-          <Toolbar setIsLinkEditMode={setIsLinkEditMode} />
+          <MarkdownToolbar
+            setIsLinkEditMode={setIsLinkEditMode}
+            collapsible
+            className="sticky top-0 z-10 rounded-t-lg"
+          />
           <div ref={setFloatingAnchorElem} className="relative px-5 py-4">
             <RichTextPlugin
               contentEditable={
@@ -425,21 +225,11 @@ export function CopyEditor({
             />
           </div>
         </div>
-        <HistoryPlugin />
-        <ListPlugin />
-        <LinkPlugin />
-        <AutoLinkPlugin matchers={LINK_MATCHERS} />
-        <MarkdownShortcutPlugin transformers={SHORTCUT_TRANSFORMERS} />
-        <YouTubePlugin />
-        <DetailsPlugin />
-        <FloatingTextFormatToolbar setIsLinkEditMode={setIsLinkEditMode} />
-        {floatingAnchorElem && (
-          <FloatingLinkEditorPlugin
-            anchorElem={floatingAnchorElem}
-            isLinkEditMode={isLinkEditMode}
-            setIsLinkEditMode={setIsLinkEditMode}
-          />
-        )}
+        <MarkdownEditorPlugins
+          anchorElem={floatingAnchorElem}
+          isLinkEditMode={isLinkEditMode}
+          setIsLinkEditMode={setIsLinkEditMode}
+        />
         <MarkdownSyncPlugin onChange={handleMarkdownChange} />
       </LexicalComposer>
 

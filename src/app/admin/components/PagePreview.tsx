@@ -1,22 +1,19 @@
 import { PageTitle } from "@/components/ColorPage";
-import { CtaButton } from "@/components/CtaButton";
 import { FaqEntry } from "@/components/PageSections";
 import { SectionCard } from "@/components/section-cards";
 import { SketchFilter } from "@/components/SketchFilter";
 import { Markdown } from "@/components/Markdown";
 import { colorVars, type PageColors } from "@/config/pages";
-import type { PageCta, PageSection } from "@/lib/pages";
+import type { PageSection } from "@/lib/pages";
 
 // A cut-down copy of the page, built from the same components, so color
 // changes can be judged before saving
 export function PagePreview({
   title,
-  cta,
   colors,
   sections,
 }: {
   title: string;
-  cta: PageCta | null;
   colors: PageColors;
   sections: PageSection[];
 }) {
@@ -36,10 +33,7 @@ export function PagePreview({
         className="flex flex-col gap-10 bg-page-bg px-6 pt-8 pb-10"
         style={colorVars(colors)}
       >
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <PageTitle className="text-4xl sm:text-4xl">{title}</PageTitle>
-          {cta && <CtaButton href={cta.href}>{cta.label}</CtaButton>}
-        </header>
+        <PageTitle className="text-4xl sm:text-4xl">{title}</PageTitle>
         {card?.kind === "text" && (
           <SectionCard label={card.label}>
             <div className="line-clamp-3">

@@ -8,14 +8,16 @@ import {
   isColorRoleKey,
   isHexColor,
   isPageKey,
+  pageTemplates,
   type PageColors,
+  type PageKey,
 } from "@/config/pages";
 import {
   PAGES_COLLECTION,
   pageFromData,
   pageTag,
   type PageContent,
-  type PageCta,
+  type PageSection,
 } from "@/lib/pages";
 
 async function requireEditor() {
@@ -30,15 +32,21 @@ async function requireEditor() {
   };
 }
 
-export type PageSettings = {
+export type PageDraft = {
   title: string;
-  cta: PageCta | null;
   colors: PageColors;
+  sections: PageSection[];
 };
 
 export type SavePageResult =
   | { ok: true; saved: PageContent }
   | { ok: false; conflict: PageContent };
+
+const ITEM_KEY = /^[a-z0-9-]{1,64}$/;
+
+function text(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
 
 function validColors(colors: PageColors): PageColors {
   for (const [role, hex] of Object.entries(colors)) {
@@ -49,23 +57,78 @@ function validColors(colors: PageColors): PageColors {
   return colors;
 }
 
-export async function savePageSettings(input: {
+// Items are stored as a map keyed by id, each with its position as `order`
+function keyedItems<T extends { key: string }>(
+  items: T[],
+  fields: (item: T) => Record<string, string>,
+) {
+  const seen = new Set<string>();
+  return Object.fromEntries(
+    items.map((item, order) => {
+      if (!ITEM_KEY.test(item.key) || seen.has(item.key)) {
+        throw new Error(`Invalid item key: ${item.key}`);
+      }
+      seen.add(item.key);
+      return [item.key, { key: item.key, order, ...fields(item) }];
+    }),
+  );
+}
+
+// Rebuilds the sections from the page's template, so a draft can only fill in
+// the sections the template defines
+function sectionsData(page: PageKey, sections: PageSection[]) {
+  return Object.fromEntries(
+    Object.values(pageTemplates[page].sections).map((template) => {
+      const section = sections.find((s) => s.key === template.key);
+      if (section?.kind !== template.kind) {
+        throw new Error(`Missing ${template.kind} section: ${template.key}`);
+      }
+      const base = { key: section.key, label: text(section.label).trim() };
+      switch (section.kind) {
+        case "text":
+          return [section.key, { ...base, content: text(section.content) }];
+        case "links":
+          return [
+            section.key,
+            {
+              ...base,
+              items: keyedItems(section.items, (item) => ({
+                title: text(item.title).trim(),
+                url: text(item.url).trim(),
+              })),
+            },
+          ];
+        case "faq":
+          return [
+            section.key,
+            {
+              ...base,
+              items: keyedItems(section.items, (item) => ({
+                question: text(item.question).trim(),
+                answer: text(item.answer),
+              })),
+            },
+          ];
+      }
+    }),
+  );
+}
+
+export async function savePage(input: {
   page: string;
-  settings: PageSettings;
+  draft: PageDraft;
   baselineUpdatedAt: string | null;
   force?: boolean;
 }): Promise<SavePageResult> {
   const editor = await requireEditor();
-  const { page, settings } = input;
+  const { page, draft } = input;
   if (!isPageKey(page)) throw new Error(`Unknown page: ${page}`);
 
-  const label = settings.cta?.label.trim() ?? "";
-  const href = settings.cta?.href.trim() ?? "";
-  const fields = {
+  const data = {
     key: page,
-    title: settings.title.trim(),
-    cta: label && href ? { label, href } : null,
-    colors: validColors(settings.colors),
+    title: text(draft.title).trim(),
+    colors: validColors(draft.colors),
+    sections: sectionsData(page, draft.sections),
     updatedAt: Timestamp.now(),
     ...editor,
   };
@@ -73,15 +136,12 @@ export async function savePageSettings(input: {
   const db = getAdminDb();
   const ref = db.collection(PAGES_COLLECTION).doc(page);
   const result = await db.runTransaction(async (tx): Promise<SavePageResult> => {
-    const data = (await tx.get(ref)).data() ?? {};
-    const current = pageFromData(page, data);
+    const current = pageFromData(page, (await tx.get(ref)).data() ?? {});
     if (!input.force && current.updatedAt !== input.baselineUpdatedAt) {
       return { ok: false, conflict: current };
     }
-    // mergeFields replaces each listed field whole (so a cleared color is
-    // removed) while leaving the sections untouched
-    tx.set(ref, fields, { mergeFields: Object.keys(fields) });
-    return { ok: true, saved: pageFromData(page, { ...data, ...fields }) };
+    tx.set(ref, data);
+    return { ok: true, saved: pageFromData(page, data) };
   });
 
   if (result.ok) updateTag(pageTag(page));

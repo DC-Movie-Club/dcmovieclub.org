@@ -23,14 +23,16 @@ function headingTilt(heading: string) {
 }
 
 function CardSection({
+  id,
   heading,
   children,
 }: {
+  id?: string;
   heading: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <section className="relative flex flex-col items-start">
+    <section id={id} className="relative flex scroll-mt-8 flex-col items-start">
       <CardSurface />
       {heading}
       <div
@@ -73,14 +75,17 @@ function CardLabel({
 // A cream card with `label` as an outlined label on its top edge, inked in the
 // page's ink color
 export function SectionCard({
+  id,
   label,
   children,
 }: {
+  id?: string;
   label: string;
   children: React.ReactNode;
 }) {
   return (
     <CardSection
+      id={id}
       heading={
         label ? (
           <CardLabel text={label} inkClassName="outline-ink-page-ink">

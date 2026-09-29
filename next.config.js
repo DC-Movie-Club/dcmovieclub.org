@@ -25,6 +25,14 @@ const nextConfig = {
       headers: [{ key: "Cache-Control", value: "private, no-store" }],
     },
   ],
+  // The code of conduct is a section of the About page
+  redirects: async () => [
+    {
+      source: "/code-of-conduct",
+      destination: "/about#conduct",
+      permanent: false,
+    },
+  ],
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

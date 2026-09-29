@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import {
   colorRoles,
   isHexColor,
@@ -11,8 +11,9 @@ import {
   type ColorRoleKey,
   type PageColors,
 } from "@/config/pages";
-import { savePageSettings } from "@/app/admin/actions/pages";
+import { savePage } from "@/app/admin/actions/pages";
 import { PagePreview } from "@/app/admin/components/PagePreview";
+import { SectionFields } from "@/app/admin/components/SectionFields";
 import { useSaveShortcuts } from "@/app/admin/hooks/useSaveShortcuts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,36 +26,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemTitle,
-} from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import type { PageContent, PageSection } from "@/lib/pages";
 
 type Draft = {
   title: string;
-  ctaLabel: string;
-  ctaHref: string;
   // "" is a color that isn't set
   colors: Record<ColorRoleKey, string>;
+  sections: PageSection[];
 };
 
 function draftOf(page: PageContent): Draft {
   return {
     title: page.title,
-    ctaLabel: page.cta?.label ?? "",
-    ctaHref: page.cta?.href ?? "",
     colors: Object.fromEntries(
       Object.values(colorRoles).map((role) => [
         role.key,
         page.colors[role.key] ?? "",
       ]),
     ) as Record<ColorRoleKey, string>,
+    sections: page.sections,
   };
 }
 
@@ -64,16 +55,18 @@ function colorsOf(draft: Draft): PageColors {
   );
 }
 
-function ctaOf(draft: Draft) {
-  const label = draft.ctaLabel.trim();
-  const href = draft.ctaHref.trim();
-  return label && href ? { label, href } : null;
+function savedStatus(page: PageContent) {
+  if (!page.updatedAt) return "Not saved yet";
+  const time = new Date(page.updatedAt).toLocaleString();
+  return `Live · saved ${time}${page.updatedByName ? ` by ${page.updatedByName}` : ""}`;
 }
 
-function savedStatus(updatedAt: string | null, updatedByName: string | null) {
-  if (!updatedAt) return "Not saved yet";
-  const time = new Date(updatedAt).toLocaleString();
-  return `Live · saved ${time}${updatedByName ? ` by ${updatedByName}` : ""}`;
+function conflictNote(theirs: PageContent) {
+  const who = theirs.updatedByName ?? "Another admin";
+  const when = theirs.updatedAt
+    ? ` at ${new Date(theirs.updatedAt).toLocaleString()}`
+    : "";
+  return `${who} saved this page${when}. Load their version, or overwrite it with yours.`;
 }
 
 function ColorField({
@@ -120,29 +113,12 @@ function ColorField({
   );
 }
 
-function conflictNote(theirs: PageContent) {
-  const who = theirs.updatedByName ?? "Another admin";
-  const when = theirs.updatedAt
-    ? ` at ${new Date(theirs.updatedAt).toLocaleString()}`
-    : "";
-  return `${who} changed this page's title, button, or colors${when}. Load their version, or overwrite it with yours.`;
-}
-
-function sectionSummary(section: PageSection) {
-  const kind = sectionKinds[section.kind].label;
-  switch (section.kind) {
-    case "text":
-      return section.content.trim() ? kind : `${kind} · empty`;
-    case "links":
-    case "faq":
-      return `${kind} · ${section.items.length}`;
-  }
-}
-
 export function PageEditor({ initialPage }: { initialPage: PageContent }) {
   const template = pageTemplates[initialPage.key];
   const [saved, setSaved] = useState(initialPage);
   const [draft, setDraft] = useState(() => draftOf(initialPage));
+  // Remounts the rich text fields, which only read their value when mounted
+  const [fieldsKey, setFieldsKey] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [conflict, setConflict] = useState<PageContent | null>(null);
@@ -156,6 +132,7 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
   const load = (page: PageContent) => {
     setSaved(page);
     setDraft(draftOf(page));
+    setFieldsKey((k) => k + 1);
     setConflict(null);
   };
 
@@ -163,18 +140,23 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
     setSaving(true);
     setError("");
     try {
-      const result = await savePageSettings({
+      const result = await savePage({
         page: saved.key,
-        settings: {
+        draft: {
           title: draft.title,
-          cta: ctaOf(draft),
           colors: colorsOf(draft),
+          sections: draft.sections,
         },
         baselineUpdatedAt: saved.updatedAt,
         force,
       });
-      if (result.ok) load(result.saved);
-      else setConflict(result.conflict);
+      if (result.ok) {
+        setSaved(result.saved);
+        setDraft(draftOf(result.saved));
+        setConflict(null);
+      } else {
+        setConflict(result.conflict);
+      }
     } catch {
       setError("Failed to save");
     } finally {
@@ -187,103 +169,57 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
   const setColor = (role: ColorRoleKey, value: string) =>
     setDraft((d) => ({ ...d, colors: { ...d.colors, [role]: value } }));
 
+  const updateSection = (
+    key: string,
+    fn: (section: PageSection) => PageSection,
+  ) =>
+    setDraft((d) => ({
+      ...d,
+      sections: d.sections.map((s) => (s.key === key ? fn(s) : s)),
+    }));
+
   let status: string;
   if (error) status = error;
   else if (saving) status = "Saving...";
   else if (!isValid) status = "Colors need to be hex values, like #a2390a";
   else if (isDirty) status = "Unsaved changes";
-  else status = savedStatus(saved.updatedAt, saved.updatedByName);
+  else status = savedStatus(saved);
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/pages"
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      <div className="sticky top-0 z-20 -mx-4 flex items-center justify-between gap-3 border-b bg-background px-4 py-3">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/pages"
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="size-4" />
+              Pages
+            </Link>
+            <h2 className="font-semibold">{template.label}</h2>
+          </div>
+          <p
+            className={cn(
+              "truncate text-xs text-muted-foreground",
+              (error || !isValid) && "text-destructive",
+            )}
           >
-            <ArrowLeft className="size-4" />
-            Pages
-          </Link>
-          <h2 className="font-semibold">{template.label}</h2>
+            {status}
+          </p>
         </div>
-        <a
-          href={template.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          View page
-          <ArrowUpRight className="size-4" />
-        </a>
-      </div>
-
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="page-title">Title</Label>
-          <Input
-            id="page-title"
-            value={draft.title}
-            onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="page-cta-label">Button text</Label>
-            <Input
-              id="page-cta-label"
-              value={draft.ctaLabel}
-              placeholder="No button"
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, ctaLabel: e.target.value }))
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="page-cta-href">Button link</Label>
-            <Input
-              id="page-cta-href"
-              value={draft.ctaHref}
-              placeholder="/code-of-conduct or https://…"
-              spellCheck={false}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, ctaHref: e.target.value }))
-              }
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Colors</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {Object.values(colorRoles).map((role) => (
-            <ColorField
-              key={role.key}
-              role={role}
-              value={draft.colors[role.key]}
-              onChange={(value) => setColor(role.key, value)}
-            />
-          ))}
-        </div>
-        <PagePreview
-          title={draft.title}
-          cta={ctaOf(draft)}
-          colors={isValid ? colorsOf(draft) : saved.colors}
-          sections={saved.sections}
-        />
-      </section>
-
-      <div className="flex items-center justify-between gap-3 border-y py-3">
-        <p
-          className={cn(
-            "text-xs text-muted-foreground",
-            (error || !isValid) && "text-destructive",
-          )}
-        >
-          {status}
-        </p>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={
+              <a href={template.href} target="_blank" rel="noopener noreferrer" />
+            }
+          >
+            View page
+            <ArrowUpRight />
+          </Button>
           {isDirty && (
             <Button
               variant="ghost"
@@ -300,33 +236,68 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
         </div>
       </div>
 
-      <section className="flex flex-col gap-3">
-        <h3 className="text-sm font-medium">Sections</h3>
-        <ItemGroup className="gap-2">
-          {saved.sections.map((section) => (
-            <Item
-              key={section.key}
-              variant="outline"
-              render={
-                <Link href={`/admin/pages/${saved.key}/${section.key}`} />
-              }
-            >
-              <ItemContent>
-                <ItemTitle>
-                  {
-                    template.sections[
-                      section.key as keyof typeof template.sections
-                    ].label
-                  }
-                </ItemTitle>
-                <ItemDescription>{sectionSummary(section)}</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </ItemActions>
-            </Item>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="page-title">Title</Label>
+        <Input
+          id="page-title"
+          value={draft.title}
+          onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
+        />
+      </div>
+
+      <section className="flex flex-col gap-4">
+        <h3 className="font-semibold">Colors</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {Object.values(colorRoles).map((role) => (
+            <ColorField
+              key={role.key}
+              role={role}
+              value={draft.colors[role.key]}
+              onChange={(value) => setColor(role.key, value)}
+            />
           ))}
-        </ItemGroup>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h3 className="font-semibold">Preview</h3>
+          <p className="text-xs text-muted-foreground">
+            How the page looks with these colors. Changes show here as you make
+            them, and on the site once you save.
+          </p>
+        </div>
+        <PagePreview
+          title={draft.title}
+          colors={isValid ? colorsOf(draft) : saved.colors}
+          sections={draft.sections}
+        />
+      </section>
+
+      <section key={fieldsKey} className="flex flex-col gap-4">
+        <h3 className="font-semibold">Sections</h3>
+        {draft.sections.map((section) => {
+          const name =
+            template.sections[section.key as keyof typeof template.sections]
+              .label;
+          return (
+            <section key={section.key} className="rounded-lg border">
+              <header className="flex items-baseline justify-between gap-3 border-b px-4 py-3">
+                <h4 className="font-medium">{name}</h4>
+                <span className="text-xs text-muted-foreground">
+                  {sectionKinds[section.kind].label}
+                </span>
+              </header>
+              <div className="flex flex-col gap-4 p-4">
+                <SectionFields
+                  name={name}
+                  section={section}
+                  update={(fn) => updateSection(section.key, fn)}
+                />
+              </div>
+            </section>
+          );
+        })}
       </section>
 
       <Dialog

@@ -51,13 +51,13 @@ function Section({ section }: { section: PageSection }) {
   switch (section.kind) {
     case "text":
       return section.content.trim() ? (
-        <SectionCard label={section.label}>
+        <SectionCard id={section.key} label={section.label}>
           <Markdown>{section.content}</Markdown>
         </SectionCard>
       ) : null;
     case "links":
       return section.items.length > 0 ? (
-        <SectionCard label={section.label}>
+        <SectionCard id={section.key} label={section.label}>
           <ul className={markdownStyles.ul}>
             {section.items.map((item) => (
               <LinkListItem key={item.key} item={item} />
