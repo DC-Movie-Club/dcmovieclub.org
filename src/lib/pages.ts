@@ -51,7 +51,12 @@ function isoDate(value: unknown) {
 // Items are stored as a map keyed by id, each with an `order`
 function orderedItems(value: unknown) {
   return Object.entries(record(value))
-    .map(([key, item]) => ({ ...record(item), key }))
+    .map(
+      ([key, item]): Record<string, unknown> & { key: string } => ({
+        ...record(item),
+        key,
+      }),
+    )
     .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0));
 }
 

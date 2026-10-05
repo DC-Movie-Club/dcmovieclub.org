@@ -82,7 +82,7 @@ function sectionsData(page: PageKey, sections: PageSection[]) {
   return Object.fromEntries(
     Object.values(pageTemplates[page].sections).map((template) => {
       const section = sections.find((s) => s.key === template.key);
-      if (section?.kind !== template.kind) {
+      if (!section || section.kind !== template.kind) {
         throw new Error(`Missing ${template.kind} section: ${template.key}`);
       }
       switch (section.kind) {
