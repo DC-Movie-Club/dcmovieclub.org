@@ -36,16 +36,21 @@ export function SiteFooter({ className }: { className?: string }) {
       <div className="relative flex flex-col gap-4 px-5 py-5">
         <div className="flex flex-col gap-4 text-page-fg/80 sm:flex-row sm:items-center sm:justify-between">
           <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            <ul className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <li>
                 <a
                   href={socials.substack.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cn("flex items-center gap-1", LINK)}
+                  className="group/subscribe relative block rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
                 >
-                  Subscribe
-                  <ArrowUpRight size={12} />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-full border-2 border-page-accent-edge bg-page-accent sketch-subtle group-hover/subscribe:sketch-subtle-animated"
+                  />
+                  <span className="relative block px-3 py-1.5 text-page-accent-text">
+                    Subscribe to newsletter
+                  </span>
                 </a>
               </li>
               {footerLinks.map((link) => (
