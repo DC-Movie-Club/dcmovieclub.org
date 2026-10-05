@@ -104,12 +104,17 @@ function Section({ section }: { section: PageSection }) {
           </ul>
         </SectionCard>
       ) : null;
-    case "cards":
-      return section.items.length > 0 ? (
+    case "cards": {
+      // A card still being filled in stays off the page until it has a link
+      // and a headline
+      const items = section.items.filter(
+        (item) => item.url.trim() && item.title.trim(),
+      );
+      return items.length > 0 ? (
         <section id={section.key} className="flex scroll-mt-8 flex-col gap-8">
           {section.label && <ListHeading>{section.label}</ListHeading>}
           <ul className="grid gap-4 sm:grid-cols-3">
-            {section.items.map((item) => (
+            {items.map((item) => (
               <li key={item.key}>
                 <LinkCard item={item} />
               </li>
@@ -117,6 +122,7 @@ function Section({ section }: { section: PageSection }) {
           </ul>
         </section>
       ) : null;
+    }
     case "faq":
       return section.items.length > 0 ? (
         <section id={section.key} className="flex scroll-mt-8 flex-col gap-8">
