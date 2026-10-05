@@ -34,7 +34,6 @@ const LOGO_SPACER = "w-[88px] xs:w-[120px]";
 // The pill's hard shadow, in px. It's deep enough to hold the hatching.
 const SHADOW_X = 6;
 const SHADOW_Y = 8;
-const SHADOW = "xs:shadow-[6px_8px_0_var(--color-charcoal)]";
 const HATCH_GAP = 5.5;
 const HATCH_WIDTH = 1.6;
 // How far the hatching stops short of the shadow's edge and the pill's edge
@@ -75,16 +74,11 @@ export function BottomNav() {
             clips that overhang without clipping the logo. */}
         <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
           <div className="absolute -inset-x-2 top-2 bottom-0 xs:inset-0">
+            <PillShadow boiling={hovered} />
             {/* The fill sits just inside the line, which the ink filter thins
                 in places, so it never shows past the line's outer edge */}
             <div className="absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full" />
-            <div
-              className={cn(
-                "absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2",
-                SHADOW,
-              )}
-            />
-            <ShadowHatching boiling={hovered} />
+            <div className="absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2" />
           </div>
         </div>
         <NavLink
@@ -233,10 +227,12 @@ export function BottomNav() {
   );
 }
 
-// Lighter strokes drawn inside the pill's hard shadow. Masked to the shadow's
-// crescent, short of both edges, so they need the pill's measured size. The
-// ink filter wobbles them in step with the shadow they sit in.
-function ShadowHatching({ boiling }: { boiling: boolean }) {
+// The pill's hard shadow with lighter strokes hatched inside it, masked short
+// of the shadow's edge and the pill's. It sits behind the pill so it can boil
+// while the pill holds still. The shadow and hatching are separate layers,
+// since the ink filter only suits one color on a clear ground, but they share
+// an origin, so they wobble and boil in lockstep. Sized from the pill.
+function PillShadow({ boiling }: { boiling: boolean }) {
   const ref = useRef<SVGSVGElement>(null);
   const id = useId();
   const [size, setSize] = useState<{ width: number; height: number } | null>(
@@ -258,57 +254,73 @@ function ShadowHatching({ boiling }: { boiling: boolean }) {
     return () => observer.disconnect();
   }, []);
 
+  const layer = cn(
+    "absolute inset-0 hidden overflow-visible xs:block",
+    boiling && "boil-sm",
+  );
+
   return (
-    <svg
-      ref={ref}
-      aria-hidden
-      width={size?.width}
-      height={size?.height}
-      className={cn(
-        "absolute inset-0 hidden overflow-visible xs:block",
-        "ink-fine",
-        boiling && "boil-sm",
-      )}
-    >
-      {size && (
-        <>
-          <defs>
-            <pattern
-              id={`${id}-hatch`}
-              patternUnits="userSpaceOnUse"
-              width={HATCH_GAP}
-              height={HATCH_GAP}
-              patternTransform="rotate(-45)"
-            >
-              <rect
-                width={HATCH_WIDTH}
-                height={HATCH_GAP}
-                className="fill-[color-mix(in_srgb,var(--color-charcoal),white_10%)]"
-              />
-            </pattern>
-            <mask
-              id={`${id}-mask`}
-              maskUnits="userSpaceOnUse"
-              x={-20}
-              y={-20}
-              width={size.width + 40}
-              height={size.height + 40}
-            >
-              <rect
-                {...pillRect(size, SHADOW_X, SHADOW_Y, -HATCH_INSET)}
-                fill="white"
-              />
-              <rect {...pillRect(size, 0, 0, HATCH_CLEARANCE)} fill="black" />
-            </mask>
-          </defs>
+    <>
+      <svg
+        ref={ref}
+        aria-hidden
+        width={size?.width}
+        height={size?.height}
+        className={cn(layer, "ink")}
+      >
+        {size && (
           <rect
             {...pillRect(size, SHADOW_X, SHADOW_Y, 0)}
-            fill={`url(#${id}-hatch)`}
-            mask={`url(#${id}-mask)`}
+            className="fill-charcoal"
           />
-        </>
-      )}
-    </svg>
+        )}
+      </svg>
+      <svg
+        aria-hidden
+        width={size?.width}
+        height={size?.height}
+        className={cn(layer, "ink-fine")}
+      >
+        {size && (
+          <>
+            <defs>
+              <pattern
+                id={`${id}-hatch`}
+                patternUnits="userSpaceOnUse"
+                width={HATCH_GAP}
+                height={HATCH_GAP}
+                patternTransform="rotate(-45)"
+              >
+                <rect
+                  width={HATCH_WIDTH}
+                  height={HATCH_GAP}
+                  className="fill-[color-mix(in_srgb,var(--color-charcoal),white_10%)]"
+                />
+              </pattern>
+              <mask
+                id={`${id}-mask`}
+                maskUnits="userSpaceOnUse"
+                x={-20}
+                y={-20}
+                width={size.width + 40}
+                height={size.height + 40}
+              >
+                <rect
+                  {...pillRect(size, SHADOW_X, SHADOW_Y, -HATCH_INSET)}
+                  fill="white"
+                />
+                <rect {...pillRect(size, 0, 0, HATCH_CLEARANCE)} fill="black" />
+              </mask>
+            </defs>
+            <rect
+              {...pillRect(size, SHADOW_X, SHADOW_Y, 0)}
+              fill={`url(#${id}-hatch)`}
+              mask={`url(#${id}-mask)`}
+            />
+          </>
+        )}
+      </svg>
+    </>
   );
 }
 
@@ -351,15 +363,16 @@ function NavLink({
     <Link
       href={route.href}
       className={cn(
-        "group/item relative flex flex-col items-center gap-0.5 transition-all",
+        "group/item relative flex flex-col items-center gap-0.5 transition-all focus-visible:outline-hidden",
         ITEM_PADDING,
         active
           ? "text-logo-red"
-          : "text-foreground hover:scale-110 hover:text-rust",
+          : "text-foreground hover:scale-110 hover:text-rust focus-visible:text-rust",
       )}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
     >
+      <FocusRing />
       <Icon
         className={cn(
           ICON_SIZE,
@@ -384,6 +397,16 @@ function NavLink({
   );
 }
 
+// A hand-drawn ring around a nav item, in place of the browser's focus box
+function FocusRing() {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute -inset-1 rounded-[50%] border-2 border-rust opacity-0 ink-subtle group-focus-visible/item:opacity-100"
+    />
+  );
+}
+
 const NavButton = forwardRef<
   HTMLButtonElement,
   {
@@ -395,12 +418,13 @@ const NavButton = forwardRef<
     <button
       ref={ref}
       className={cn(
-        "group/item relative flex cursor-pointer flex-col items-center gap-0.5 text-foreground transition-all hover:scale-110 hover:text-rust",
+        "group/item relative flex cursor-pointer flex-col items-center gap-0.5 text-foreground transition-all hover:scale-110 hover:text-rust focus-visible:text-rust focus-visible:outline-hidden",
         ITEM_PADDING,
         className,
       )}
       {...props}
     >
+      <FocusRing />
       <Icon
         className={cn(
           ICON_SIZE,
