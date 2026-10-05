@@ -1,6 +1,13 @@
 "use client";
 
-import { forwardRef, useEffect, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -23,6 +30,16 @@ const LABEL_SIZE = "text-[9px] xs:text-[11px]";
 const ITEM_PADDING = "px-2 py-1 xs:px-3 xs:py-1.5";
 const LOGO_SIZE = "size-24 -top-8 xs:size-28 xs:-top-8";
 const LOGO_SPACER = "w-[88px] xs:w-[120px]";
+
+// The pill's hard shadow, in px. It's deep enough to hold the hatching.
+const SHADOW_X = 6;
+const SHADOW_Y = 8;
+const SHADOW = "xs:shadow-[6px_8px_0_var(--color-charcoal)]";
+const HATCH_GAP = 5.5;
+const HATCH_WIDTH = 1.6;
+// How far the hatching stops short of the shadow's edge and the pill's edge
+const HATCH_INSET = 1.75;
+const HATCH_CLEARANCE = 1.5;
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -57,12 +74,24 @@ export function BottomNav() {
             sketch filter's wobble can't open a gap along them. The wrapper
             clips that overhang without clipping the logo. */}
         <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
-          <div
-            className={cn(
-              "absolute -inset-x-2 top-2 bottom-0 border-t-2 border-charcoal bg-surface sketch xs:inset-0 xs:border-2 xs:rounded-full xs:shadow-[4px_5px_0_var(--color-charcoal)]",
-              hovered && "sketch-animated",
-            )}
-          />
+          <div className="absolute -inset-x-2 top-2 bottom-0 xs:inset-0">
+            {/* The fill sits just inside the line, which the ink filter thins
+                in places, so it never shows past the line's outer edge */}
+            <div
+              className={cn(
+                "absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full",
+                hovered && "sketch-animated",
+              )}
+            />
+            <div
+              className={cn(
+                "absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2",
+                SHADOW,
+                hovered && "ink-animated",
+              )}
+            />
+            <ShadowHatching animated={hovered} />
+          </div>
         </div>
         <NavLink
           route={routes.blog}
@@ -210,6 +239,100 @@ export function BottomNav() {
   );
 }
 
+// Lighter strokes drawn inside the pill's hard shadow. Masked to the shadow's
+// crescent, short of both edges, so they need the pill's measured size. The
+// ink filter wobbles them in step with the shadow they sit in.
+function ShadowHatching({ animated }: { animated: boolean }) {
+  const ref = useRef<SVGSVGElement>(null);
+  const id = useId();
+  const [size, setSize] = useState<{ width: number; height: number } | null>(
+    null,
+  );
+
+  useLayoutEffect(() => {
+    const pill = ref.current?.parentElement;
+    if (!pill) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setSize((prev) =>
+        prev?.width === width && prev.height === height
+          ? prev
+          : { width, height },
+      );
+    });
+    observer.observe(pill);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <svg
+      ref={ref}
+      aria-hidden
+      width={size?.width}
+      height={size?.height}
+      className={cn(
+        "absolute inset-0 hidden overflow-visible xs:block",
+        animated ? "ink-fine-animated" : "ink-fine",
+      )}
+    >
+      {size && (
+        <>
+          <defs>
+            <pattern
+              id={`${id}-hatch`}
+              patternUnits="userSpaceOnUse"
+              width={HATCH_GAP}
+              height={HATCH_GAP}
+              patternTransform="rotate(-45)"
+            >
+              <rect
+                width={HATCH_WIDTH}
+                height={HATCH_GAP}
+                className="fill-[color-mix(in_srgb,var(--color-charcoal),white_10%)]"
+              />
+            </pattern>
+            <mask
+              id={`${id}-mask`}
+              maskUnits="userSpaceOnUse"
+              x={-20}
+              y={-20}
+              width={size.width + 40}
+              height={size.height + 40}
+            >
+              <rect
+                {...pillRect(size, SHADOW_X, SHADOW_Y, -HATCH_INSET)}
+                fill="white"
+              />
+              <rect {...pillRect(size, 0, 0, HATCH_CLEARANCE)} fill="black" />
+            </mask>
+          </defs>
+          <rect
+            {...pillRect(size, SHADOW_X, SHADOW_Y, 0)}
+            fill={`url(#${id}-hatch)`}
+            mask={`url(#${id}-mask)`}
+          />
+        </>
+      )}
+    </svg>
+  );
+}
+
+// The pill at an offset, grown (or shrunk, for a negative `grow`) on every side
+function pillRect(
+  { width, height }: { width: number; height: number },
+  x: number,
+  y: number,
+  grow: number,
+) {
+  return {
+    x: x - grow,
+    y: y - grow,
+    width: width + 2 * grow,
+    height: height + 2 * grow,
+    rx: height / 2 + grow,
+  };
+}
+
 const WATERCOLOR_CLASSES = [
   "watercolor-0",
   "watercolor-1",
@@ -245,8 +368,8 @@ function NavLink({
       <Icon
         className={cn(
           ICON_SIZE,
-          "sketch-subtle",
-          !active && "group-hover/item:sketch-subtle-animated",
+          "ink-subtle",
+          !active && "group-hover/item:ink-subtle-animated",
         )}
       />
       <span
@@ -284,7 +407,7 @@ const NavButton = forwardRef<
       <Icon
         className={cn(
           ICON_SIZE,
-          "sketch-subtle group-hover/item:sketch-subtle-animated",
+          "ink-subtle group-hover/item:ink-subtle-animated",
         )}
       />
       <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>{label}</span>

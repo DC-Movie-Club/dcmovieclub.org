@@ -229,6 +229,31 @@ html[data-loading] .animate-nav-spring-in {
   filter: url(#sketch-subtle-animated);
 }
 
+/* The sketch wobble drawn as a brush pen line; see SketchFilter */
+@utility ink {
+  filter: url(#ink);
+}
+
+@utility ink-animated {
+  filter: url(#ink-animated);
+}
+
+@utility ink-subtle {
+  filter: url(#ink-subtle);
+}
+
+@utility ink-subtle-animated {
+  filter: url(#ink-subtle-animated);
+}
+
+@utility ink-fine {
+  filter: url(#ink-fine);
+}
+
+@utility ink-fine-animated {
+  filter: url(#ink-fine-animated);
+}
+
 @utility watercolor-0 {
   filter: url(#watercolor-0);
 }
