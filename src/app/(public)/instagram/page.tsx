@@ -5,6 +5,7 @@
 
 import { Link, ExternalLink } from "@/components/ui/link";
 import { HomeLink } from "@/components/HomeLink";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const placeholderLinks = [
   { label: "Next Event: TBD", href: "/events", external: false },
@@ -39,6 +40,7 @@ export default function Instagram() {
           ),
         )}
       </div>
+      <SiteFooter className="mt-20 text-left" />
     </div>
   );
 }

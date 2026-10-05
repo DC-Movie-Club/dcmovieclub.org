@@ -10,6 +10,7 @@ import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
 import { AudienceMarquee } from "@/components/AudienceMarquee";
+import { SiteFooter } from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
 
 const UPCOMING_TILE_COUNT = 3;
@@ -148,6 +149,9 @@ export function HomePage({
         colors={eventsPage?.colors ?? {}}
       />
       {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
+      <div className="mt-auto px-6 pt-14">
+        <SiteFooter />
+      </div>
     </div>
   );
 }

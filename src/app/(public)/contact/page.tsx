@@ -3,6 +3,7 @@
 
 import { ExternalLink } from "@/components/ui/link";
 import { HomeLink } from "@/components/HomeLink";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function Contact() {
   return (
@@ -18,6 +19,7 @@ export default function Contact() {
       >
         hello@dcmovieclub.org
       </ExternalLink>
+      <SiteFooter className="mt-24" />
     </div>
   );
 }

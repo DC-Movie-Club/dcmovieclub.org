@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { colorVars, type PageColors } from "@/config/pages";
 import { HomeLink } from "@/components/HomeLink";
+import { SiteFooter } from "@/components/SiteFooter";
 
 // A full-bleed page in its color roles (see colorRoles), from the page's
 // Firestore doc. `contentClassName` sets the spacing between sections.
@@ -31,6 +32,7 @@ export function ColorPage({
       >
         {children}
       </div>
+      <SiteFooter className="mt-20" />
     </div>
   );
 }
