@@ -40,7 +40,7 @@ export function AudienceMarquee() {
   return (
     <div
       aria-hidden
-      className="h-[calc(280px*var(--seat-scale))] w-full overflow-hidden text-page-fg/45 [mask-image:linear-gradient(to_bottom,black_50%,transparent)] [--seat-scale:0.4] sm:[--seat-scale:0.55]"
+      className="h-[calc(280px*var(--seat-scale))] w-full overflow-hidden text-page-fg [mask-image:linear-gradient(to_bottom,black_80%,transparent)] [--seat-scale:0.5] sm:[--seat-scale:0.65]"
     >
       {/* Two identical sets so translating by -50% loops seamlessly */}
       <div className="flex h-full w-max items-end animate-marquee motion-reduce:animate-none">

@@ -10,6 +10,7 @@ import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
 import { AudienceMarquee } from "@/components/AudienceMarquee";
+import { LogoLettering } from "@/components/LogoLettering";
 import { SiteFooter } from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
 
@@ -41,8 +42,10 @@ function Hero() {
     <>
       <section className="flex flex-col items-center pt-8">
         <AudienceMarquee />
-        <h1 className="relative -mt-4 px-4 text-center text-[3.5rem] whitespace-nowrap uppercase leading-none text-page-fg max-[349px]:text-5xl sm:-mt-9 sm:text-8xl">
-          DC Movie Club
+        <h1 className="relative -mt-8 w-full max-w-225 px-4 sm:-mt-14">
+          <span className="sr-only">DC Movie Club</span>
+          <LogoLettering layout="stacked" className="sm:hidden" />
+          <LogoLettering layout="row" className="max-sm:hidden" />
         </h1>
         <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl">
           <TaglineBanner className="-rotate-2">
