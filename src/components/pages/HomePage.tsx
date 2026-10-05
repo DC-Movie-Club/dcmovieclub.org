@@ -42,7 +42,7 @@ function Hero() {
     <>
       <section className="flex flex-col items-center pt-8">
         <AudienceMarquee />
-        <h1 className="relative -mt-8 w-full max-w-225 px-4 sm:-mt-14">
+        <h1 className="relative w-full max-w-225 px-4">
           <span className="sr-only">DC Movie Club</span>
           <LogoLettering layout="stacked" className="sm:hidden" />
           <LogoLettering layout="row" className="max-sm:hidden" />
