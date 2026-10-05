@@ -7,7 +7,6 @@ import { ExternalLink } from "@/components/ui/link";
 import { Letterboxd } from "@/components/icons/Letterboxd";
 import type { LetterboxdReview } from "@/types/letterboxd";
 
-const MAX_FILMS = 11;
 const SHORT_REVIEW_CHARS = 60;
 const LETTERBOXD_PROFILE_URL = "https://letterboxd.com/DCMovieClub/";
 
@@ -284,7 +283,13 @@ function ReviewCard({
   );
 }
 
-function FollowTile() {
+function FollowTile({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
   return (
     <TileLink href={LETTERBOXD_PROFILE_URL}>
       <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-teal p-4 text-center text-cream transition-colors group-hover/card:bg-teal-dark">
@@ -300,8 +305,8 @@ function FollowTile() {
           />
         </span>
         <span className="flex flex-col uppercase leading-tight tracking-wide">
-          <span className="text-xl">Follow us</span>
-          <span className="text-sm text-cream/70">on Letterboxd</span>
+          <span className="text-xl">{title}</span>
+          <span className="text-sm text-cream/70">{subtitle}</span>
         </span>
       </div>
     </TileLink>
@@ -310,8 +315,16 @@ function FollowTile() {
 
 export function RecentlyWatchedRail({
   reviews,
+  heading,
+  count,
+  followTitle,
+  followSubtitle,
 }: {
   reviews: LetterboxdReview[];
+  heading: string;
+  count: number;
+  followTitle: string;
+  followSubtitle: string;
 }) {
   return (
     <section className="pb-2">
@@ -321,13 +334,13 @@ export function RecentlyWatchedRail({
             aria-hidden
             className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-charcoal sketch"
           />
-          <h2 className="relative mx-auto w-fit bg-background px-5 text-center text-xl uppercase leading-none tracking-wide text-charcoal sm:text-2xl">
-            What we've been watching
+          <h2 className="relative mx-auto w-fit bg-page-bg px-5 text-center text-xl uppercase leading-none tracking-wide text-charcoal sm:text-2xl">
+            {heading}
           </h2>
         </div>
 
         <div className="mt-8 grid auto-rows-fr grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-8 px-6 xs:grid-cols-3 sm:gap-x-5 md:grid-cols-4">
-          {reviews.slice(0, MAX_FILMS).map((review) =>
+          {reviews.slice(0, count).map((review) =>
             review.review ? (
               <div
                 key={review.id}
@@ -340,7 +353,7 @@ export function RecentlyWatchedRail({
               <FilmPoster key={review.id} review={review} showRating />
             ),
           )}
-          <FollowTile />
+          <FollowTile title={followTitle} subtitle={followSubtitle} />
         </div>
       </div>
     </section>

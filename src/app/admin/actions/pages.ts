@@ -9,6 +9,7 @@ import {
   isHexColor,
   isPageKey,
   pageTemplates,
+  sectionKinds,
   type PageColors,
   type PageKey,
 } from "@/config/pages";
@@ -34,6 +35,7 @@ async function requireEditor() {
 
 export type PageDraft = {
   title: string;
+  subtitle: string;
   colors: PageColors;
   sections: PageSection[];
 };
@@ -83,15 +85,23 @@ function sectionsData(page: PageKey, sections: PageSection[]) {
       if (section?.kind !== template.kind) {
         throw new Error(`Missing ${template.kind} section: ${template.key}`);
       }
-      const base = { key: section.key, label: text(section.label).trim() };
       switch (section.kind) {
         case "text":
-          return [section.key, { ...base, content: text(section.content) }];
-        case "links":
           return [
             section.key,
             {
-              ...base,
+              key: section.key,
+              label: text(section.label).trim(),
+              content: text(section.content),
+            },
+          ];
+        case "links":
+        case "tags":
+          return [
+            section.key,
+            {
+              key: section.key,
+              label: text(section.label).trim(),
               items: keyedItems(section.items, (item) => ({
                 title: text(item.title).trim(),
                 url: text(item.url).trim(),
@@ -102,13 +112,29 @@ function sectionsData(page: PageKey, sections: PageSection[]) {
           return [
             section.key,
             {
-              ...base,
+              key: section.key,
+              label: text(section.label).trim(),
               items: keyedItems(section.items, (item) => ({
                 question: text(item.question).trim(),
                 answer: text(item.answer),
               })),
             },
           ];
+        default: {
+          const fields = sectionKinds[section.kind].fields;
+          return [
+            section.key,
+            {
+              key: section.key,
+              ...Object.fromEntries(
+                Object.keys(fields).map((field) => [
+                  field,
+                  text(section.fields?.[field]).trim(),
+                ]),
+              ),
+            },
+          ];
+        }
       }
     }),
   );
@@ -127,6 +153,7 @@ export async function savePage(input: {
   const data = {
     key: page,
     title: text(draft.title).trim(),
+    subtitle: pageTemplates[page].subtitle ? text(draft.subtitle).trim() : "",
     colors: validColors(draft.colors),
     sections: sectionsData(page, draft.sections),
     updatedAt: Timestamp.now(),

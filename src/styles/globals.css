@@ -103,15 +103,16 @@
   --color-purple-dark: #313a5f;
   --color-purple-light: #ccced3;
 
-  /* --- Page colors: ColorPage sets them from the page's Firestore doc (see
-     colorRoles), or pages without one set them with page-ink-* and page-edge-*.
+  /* --- Page colors: pages set them from their Firestore doc (see colorRoles).
      The fallbacks are neutral, for a color that isn't set. --- */
   --color-page-bg: var(--page-bg, var(--color-background));
+  /* Text: copy sitting directly on the page background */
+  --color-page-fg: var(--page-fg, var(--color-charcoal));
   /* Ink: outlines on lettering labels */
   --color-page-ink: var(--page-ink, var(--color-charcoal));
   /* Edge: card and tile borders */
   --color-page-edge: var(--page-edge, var(--color-charcoal));
-  /* Accent: buttons */
+  /* Accent: buttons, banners, stickers */
   --color-page-accent: var(--page-accent, var(--color-charcoal));
   --color-page-accent-edge: var(--page-accent-edge, var(--color-charcoal));
   --color-page-accent-text: var(--page-accent-text, var(--color-cream));
@@ -193,15 +194,6 @@ html[data-loading] .animate-nav-spring-in {
   text-wrap: balance;
 }
 
-
-/* Set a page's ink and edge colors (see --color-page-ink, --color-page-edge) */
-@utility page-ink-* {
-  --page-ink: --value(--color-*);
-}
-
-@utility page-edge-* {
-  --page-edge: --value(--color-*);
-}
 
 /* Poster-style lettering: an outline plus a stacked hard shadow, both in
    --outline-ink (set with outline-ink-*), so a parent state like hover can

@@ -1,12 +1,12 @@
 import { getUpcomingEvents } from "@/lib/data";
-import { Markdown } from "@/components/Markdown";
-import { copySlots } from "@/config/copy";
-import { getCopy } from "@/lib/copy";
 import { formatEventMonth } from "@/lib/event-format";
+import { getPage } from "@/lib/pages";
+import { pageTemplates } from "@/config/pages";
 import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
 import { CreamCard } from "@/components/CreamCard";
+import { PageSections } from "@/components/PageSections";
 import type { CalendarEvent } from "@/types/event";
 
 function groupByMonth(events: CalendarEvent[]) {
@@ -18,37 +18,31 @@ function groupByMonth(events: CalendarEvent[]) {
   return [...groups].map(([label, events]) => ({ label, events }));
 }
 
-export default async function Events() {
-  const [events, copy] = await Promise.all([
-    getUpcomingEvents(),
-    getCopy(copySlots.events.key),
-  ]);
-
+function UpcomingEvents({
+  events,
+  fields,
+}: {
+  events: CalendarEvent[];
+  fields: Record<string, string>;
+}) {
   const [featured, ...rest] = events;
   const months = groupByMonth(rest);
 
   return (
-    <ColorPage className="bg-teal page-ink-teal-dark page-edge-teal-light">
-      <header className="flex flex-col gap-4">
-        <PageTitle>Events</PageTitle>
-        <p className="text-lg uppercase tracking-wide text-cream/80">
-          Screenings, happy hours, and hangouts around DC
-        </p>
-      </header>
-
+    <>
       {featured ? (
-        <FeaturedEventCard event={featured} />
+        <FeaturedEventCard event={featured} label={fields.featuredLabel} />
       ) : (
         <CreamCard>
           <p className="text-center text-lg uppercase tracking-wide text-charcoal/80">
-            No upcoming events right now. Check back soon!
+            {fields.emptyMessage}
           </p>
         </CreamCard>
       )}
 
       {months.map((month) => (
         <section key={month.label} className="flex flex-col gap-4">
-          <h2 className="text-xl uppercase tracking-wide text-cream sm:text-2xl">
+          <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
             {month.label}
           </h2>
           <ul className="grid gap-4 sm:grid-cols-3">
@@ -60,12 +54,33 @@ export default async function Events() {
           </ul>
         </section>
       ))}
+    </>
+  );
+}
 
-      {copy.content.trim() && (
-        <CreamCard>
-          <Markdown>{copy.content}</Markdown>
-        </CreamCard>
-      )}
+export default async function Events() {
+  const [page, events] = await Promise.all([
+    getPage(pageTemplates.events.key),
+    getUpcomingEvents(),
+  ]);
+
+  return (
+    <ColorPage colors={page.colors}>
+      <header className="flex flex-col gap-4">
+        <PageTitle>{page.title}</PageTitle>
+        {page.subtitle && (
+          <p className="text-lg uppercase tracking-wide text-page-fg/80">
+            {page.subtitle}
+          </p>
+        )}
+      </header>
+
+      <PageSections
+        sections={page.sections}
+        renderers={{
+          events: (fields) => <UpcomingEvents events={events} fields={fields} />,
+        }}
+      />
     </ColorPage>
   );
 }

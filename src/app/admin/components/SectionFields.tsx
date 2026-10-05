@@ -7,10 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { sectionKinds, type FieldsKind } from "@/config/pages";
 import type { PageSection } from "@/lib/pages";
 
 type SectionOf<K extends PageSection["kind"]> = Extract<PageSection, { kind: K }>;
 type Update<S> = (fn: (section: S) => S) => void;
+
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 function newItemKey() {
   return crypto.randomUUID().slice(0, 8);
@@ -120,10 +125,12 @@ function TextFields({
 
 function LinksFields({
   section,
+  item: noun,
   update,
 }: {
-  section: SectionOf<"links">;
-  update: Update<SectionOf<"links">>;
+  section: SectionOf<"links" | "tags">;
+  item: string;
+  update: Update<SectionOf<"links" | "tags">>;
 }) {
   const setItem = (key: string, fields: { title?: string; url?: string }) =>
     update((s) => ({
@@ -151,7 +158,7 @@ function LinksFields({
             />
             <Input
               aria-label="Link"
-              placeholder="https://…"
+              placeholder={section.kind === "tags" ? "Link (optional)" : "https://…"}
               spellCheck={false}
               value={item.url}
               onChange={(e) => setItem(item.key, { url: e.target.value })}
@@ -159,7 +166,7 @@ function LinksFields({
             <ItemControls
               index={index}
               count={section.items.length}
-              name={item.title || "link"}
+              name={item.title || noun}
               onMove={(to) =>
                 update((s) => ({ ...s, items: moved(s.items, index, to) }))
               }
@@ -186,7 +193,7 @@ function LinksFields({
         }
       >
         <Plus />
-        Add link
+        Add {noun}
       </Button>
     </>
   );
@@ -195,9 +202,11 @@ function LinksFields({
 // Answers only mount their editor while open, so a long list stays light
 function FaqFields({
   section,
+  item: noun,
   update,
 }: {
   section: SectionOf<"faq">;
+  item: string;
   update: Update<SectionOf<"faq">>;
 }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
@@ -233,7 +242,7 @@ function FaqFields({
                   type="button"
                   variant="ghost"
                   size="icon-xs"
-                  aria-label={isOpen ? "Hide answer" : "Show answer"}
+                  aria-label={isOpen ? "Hide text" : "Show text"}
                   aria-expanded={isOpen}
                   onClick={() => toggle(item.key)}
                 >
@@ -242,15 +251,15 @@ function FaqFields({
                   />
                 </Button>
                 <Input
-                  aria-label="Question"
-                  placeholder="Question"
+                  aria-label={capitalize(noun)}
+                  placeholder={capitalize(noun)}
                   value={item.question}
                   onChange={(e) => setItem(item.key, { question: e.target.value })}
                 />
                 <ItemControls
                   index={index}
                   count={section.items.length}
-                  name={item.question || "question"}
+                  name={item.question || noun}
                   onMove={(to) =>
                     update((s) => ({ ...s, items: moved(s.items, index, to) }))
                   }
@@ -264,7 +273,7 @@ function FaqFields({
               </div>
               {isOpen && (
                 <RichTextField
-                  label={`Answer to ${item.question}`}
+                  label={`Text for ${item.question}`}
                   value={item.answer}
                   onChange={(answer) => setItem(item.key, { answer })}
                 />
@@ -288,18 +297,55 @@ function FaqFields({
         }}
       >
         <Plus />
-        Add question
+        Add {noun}
       </Button>
     </>
   );
 }
 
+function FieldsFields({
+  section,
+  update,
+}: {
+  section: SectionOf<FieldsKind>;
+  update: Update<SectionOf<FieldsKind>>;
+}) {
+  return Object.values(sectionKinds[section.kind].fields).map(
+    (field: { key: string; label: string; type?: string; hint?: string }) => {
+      const id = `${section.key}-${field.key}`;
+      return (
+        <div key={field.key} className="flex flex-col gap-1.5">
+          <Label htmlFor={id}>{field.label}</Label>
+          <Input
+            id={id}
+            type={field.type === "number" ? "number" : "text"}
+            min={field.type === "number" ? 0 : undefined}
+            value={section.fields[field.key] ?? ""}
+            onChange={(e) =>
+              update((s) => ({
+                ...s,
+                fields: { ...s.fields, [field.key]: e.target.value },
+              }))
+            }
+          />
+          {field.hint && (
+            <p className="text-xs text-muted-foreground">{field.hint}</p>
+          )}
+        </div>
+      );
+    },
+  );
+}
+
 export function SectionFields({
   name,
+  item,
   section,
   update,
 }: {
   name: string;
+  // What one list item is called, like "question"
+  item?: string;
   section: PageSection;
   update: Update<PageSection>;
 }) {
@@ -313,17 +359,29 @@ export function SectionFields({
         />
       );
     case "links":
+    case "tags":
       return (
         <LinksFields
           section={section}
-          update={(fn) => update((s) => (s.kind === "links" ? fn(s) : s))}
+          item={item ?? "link"}
+          update={(fn) =>
+            update((s) => (s.kind === "links" || s.kind === "tags" ? fn(s) : s))
+          }
         />
       );
     case "faq":
       return (
         <FaqFields
           section={section}
+          item={item ?? "item"}
           update={(fn) => update((s) => (s.kind === "faq" ? fn(s) : s))}
+        />
+      );
+    default:
+      return (
+        <FieldsFields
+          section={section}
+          update={(fn) => update((s) => ("fields" in s ? fn(s) : s))}
         />
       );
   }

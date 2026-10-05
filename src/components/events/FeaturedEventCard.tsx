@@ -13,14 +13,20 @@ import type { CalendarEvent } from "@/types/event";
 // either filter it away or display it differently (e.g. "Sold Out" badge,
 // moved to a separate section). For now we always show the first upcoming event.
 
-export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
+export function FeaturedEventCard({
+  event,
+  label,
+}: {
+  event: CalendarEvent;
+  label: string;
+}) {
   const { month, day, weekday } = formatEventDate(event);
   const cta = getEventCta(event);
   const mapUrl = getMapUrl(event.location);
 
   return (
     <div className="group/card relative">
-      <CardSurface className={cn(cta && "card-hover:stroke-orange-dark")} />
+      <CardSurface className={cn(cta && "card-hover:stroke-page-accent-edge")} />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
           focusable CTA, so this one stays out of the tab order. */}
@@ -39,10 +45,10 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
         <span
           className={cn(
             "font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-5xl",
-            cta && "card-hover:outline-ink-orange-dark",
+            cta && "card-hover:outline-ink-page-accent-edge",
           )}
         >
-          Next Up
+          {label}
         </span>
       </div>
 
@@ -95,9 +101,9 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
         >
           <span
             aria-hidden
-            className="absolute inset-0 rounded-full border-[3px] border-orange-dark bg-orange shadow-lg sketch card-hover:sketch-animated"
+            className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent shadow-lg sketch card-hover:sketch-animated"
           />
-          <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-orange-dark sm:px-6 sm:py-3 sm:text-base">
+          <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
             <cta.icon size={18} className="shrink-0" />
             {cta.label}
           </span>

@@ -2,7 +2,10 @@ import { ArrowUpRight, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getRecentPosts } from "@/lib/data";
 import { TIME_ZONE } from "@/lib/event-format";
+import { getPage, sectionFields } from "@/lib/pages";
+import { pageTemplates } from "@/config/pages";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
+import { PageSections } from "@/components/PageSections";
 import { CardSurface } from "@/components/CardSurface";
 import { CreamCard } from "@/components/CreamCard";
 import type { SubstackPost } from "@/types/post";
@@ -62,7 +65,7 @@ function OpensOverlay({
         className,
       )}
     >
-      <div className={cn("absolute inset-0 bg-rose-dark/80", washClassName)} />
+      <div className={cn("absolute inset-0 bg-page-accent-edge/80", washClassName)} />
       <ArrowUpRight
         size={32}
         strokeWidth={2.5}
@@ -72,10 +75,16 @@ function OpensOverlay({
   );
 }
 
-function LatestPostCard({ post }: { post: SubstackPost }) {
+function LatestPostCard({
+  post,
+  label,
+}: {
+  post: SubstackPost;
+  label: string;
+}) {
   return (
     <div className="group/card relative">
-      <CardSurface className="card-hover:stroke-rose-dark" />
+      <CardSurface className="card-hover:stroke-page-accent-edge" />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
           focusable CTA, so this one stays out of the tab order. */}
@@ -89,8 +98,8 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
       />
 
       <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
-        <span className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink card-hover:outline-ink-rose-dark sm:text-5xl">
-          Latest
+        <span className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink card-hover:outline-ink-page-accent-edge sm:text-5xl">
+          {label}
         </span>
       </div>
 
@@ -135,9 +144,9 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
       >
         <span
           aria-hidden
-          className="absolute inset-0 rounded-full border-[3px] border-rose-dark bg-rose shadow-lg sketch card-hover:sketch-animated"
+          className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent shadow-lg sketch card-hover:sketch-animated"
         />
-        <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-rose-dark sm:px-6 sm:py-3 sm:text-base">
+        <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
           <span className="sm:hidden">Read</span>
           <span className="hidden sm:inline">Read on Substack</span>
           <ArrowUpRight size={18} className="shrink-0" />
@@ -157,7 +166,7 @@ function PostTile({ post }: { post: SubstackPost }) {
     >
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream transition-colors sketch group-hover/tile:border-rose-dark"
+        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream transition-colors sketch group-hover/tile:border-page-accent-edge"
       />
       <div
         className={cn(
@@ -193,50 +202,31 @@ function PostTile({ post }: { post: SubstackPost }) {
   );
 }
 
-export default async function Blog() {
-  const posts = await getRecentPosts();
+function Posts({
+  posts,
+  fields,
+}: {
+  posts: SubstackPost[];
+  fields: Record<string, string>;
+}) {
   const [latest, ...older] = posts;
 
   return (
-    <ColorPage className="bg-charcoal page-ink-rose page-edge-charcoal-light">
-      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-4">
-          <PageTitle>Blog</PageTitle>
-          <p className="text-xl uppercase tracking-wide text-cream">
-            Updates and interviews from our newsletter
-          </p>
-        </div>
-        <a
-          href={SUBSTACK_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group/subscribe relative self-start rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:self-auto"
-        >
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-full border-2 border-cream transition-colors sketch-subtle group-hover/subscribe:bg-cream group-hover/subscribe:sketch-subtle-animated"
-          />
-          <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-cream transition-colors group-hover/subscribe:text-charcoal">
-            <Mail size={14} />
-            Subscribe
-          </span>
-        </a>
-      </header>
-
+    <>
       {latest ? (
-        <LatestPostCard post={latest} />
+        <LatestPostCard post={latest} label={fields.latestLabel} />
       ) : (
         <CreamCard>
           <p className="text-center text-lg uppercase tracking-wide text-charcoal/80">
-            No posts yet. Check back soon!
+            {fields.emptyMessage}
           </p>
         </CreamCard>
       )}
 
       {older.length > 0 && (
         <section className="flex flex-col gap-6">
-          <h2 className="text-xl uppercase tracking-wide text-cream sm:text-2xl">
-            Older posts
+          <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
+            {fields.olderHeading}
           </h2>
           <ul className="grid gap-x-4 gap-y-6 sm:grid-cols-3">
             {older.map((post) => (
@@ -247,6 +237,51 @@ export default async function Blog() {
           </ul>
         </section>
       )}
+    </>
+  );
+}
+
+export default async function Blog() {
+  const [page, posts] = await Promise.all([
+    getPage(pageTemplates.blog.key),
+    getRecentPosts(),
+  ]);
+  const { subscribeLabel } = sectionFields(page, "posts");
+
+  return (
+    <ColorPage colors={page.colors}>
+      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4">
+          <PageTitle>{page.title}</PageTitle>
+          {page.subtitle && (
+            <p className="text-xl uppercase tracking-wide text-page-fg">
+              {page.subtitle}
+            </p>
+          )}
+        </div>
+        {subscribeLabel && (
+          <a
+            href={SUBSTACK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/subscribe relative self-start rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:self-auto"
+          >
+            <span
+              aria-hidden
+              className="absolute inset-0 rounded-full border-2 border-page-fg transition-colors sketch-subtle group-hover/subscribe:bg-page-fg group-hover/subscribe:sketch-subtle-animated"
+            />
+            <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-page-fg transition-colors group-hover/subscribe:text-charcoal">
+              <Mail size={14} />
+              {subscribeLabel}
+            </span>
+          </a>
+        )}
+      </header>
+
+      <PageSections
+        sections={page.sections}
+        renderers={{ posts: (fields) => <Posts posts={posts} fields={fields} /> }}
+      />
     </ColorPage>
   );
 }

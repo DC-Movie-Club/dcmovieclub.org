@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { copySlots } from "@/config/copy";
 import { pageTemplates } from "@/config/pages";
-import { getCopy } from "@/lib/copy";
 import { readPage } from "@/lib/pages";
 import {
   Item,
@@ -23,12 +21,12 @@ function PageItem({
   href,
   label,
   description,
-  colors = [],
+  colors,
 }: {
   href: string;
   label: string;
   description: string;
-  colors?: string[];
+  colors: string[];
 }) {
   return (
     <Item variant="outline" render={<Link href={href} />}>
@@ -54,14 +52,11 @@ function PageItem({
   );
 }
 
-// Pages still on a single copy slot open the copy editor until they get a template
 export default async function PagesPage() {
   const templates = Object.values(pageTemplates);
-  const slots = Object.values(copySlots);
-  const [pages, copies] = await Promise.all([
-    Promise.all(templates.map((template) => readPage(template.key))),
-    Promise.all(slots.map((slot) => getCopy(slot.key))),
-  ]);
+  const pages = await Promise.all(
+    templates.map((template) => readPage(template.key)),
+  );
 
   return (
     <ItemGroup className="gap-2">
@@ -72,14 +67,6 @@ export default async function PagesPage() {
           label={template.label}
           description={savedLabel(pages[i].updatedAt, pages[i].updatedByName)}
           colors={Object.values(pages[i].colors)}
-        />
-      ))}
-      {slots.map((slot, i) => (
-        <PageItem
-          key={slot.key}
-          href={`/admin/pages/${slot.key}`}
-          label={slot.label}
-          description={savedLabel(copies[i].updatedAt, copies[i].updatedByName)}
         />
       ))}
     </ItemGroup>

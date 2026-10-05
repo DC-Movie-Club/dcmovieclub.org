@@ -6,8 +6,10 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import {
   colorRoles,
   isHexColor,
+  isPageKey,
   pageTemplates,
   sectionKinds,
+  sectionTemplate,
   type ColorRoleKey,
   type PageColors,
 } from "@/config/pages";
@@ -31,6 +33,7 @@ import type { PageContent, PageSection } from "@/lib/pages";
 
 type Draft = {
   title: string;
+  subtitle: string;
   // "" is a color that isn't set
   colors: Record<ColorRoleKey, string>;
   sections: PageSection[];
@@ -39,6 +42,7 @@ type Draft = {
 function draftOf(page: PageContent): Draft {
   return {
     title: page.title,
+    subtitle: page.subtitle,
     colors: Object.fromEntries(
       Object.values(colorRoles).map((role) => [
         role.key,
@@ -144,6 +148,7 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
         page: saved.key,
         draft: {
           title: draft.title,
+          subtitle: draft.subtitle,
           colors: colorsOf(draft),
           sections: draft.sections,
         },
@@ -245,6 +250,19 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
         />
       </div>
 
+      {template.subtitle && (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="page-subtitle">Subtitle</Label>
+          <Input
+            id="page-subtitle"
+            value={draft.subtitle}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, subtitle: e.target.value }))
+            }
+          />
+        </div>
+      )}
+
       <section className="flex flex-col gap-4">
         <h3 className="font-semibold">Colors</h3>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -277,9 +295,10 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
       <section key={fieldsKey} className="flex flex-col gap-4">
         <h3 className="font-semibold">Sections</h3>
         {draft.sections.map((section) => {
-          const name =
-            template.sections[section.key as keyof typeof template.sections]
-              .label;
+          const { label: name, item, colorsFrom } = sectionTemplate(
+            saved.key,
+            section.key,
+          );
           return (
             <section key={section.key} className="rounded-lg border">
               <header className="flex items-baseline justify-between gap-3 border-b px-4 py-3">
@@ -289,8 +308,14 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
                 </span>
               </header>
               <div className="flex flex-col gap-4 p-4">
+                {colorsFrom && isPageKey(colorsFrom) && (
+                  <p className="text-xs text-muted-foreground">
+                    {`Uses the ${pageTemplates[colorsFrom].label} page's colors`}
+                  </p>
+                )}
                 <SectionFields
                   name={name}
+                  item={item}
                   section={section}
                   update={(fn) => updateSection(section.key, fn)}
                 />

@@ -3,7 +3,13 @@ import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { SectionCard } from "@/components/section-cards";
 import { Link, ExternalLink } from "@/components/ui/link";
+import type { FieldsKind } from "@/config/pages";
 import type { FaqItem, LinkItem, PageSection } from "@/lib/pages";
+
+// Renders a section the page builds itself from live data, given its fields
+export type SectionRenderers = Partial<
+  Record<FieldsKind, (fields: Record<string, string>) => React.ReactNode>
+>;
 
 function LinkListItem({ item }: { item: LinkItem }) {
   if (!item.url) return <li>{item.title}</li>;
@@ -13,6 +19,24 @@ function LinkListItem({ item }: { item: LinkItem }) {
       <LinkComponent href={item.url} className={markdownStyles.link}>
         {item.title}
       </LinkComponent>
+    </li>
+  );
+}
+
+function TagItem({ item }: { item: LinkItem }) {
+  return (
+    <li className="relative px-4 py-2 text-base uppercase leading-none tracking-wide text-charcoal">
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-full border-2 border-page-accent-edge/30 bg-page-accent/20 shadow-sm sketch-subtle"
+      />
+      {item.url ? (
+        <ExternalLink href={item.url} className="relative">
+          {item.title}
+        </ExternalLink>
+      ) : (
+        <span className="relative">{item.title}</span>
+      )}
     </li>
   );
 }
@@ -47,7 +71,13 @@ export function FaqEntry({ item }: { item: FaqItem }) {
   );
 }
 
-function Section({ section }: { section: PageSection }) {
+function Section({
+  section,
+  renderers,
+}: {
+  section: PageSection;
+  renderers: SectionRenderers;
+}) {
   switch (section.kind) {
     case "text":
       return section.content.trim() ? (
@@ -61,6 +91,16 @@ function Section({ section }: { section: PageSection }) {
           <ul className={markdownStyles.ul}>
             {section.items.map((item) => (
               <LinkListItem key={item.key} item={item} />
+            ))}
+          </ul>
+        </SectionCard>
+      ) : null;
+    case "tags":
+      return section.items.length > 0 ? (
+        <SectionCard id={section.key} label={section.label}>
+          <ul className="flex flex-wrap gap-3">
+            {section.items.map((item) => (
+              <TagItem key={item.key} item={item} />
             ))}
           </ul>
         </SectionCard>
@@ -80,11 +120,19 @@ function Section({ section }: { section: PageSection }) {
           </div>
         </section>
       ) : null;
+    default:
+      return renderers[section.kind]?.(section.fields) ?? null;
   }
 }
 
-export function PageSections({ sections }: { sections: PageSection[] }) {
+export function PageSections({
+  sections,
+  renderers = {},
+}: {
+  sections: PageSection[];
+  renderers?: SectionRenderers;
+}) {
   return sections.map((section) => (
-    <Section key={section.key} section={section} />
+    <Section key={section.key} section={section} renderers={renderers} />
   ));
 }

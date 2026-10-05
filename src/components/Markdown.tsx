@@ -5,7 +5,6 @@ import { parseYouTubeId } from "@/lib/youtube";
 import { Link, ExternalLink } from "@/components/ui/link";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { markdownStyles } from "@/components/markdownStyles";
-import { rehypeSections, type SectionsOptions } from "@/lib/rehype-sections";
 import { remarkDetails } from "@/lib/remark-details";
 
 // A paragraph that is only a link to a YouTube video, e.g. `<https://www.youtube.com/watch?v=…>`
@@ -76,20 +75,16 @@ export function Markdown({
   children,
   className,
   overrides,
-  sections,
 }: {
   children: string;
   className?: string;
   overrides?: Components;
-  // Groups each heading at `depth` with its content (see rehypeSections)
-  sections?: SectionsOptions;
 }) {
   return (
     <div className={cn("text-charcoal", className)}>
       <ReactMarkdown
         components={{ ...components, ...overrides }}
         remarkPlugins={[remarkDirective, remarkDetails]}
-        rehypePlugins={sections ? [[rehypeSections, sections]] : []}
       >
         {children}
       </ReactMarkdown>
