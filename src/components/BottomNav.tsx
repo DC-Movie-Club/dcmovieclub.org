@@ -59,7 +59,7 @@ export function BottomNav() {
         <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
           <div
             className={cn(
-              "absolute -inset-x-2 top-2 bottom-0 border-t-2 border-charcoal/20 bg-surface sketch xs:inset-0 xs:border-2 xs:rounded-full",
+              "absolute -inset-x-2 top-2 bottom-0 border-t-2 border-charcoal bg-surface sketch xs:inset-0 xs:border-2 xs:rounded-full xs:shadow-[4px_5px_0_var(--color-charcoal)]",
               hovered && "sketch-animated",
             )}
           />
