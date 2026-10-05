@@ -2,11 +2,13 @@
     May also surface social links. */}
 
 import { ExternalLink } from "@/components/ui/link";
+import { HomeLink } from "@/components/HomeLink";
 
 export default function Contact() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-4xl uppercase tracking-wide">Contact</h1>
+    <div className="mx-auto max-w-3xl px-6 pt-5 pb-16 sm:pt-6">
+      <HomeLink />
+      <h1 className="mt-5 text-4xl uppercase tracking-wide sm:mt-8">Contact</h1>
       <p className="mt-6 text-lg text-muted-foreground">
         Get in touch with DC Movie Club.
       </p>
