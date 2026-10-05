@@ -9,7 +9,9 @@ import {
   isColorRoleKey,
   isHexColor,
   isPageKey,
+  navPages,
   pageTemplates,
+  type NavColors,
   type PageColors,
   type PageKey,
 } from "@/config/pages";
@@ -37,6 +39,7 @@ export type PageDraft = {
   title: string;
   subtitle: string;
   colors: PageColors;
+  navColors: NavColors;
   sections: PageSection[];
 };
 
@@ -54,6 +57,15 @@ function validColors(colors: PageColors): PageColors {
   for (const [role, hex] of Object.entries(colors)) {
     if (!isColorRoleKey(role) || !isHexColor(hex)) {
       throw new Error(`Invalid color ${role}: ${hex}`);
+    }
+  }
+  return colors;
+}
+
+function validNavColors(colors: NavColors): NavColors {
+  for (const [page, hex] of Object.entries(colors)) {
+    if (!navPages.some((p) => p.key === page) || !isHexColor(hex)) {
+      throw new Error(`Invalid nav color ${page}: ${hex}`);
     }
   }
   return colors;
@@ -154,6 +166,9 @@ export async function savePage(input: {
     title: text(draft.title).trim(),
     subtitle: pageTemplates[page].subtitle ? text(draft.subtitle).trim() : "",
     colors: validColors(draft.colors),
+    ...(page === pageTemplates.home.key
+      ? { navColors: validNavColors(draft.navColors) }
+      : {}),
     sections: sectionsData(page, draft.sections),
     updatedAt: Timestamp.now(),
     ...editor,

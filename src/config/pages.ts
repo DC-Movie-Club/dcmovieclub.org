@@ -133,6 +133,15 @@ export function isPageKey(value: string): value is PageKey {
   return Object.hasOwn(pageTemplates, value);
 }
 
+// The bottom nav has an item for every page but Home, whose item is the logo.
+// An item takes its page's accent color, unless Home's nav colors (stored on
+// pages/home) give it another.
+export const navPages = Object.values(pageTemplates).filter(
+  (page) => page.key !== pageTemplates.home.key,
+);
+
+export type NavColors = Partial<Record<PageKey, string>>;
+
 export function sectionTemplate(page: PageKey, key: string) {
   const sections: Record<string, SectionTemplate> = pageTemplates[page].sections;
   return sections[key];

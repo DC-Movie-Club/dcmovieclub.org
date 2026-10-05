@@ -6,7 +6,9 @@ import { getAdminDb } from "@/lib/firebase-admin";
 import {
   isColorRoleKey,
   isHexColor,
+  isPageKey,
   pageTemplates,
+  type NavColors,
   type PageColors,
   type PageKey,
   type SectionKind,
@@ -31,6 +33,8 @@ export type PageContent = {
   title: string;
   subtitle: string;
   colors: PageColors;
+  // Only Home sets these (see navPages)
+  navColors: NavColors;
   sections: PageSection[];
   updatedAt: string | null;
   updatedByName: string | null;
@@ -129,6 +133,11 @@ export function pageFromData(
         ([role, hex]) => isColorRoleKey(role) && isHexColor(hex),
       ),
     ) as PageColors,
+    navColors: Object.fromEntries(
+      Object.entries(record(data.navColors)).filter(
+        ([page, hex]) => isPageKey(page) && isHexColor(hex),
+      ),
+    ) as NavColors,
     sections: Object.values(pageTemplates[key].sections).map((section) =>
       toSection(section.key, section.kind, record(sections[section.key])),
     ),
@@ -156,15 +165,16 @@ export const getPage = cache((key: PageKey) =>
   })(),
 );
 
-// Each page's accent color by route, for pages that set one, which the bottom
-// nav colors its items with. Read through getPage, so saving a page's colors
-// updates the nav too.
+// The color the bottom nav gives each page's item, by route: Home's nav color
+// for it, or else the page's accent, for pages that have either. Read through
+// getPage, so saving Home or the page updates the nav too.
 export async function getPageAccents(): Promise<Record<string, string>> {
+  const { navColors } = await getPage(pageTemplates.home.key);
   const accents: Record<string, string> = {};
   await Promise.all(
     Object.values(pageTemplates).map(async ({ key, href }) => {
-      const { accent } = (await getPage(key)).colors;
-      if (accent) accents[href] = accent;
+      const color = navColors[key] ?? (await getPage(key)).colors.accent;
+      if (color) accents[href] = color;
     }),
   );
   return accents;

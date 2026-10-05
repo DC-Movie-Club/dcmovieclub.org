@@ -1,7 +1,13 @@
 "use client";
 
-import { colorRoles, isHexColor, type ColorRoleKey } from "@/config/pages";
-import { ColorPopover } from "@/app/admin/components/ColorPopover";
+import {
+  colorRoles,
+  isHexColor,
+  navPages,
+  type ColorRoleKey,
+  type PageKey,
+} from "@/config/pages";
+import { ColorPopover, Contrast } from "@/app/admin/components/ColorPopover";
 import {
   Field,
   FieldDescription,
@@ -10,7 +16,43 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-// `colors` holds "" for a role that isn't set, and may hold half-typed hex
+// `value` is "" when the color isn't set, and may be half-typed hex
+function ColorField({
+  id,
+  label,
+  value,
+  placeholder = "Not set",
+  onChange,
+  children,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  placeholder?: string;
+  onChange: (value: string) => void;
+  children?: React.ReactNode;
+}) {
+  return (
+    <Field orientation="horizontal" className="gap-3">
+      <ColorPopover label={label} value={value} onChange={onChange}>
+        {children}
+      </ColorPopover>
+      <FieldLabel htmlFor={id} className="flex-1">
+        {label}
+      </FieldLabel>
+      <Input
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        spellCheck={false}
+        aria-invalid={!!value && !isHexColor(value)}
+        className="w-28 shrink-0 font-mono"
+        onChange={(e) => onChange(e.target.value.trim())}
+      />
+    </Field>
+  );
+}
+
 export function ColorFields({
   colors,
   onChange,
@@ -26,30 +68,48 @@ export function ColorFields({
       </FieldDescription>
       {Object.values(colorRoles).map((role) => {
         const value = colors[role.key];
-        const id = `color-${role.key}`;
         return (
-          <Field key={role.key} orientation="horizontal" className="gap-3">
-            <ColorPopover
-              role={role}
-              value={value}
-              colors={colors}
-              onChange={(next) => onChange(role.key, next)}
-            />
-            <FieldLabel htmlFor={id} className="flex-1">
-              {role.label}
-            </FieldLabel>
-            <Input
-              id={id}
-              value={value}
-              placeholder="Not set"
-              spellCheck={false}
-              aria-invalid={!!value && !isHexColor(value)}
-              className="w-28 shrink-0 font-mono"
-              onChange={(e) => onChange(role.key, e.target.value.trim())}
-            />
-          </Field>
+          <ColorField
+            key={role.key}
+            id={`color-${role.key}`}
+            label={role.label}
+            value={value}
+            onChange={(next) => onChange(role.key, next)}
+          >
+            {isHexColor(value) && (
+              <Contrast role={role.key} color={value} colors={colors} />
+            )}
+          </ColorField>
         );
       })}
+    </FieldGroup>
+  );
+}
+
+export function NavColorFields({
+  colors,
+  onChange,
+}: {
+  colors: Partial<Record<PageKey, string>>;
+  onChange: (page: PageKey, value: string) => void;
+}) {
+  return (
+    <FieldGroup className="gap-3">
+      <FieldDescription>
+        Each page&apos;s item in the bottom nav uses the page&apos;s accent
+        color. Pick a color here to use a different one in the nav. The nav
+        changes when you save.
+      </FieldDescription>
+      {navPages.map((page) => (
+        <ColorField
+          key={page.key}
+          id={`nav-color-${page.key}`}
+          label={page.label}
+          value={colors[page.key] ?? ""}
+          placeholder="Page accent"
+          onChange={(next) => onChange(page.key, next)}
+        />
+      ))}
     </FieldGroup>
   );
 }

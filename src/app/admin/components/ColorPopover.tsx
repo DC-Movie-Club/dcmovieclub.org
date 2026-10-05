@@ -55,7 +55,7 @@ function ratioText(ratio: number) {
   return `${Math.floor(ratio * 10) / 10}:1`;
 }
 
-function Contrast({
+export function Contrast({
   role,
   color,
   colors,
@@ -107,24 +107,25 @@ function Contrast({
   );
 }
 
-// `value` is "" when the role isn't set, and may be half-typed hex from the
-// field's text input
+// `value` is "" when the color isn't set, and may be half-typed hex from the
+// field's text input. `children` go under the shades, like a page color's
+// contrast checks.
 export function ColorPopover({
-  role,
+  label,
   value,
-  colors,
   onChange,
+  children,
 }: {
-  role: (typeof colorRoles)[ColorRoleKey];
+  label: string;
   value: string;
-  colors: Record<ColorRoleKey, string>;
   onChange: (value: string) => void;
+  children?: React.ReactNode;
 }) {
   const color = isHexColor(value) ? value : "";
   return (
     <Popover>
       <PopoverTrigger
-        aria-label={`Pick ${role.label.toLowerCase()} color`}
+        aria-label={`Pick ${label.toLowerCase()} color`}
         className={cn(
           "size-8 shrink-0 cursor-pointer rounded-md border outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
           !color && "border-dashed",
@@ -136,7 +137,7 @@ export function ColorPopover({
         className="max-h-(--available-height) w-64 gap-3 overflow-y-auto p-3"
       >
         <div className="flex h-6 items-center justify-between gap-2">
-          <PopoverTitle>{role.label}</PopoverTitle>
+          <PopoverTitle>{label}</PopoverTitle>
           {value ? (
             <Button variant="ghost" size="xs" onClick={() => onChange("")}>
               Clear
@@ -147,7 +148,7 @@ export function ColorPopover({
         </div>
         <ColorPicker color={color} onChange={onChange} />
         {color && <Shades color={color} onPick={onChange} />}
-        {color && <Contrast role={role.key} color={color} colors={colors} />}
+        {children}
         <BrandSwatches value={color} onPick={onChange} />
       </PopoverContent>
     </Popover>

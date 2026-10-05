@@ -6,13 +6,18 @@ import { ArrowUpRight, Maximize2, Minimize2, Undo2 } from "lucide-react";
 import {
   colorRoles,
   isHexColor,
+  navPages,
   pageTemplates,
   sectionTemplate,
   type ColorRoleKey,
+  type NavColors,
   type PageColors,
 } from "@/config/pages";
 import { savePage } from "@/app/admin/actions/pages";
-import { ColorFields } from "@/app/admin/components/ColorFields";
+import {
+  ColorFields,
+  NavColorFields,
+} from "@/app/admin/components/ColorFields";
 import {
   outlineItems,
   PageOutline,
@@ -47,6 +52,7 @@ type Draft = {
   subtitle: string;
   // "" is a color that isn't set
   colors: Record<ColorRoleKey, string>;
+  navColors: NavColors;
   sections: PageSection[];
 };
 
@@ -60,6 +66,9 @@ function draftOf(page: PageContent): Draft {
         page.colors[role.key] ?? "",
       ]),
     ) as Record<ColorRoleKey, string>,
+    navColors: Object.fromEntries(
+      navPages.map((nav) => [nav.key, page.navColors[nav.key] ?? ""]),
+    ),
     sections: page.sections,
   };
 }
@@ -71,16 +80,24 @@ function colorsOf(draft: Draft): PageColors {
   );
 }
 
+function navColorsOf(draft: Draft): NavColors {
+  return Object.fromEntries(
+    Object.entries(draft.navColors).filter(([, hex]) => isHexColor(hex)),
+  );
+}
+
 function same(a: unknown, b: unknown) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-// The outline's items are "title", "colors" and the template's section keys
+// The outline's items are "title", "colors", "nav" and the template's section
+// keys
 function itemChanged(draft: Draft, base: Draft, item: string) {
   if (item === "title") {
     return draft.title !== base.title || draft.subtitle !== base.subtitle;
   }
   if (item === "colors") return !same(draft.colors, base.colors);
+  if (item === "nav") return !same(draft.navColors, base.navColors);
   return !same(
     draft.sections.find((s) => s.key === item),
     base.sections.find((s) => s.key === item),
@@ -92,6 +109,7 @@ function withItemFrom(draft: Draft, base: Draft, item: string): Draft {
     return { ...draft, title: base.title, subtitle: base.subtitle };
   }
   if (item === "colors") return { ...draft, colors: base.colors };
+  if (item === "nav") return { ...draft, navColors: base.navColors };
   return {
     ...draft,
     sections: draft.sections.map((s) =>
@@ -193,15 +211,19 @@ export function PageEditor({
   // no sections opens on its first part
   const [selected, setSelected] = useState(
     () =>
-      items.find((item) => item.key === initialItem)?.key ??
-      items[items.length > 2 ? 1 : 0].key,
+      (
+        items.find((item) => item.key === initialItem) ??
+        items.find((item) => sectionTemplate(pageKey, item.key)) ??
+        items[0]
+      ).key,
   );
   const current = items.find((item) => item.key === selected) ?? items[0];
 
   const isDirty = items.some((item) => item.dirty);
-  const isValid = Object.values(draft.colors).every(
-    (hex) => !hex || isHexColor(hex),
-  );
+  const isValid = [
+    ...Object.values(draft.colors),
+    ...Object.values(draft.navColors),
+  ].every((hex) => !hex || isHexColor(hex));
   const canSave = isDirty && isValid && !saving;
   const guard = useLeaveGuard(isDirty);
 
@@ -228,6 +250,7 @@ export function PageEditor({
           title: draft.title,
           subtitle: draft.subtitle,
           colors: colorsOf(draft),
+          navColors: navColorsOf(draft),
           sections: draft.sections,
         },
         baselineUpdatedAt: saved.updatedAt,
@@ -289,6 +312,18 @@ export function PageEditor({
         colors={draft.colors}
         onChange={(role, value) =>
           setDraft((d) => ({ ...d, colors: { ...d.colors, [role]: value } }))
+        }
+      />
+    );
+  } else if (current.key === "nav") {
+    form = (
+      <NavColorFields
+        colors={draft.navColors}
+        onChange={(page, value) =>
+          setDraft((d) => ({
+            ...d,
+            navColors: { ...d.navColors, [page]: value },
+          }))
         }
       />
     );

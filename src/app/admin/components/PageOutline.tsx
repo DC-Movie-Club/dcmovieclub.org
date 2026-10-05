@@ -9,6 +9,7 @@ import {
   Link as LinkIcon,
   ListCollapse,
   Palette,
+  PanelBottom,
   Tags,
   type LucideIcon,
 } from "lucide-react";
@@ -31,7 +32,8 @@ export type OutlineItem = {
 };
 
 // The editable parts of a page, in the order they appear on it: the title (if
-// admins edit it), each section, then the page's colors
+// admins edit it), each section, then the page's colors, and on Home the
+// bottom nav's colors
 export function outlineItems(
   page: PageKey,
   isDirty: (item: string) => boolean,
@@ -53,6 +55,9 @@ export function outlineItems(
       item(section.key, section.label, kindIcons[section.kind].icon),
     ),
     item("colors", "Colors", Palette),
+    ...(page === pageTemplates.home.key
+      ? [item("nav", "Nav colors", PanelBottom)]
+      : []),
   ];
 }
 
