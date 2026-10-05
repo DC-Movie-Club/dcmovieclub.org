@@ -37,7 +37,7 @@ export function SiteFooter({ className }: { className?: string }) {
         href={socials.substack.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="group/subscribe absolute top-0 left-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+        className="group/subscribe absolute top-0 left-1/2 z-10 block -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
       >
         <span
           aria-hidden
