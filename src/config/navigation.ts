@@ -2,7 +2,7 @@ import {
   House,
   Ticket,
   Newspaper,
-  Users,
+  ScrollText,
   Handshake,
   Mail,
 } from "lucide-react";
@@ -38,7 +38,7 @@ export const routes = {
     label: "About",
     labelShort: "About",
     href: "/about",
-    icon: Users,
+    icon: ScrollText,
   },
   partnerships: {
     key: "partnerships",
