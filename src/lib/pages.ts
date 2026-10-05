@@ -179,3 +179,15 @@ export async function getPageAccents(): Promise<Record<string, string>> {
   );
   return accents;
 }
+
+// Each page's background, by route, for pages that set one
+export async function getPageBackgrounds(): Promise<Record<string, string>> {
+  const backgrounds: Record<string, string> = {};
+  await Promise.all(
+    Object.values(pageTemplates).map(async ({ key, href }) => {
+      const color = (await getPage(key)).colors.background;
+      if (color) backgrounds[href] = color;
+    }),
+  );
+  return backgrounds;
+}

@@ -1,6 +1,6 @@
 import { Link } from "@/components/ui/link";
 import { BottomNav } from "@/components/BottomNav";
-import { getPageAccents } from "@/lib/pages";
+import { getPageAccents, getPageBackgrounds } from "@/lib/pages";
 
 export default async function NotFound() {
   return (
@@ -15,7 +15,10 @@ export default async function NotFound() {
           Go home
         </Link>
       </div>
-      <BottomNav accents={await getPageAccents()} />
+      <BottomNav
+        accents={await getPageAccents()}
+        backgrounds={await getPageBackgrounds()}
+      />
     </div>
   );
 }
