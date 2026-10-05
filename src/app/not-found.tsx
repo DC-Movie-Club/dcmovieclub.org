@@ -1,7 +1,8 @@
 import { Link } from "@/components/ui/link";
 import { BottomNav } from "@/components/BottomNav";
+import { getPageAccents } from "@/lib/pages";
 
-export default function NotFound() {
+export default async function NotFound() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6 text-center">
@@ -14,7 +15,7 @@ export default function NotFound() {
           Go home
         </Link>
       </div>
-      <BottomNav />
+      <BottomNav accents={await getPageAccents()} />
     </div>
   );
 }
