@@ -37,6 +37,17 @@ export function SiteFooter({ className }: { className?: string }) {
         <div className="flex flex-col gap-4 text-page-fg/80 sm:flex-row sm:items-center sm:justify-between">
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <li>
+                <a
+                  href={socials.substack.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn("flex items-center gap-1", LINK)}
+                >
+                  Subscribe
+                  <ArrowUpRight size={12} />
+                </a>
+              </li>
               {footerLinks.map((link) => (
                 <li key={link.key}>
                   <NextLink href={link.href} className={LINK}>
