@@ -50,11 +50,11 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
         <CalendarDate month={month} day={day} variant="tall" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <h2 className="text-2xl uppercase leading-tight tracking-wide text-charcoal sm:text-3xl">
+          <h2 className="text-2xl uppercase leading-tight tracking-wide text-page-ink sm:text-3xl">
             {event.title}
           </h2>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm uppercase tracking-wider text-charcoal/70">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm uppercase tracking-wider text-page-ink/80">
             <span className="flex items-center gap-1.5">
               <CalendarDays size={14} className="shrink-0" />
               {weekday}
@@ -68,7 +68,7 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
             {event.location && mapUrl && (
               <ExternalLink
                 href={mapUrl}
-                className="pointer-events-auto flex items-center gap-1.5 underline decoration-charcoal/30 underline-offset-4 hover:decoration-rust"
+                className="pointer-events-auto flex items-center gap-1.5 underline decoration-page-ink/30 underline-offset-4 hover:decoration-rust"
               >
                 <MapPin size={14} className="shrink-0" />
                 {event.location}
@@ -79,7 +79,7 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
           {event.description && (
             <ExpandableDescription
               html={event.description}
-              className="mt-2 border-t border-dashed border-charcoal/20 pt-3 text-sm text-charcoal/85 [&_a]:pointer-events-auto [&_a]:text-charcoal/60 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-charcoal"
+              className="mt-2 border-t border-dashed border-charcoal/20 pt-3 text-sm text-page-ink/90 [&_a]:pointer-events-auto [&_a]:text-rust [&_a]:underline [&_a]:decoration-rust/40 [&_a]:underline-offset-4 [&_a:hover]:decoration-rust"
               actionClassName="pointer-events-auto absolute bottom-0 left-1/2 mt-0 -translate-x-1/2 translate-y-1/2"
             />
           )}
