@@ -158,12 +158,13 @@ export function BottomNav({ accents }: { accents: Record<string, string> }) {
           href={routes.home.href}
           className={cn(
             "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-[scale,translate] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] focus-visible:outline-hidden",
-            // Home is the logo's page, so there it's full size and stays a link
-            // without hover feedback, like the other items on their own pages.
-            // Elsewhere it sits smaller in the bar, peeking above it a little,
-            // and grows on hover by about as much as the other items do.
+            // Home is the logo's page, so there it's full size and in color, and
+            // stays a link without hover feedback, like the other items on
+            // their own pages. Elsewhere it's drawn in line, smaller and lower
+            // in the bar; on hover it boils and turns logo red, grows by about
+            // as much as the other items, and rises to where it sits on home.
             !onHome &&
-              "translate-y-2 scale-90 hover:scale-[0.99] focus-visible:scale-[0.99]",
+              "translate-y-1 scale-90 hover:translate-y-0 hover:scale-[0.99] focus-visible:translate-y-0 focus-visible:scale-[0.99]",
             LOGO_SIZE,
           )}
         >
@@ -175,15 +176,23 @@ export function BottomNav({ accents }: { accents: Record<string, string> }) {
             priority
             className={cn(
               LOGO_SIZE,
-              "transition-opacity duration-150",
-              // Away from home it's drawn in line until hovered
-              !onHome &&
-                "opacity-0 group-hover/logo:opacity-100 group-hover/logo:boil group-focus-visible/logo:opacity-100 group-focus-visible/logo:boil",
+              "transition-opacity duration-300 ease-out",
+              !onHome && "opacity-0",
             )}
           />
-          {!onHome && (
-            <LogoOutline className="pointer-events-none absolute inset-0 transition-opacity duration-150 group-hover/logo:opacity-0 group-focus-visible/logo:opacity-0" />
-          )}
+          {/* Mounted on every page, so arriving home crossfades it into the
+              color logo */}
+          <LogoOutline
+            className={cn(
+              "pointer-events-none absolute inset-0 transition-[color,opacity] duration-300 ease-out",
+              onHome
+                ? "opacity-0"
+                : "group-hover/logo:text-logo-red group-focus-visible/logo:text-logo-red",
+            )}
+            layerClassName={cn(
+              !onHome && "group-hover/logo:boil group-focus-visible/logo:boil",
+            )}
+          />
         </Link>
       </div>
     </nav>
