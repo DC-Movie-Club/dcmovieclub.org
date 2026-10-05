@@ -55,14 +55,14 @@ function Hero() {
           <LogoLettering layout="row" className="mx-auto max-w-3xl max-sm:hidden" />
         </h1>
         <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl">
-          <TaglineBanner className="-rotate-2">
+          <TaglineBanner className="-rotate-[0.75deg] sm:-rotate-[0.35deg]">
             DC’s inclusive and
             <span className="max-sm:hidden"> (mostly) unpretentious community</span>
           </TaglineBanner>
-          <TaglineBanner className="rotate-1 sm:hidden">
+          <TaglineBanner className="rotate-[0.4deg] sm:hidden">
             (mostly) unpretentious community
           </TaglineBanner>
-          <TaglineBanner className="-rotate-1 sm:rotate-[1.5deg]">
+          <TaglineBanner className="-rotate-[0.4deg] sm:rotate-[0.25deg]">
             for discussing movies and making friends!
           </TaglineBanner>
         </p>
