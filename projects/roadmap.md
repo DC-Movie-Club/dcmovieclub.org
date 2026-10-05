@@ -65,12 +65,11 @@ Vision: hitting "publish" on an event in the DCMC admin fans out to every platfo
 
 - [ ] **Ticket Tailor** — chosen ticketing platform (good API, fair price). ⏳ Need API key from Abbie (Box office settings → Manage → API). See [ticket-tailor-api.md](../docs/ticket-tailor-api.md)
 - [ ] **Google Calendar** — auto-create events on the shared calendar
-- [ ] **Discord** — auto-post event announcements (replaces the manual moderator step)
 - [ ] **Substack** — no public write API; stays manual for now
 - [ ] **Instagram** — maybe; ~$16/mo via getlate.dev. Deferred
 - [ ] Linktree becomes redundant once `/instagram` ships
 
-Current manual workflow being replaced: lock venue → IG post → Ticket Tailor page → Linktree → Google Calendar → Substack email → Discord.
+Current manual workflow being replaced: lock venue → IG post → Ticket Tailor page → Linktree → Google Calendar → Substack email.
 
 ---
 
