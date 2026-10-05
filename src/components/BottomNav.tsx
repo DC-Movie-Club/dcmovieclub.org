@@ -77,20 +77,14 @@ export function BottomNav() {
           <div className="absolute -inset-x-2 top-2 bottom-0 xs:inset-0">
             {/* The fill sits just inside the line, which the ink filter thins
                 in places, so it never shows past the line's outer edge */}
-            <div
-              className={cn(
-                "absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full",
-                hovered && "sketch-animated",
-              )}
-            />
+            <div className="absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full" />
             <div
               className={cn(
                 "absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2",
                 SHADOW,
-                hovered && "ink-animated",
               )}
             />
-            <ShadowHatching animated={hovered} />
+            <ShadowHatching boiling={hovered} />
           </div>
         </div>
         <NavLink
@@ -231,7 +225,7 @@ export function BottomNav() {
             width={NAV_LOGO_SIZE}
             height={NAV_LOGO_SIZE}
             priority
-            className={cn(LOGO_SIZE, logoHovered && "sketch-subtle-animated")}
+            className={cn(LOGO_SIZE, logoHovered && "boil")}
           />
         </Link>
       </div>
@@ -242,7 +236,7 @@ export function BottomNav() {
 // Lighter strokes drawn inside the pill's hard shadow. Masked to the shadow's
 // crescent, short of both edges, so they need the pill's measured size. The
 // ink filter wobbles them in step with the shadow they sit in.
-function ShadowHatching({ animated }: { animated: boolean }) {
+function ShadowHatching({ boiling }: { boiling: boolean }) {
   const ref = useRef<SVGSVGElement>(null);
   const id = useId();
   const [size, setSize] = useState<{ width: number; height: number } | null>(
@@ -272,7 +266,8 @@ function ShadowHatching({ animated }: { animated: boolean }) {
       height={size?.height}
       className={cn(
         "absolute inset-0 hidden overflow-visible xs:block",
-        animated ? "ink-fine-animated" : "ink-fine",
+        "ink-fine",
+        boiling && "boil-sm",
       )}
     >
       {size && (
@@ -369,7 +364,7 @@ function NavLink({
         className={cn(
           ICON_SIZE,
           "ink-subtle",
-          !active && "group-hover/item:ink-subtle-animated",
+          !active && "group-hover/item:boil",
         )}
       />
       <span
@@ -378,7 +373,9 @@ function NavLink({
           // Padding is always applied (and cancelled by negative margins) so
           // only color and rotation change when the tag appears.
           "-mx-1 -my-px rounded-[3px] px-1 py-px uppercase tracking-wide transition-[background-color,color,rotate] duration-300 ease-out",
-          active && "-rotate-1 bg-logo-red text-cream sketch-subtle",
+          active
+            ? "-rotate-1 bg-logo-red text-cream sketch-subtle"
+            : "group-hover/item:boil-sm",
         )}
       >
         {route.labelShort}
@@ -407,10 +404,17 @@ const NavButton = forwardRef<
       <Icon
         className={cn(
           ICON_SIZE,
-          "ink-subtle group-hover/item:ink-subtle-animated",
+          "ink-subtle group-hover/item:boil",
         )}
       />
-      <span className={cn(LABEL_SIZE, "uppercase tracking-wide")}>{label}</span>
+      <span
+        className={cn(
+          LABEL_SIZE,
+          "uppercase tracking-wide group-hover/item:boil-sm",
+        )}
+      >
+        {label}
+      </span>
     </button>
   );
 });

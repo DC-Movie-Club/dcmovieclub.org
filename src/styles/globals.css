@@ -213,8 +213,23 @@ html[data-loading] .animate-nav-spring-in {
   --outline-ink: --value(--color-*);
 }
 
+/* A sketch or ink class sets an element's resting wobble; a boil class adds
+   a shudder on top (see SketchFilter). Each names its filter in its own
+   variable and sets the same composed filter, so they combine in any order.
+   The variables don't inherit, so a boiling parent leaves its children be. */
+@property --wobble {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --boil {
+  syntax: "*";
+  inherits: false;
+}
+
 @utility sketch {
-  filter: url(#sketch);
+  --wobble: url(#sketch);
+  filter: var(--boil,) var(--wobble);
 }
 
 @utility sketch-animated {
@@ -222,36 +237,43 @@ html[data-loading] .animate-nav-spring-in {
 }
 
 @utility sketch-subtle {
-  filter: url(#sketch-subtle);
+  --wobble: url(#sketch-subtle);
+  filter: var(--boil,) var(--wobble);
 }
 
 @utility sketch-subtle-animated {
   filter: url(#sketch-subtle-animated);
 }
 
-/* The sketch wobble drawn as a brush pen line; see SketchFilter */
+/* The sketch wobble drawn as a brush pen line */
 @utility ink {
-  filter: url(#ink);
-}
-
-@utility ink-animated {
-  filter: url(#ink-animated);
+  --wobble: url(#ink);
+  filter: var(--boil,) var(--wobble);
 }
 
 @utility ink-subtle {
-  filter: url(#ink-subtle);
-}
-
-@utility ink-subtle-animated {
-  filter: url(#ink-subtle-animated);
+  --wobble: url(#ink-subtle);
+  filter: var(--boil,) var(--wobble);
 }
 
 @utility ink-fine {
-  filter: url(#ink-fine);
+  --wobble: url(#ink-fine);
+  filter: var(--boil,) var(--wobble);
 }
 
-@utility ink-fine-animated {
-  filter: url(#ink-fine-animated);
+@utility boil-sm {
+  --boil: url(#boil-sm);
+  filter: var(--boil) var(--wobble,);
+}
+
+@utility boil {
+  --boil: url(#boil);
+  filter: var(--boil) var(--wobble,);
+}
+
+@utility boil-lg {
+  --boil: url(#boil-lg);
+  filter: var(--boil) var(--wobble,);
 }
 
 @utility watercolor-0 {

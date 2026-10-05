@@ -16,18 +16,29 @@ function sketchFilter(id: string, scale: number, animated: boolean) {
 // cut is made on a blurred copy, which also smooths away the one-pixel steps
 // the displacement leaves. Only for single-color strokes: the color comes
 // from dilating the wobbled source, which would blend neighboring colors.
-function inkFilter(id: string, scale: number, blur: number, animated: boolean) {
-  const animate = animated
-    ? `<animate attributeName="seed" values="1;20;42;65;88" dur="0.5s" calcMode="discrete" repeatCount="indefinite" />`
-    : "";
+function inkFilter(id: string, scale: number, blur: number) {
   return `<filter id="${id}" x="-5%" y="-15%" width="110%" height="130%" filterUnits="objectBoundingBox">
-    <feTurbulence type="turbulence" baseFrequency="${SKETCH_NOISE.baseFrequency}" numOctaves="${SKETCH_NOISE.numOctaves}" seed="${SKETCH_NOISE.seed}" result="noise">${animate}</feTurbulence>
+    <feTurbulence type="turbulence" baseFrequency="${SKETCH_NOISE.baseFrequency}" numOctaves="${SKETCH_NOISE.numOctaves}" seed="${SKETCH_NOISE.seed}" result="noise" />
     <feDisplacementMap in="SourceGraphic" in2="noise" scale="${scale}" xChannelSelector="R" yChannelSelector="G" result="wobbled" />
     <feGaussianBlur in="wobbled" stdDeviation="${blur}" result="blurred" />
     <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="1" seed="4" result="pressure" />
     <feComposite in="blurred" in2="pressure" operator="arithmetic" k1="0" k2="4" k3="-2.28" k4="-0.336" result="stroke" />
     <feMorphology in="wobbled" operator="dilate" radius="1.5" result="ink" />
     <feComposite in="ink" in2="stroke" operator="in" />
+  </filter>`;
+}
+
+// How far each boil level shudders a shape, in px. A boil is a small jitter
+// re-rolled ten times a second on top of the resting wobble, so the shape
+// shudders in place rather than being redrawn. See the boil utilities.
+const BOIL_SCALES = { "boil-sm": 0.7, boil: 1.4, "boil-lg": 3 };
+
+function boilFilter(id: string, scale: number) {
+  return `<filter id="${id}" x="-5%" y="-15%" width="110%" height="130%" filterUnits="objectBoundingBox">
+    <feTurbulence type="turbulence" baseFrequency="${SKETCH_NOISE.baseFrequency}" numOctaves="${SKETCH_NOISE.numOctaves}" seed="7" result="noise">
+      <animate attributeName="seed" values="7;31;53;76;97" dur="0.5s" calcMode="discrete" repeatCount="indefinite" />
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="${scale}" xChannelSelector="R" yChannelSelector="G" />
   </filter>`;
 }
 
@@ -38,12 +49,12 @@ export function SketchFilter() {
       ${sketchFilter("sketch-animated", SKETCH_SCALE, true)}
       ${sketchFilter("sketch-subtle", 1.4, false)}
       ${sketchFilter("sketch-subtle-animated", 1.4, true)}
-      ${inkFilter("ink", SKETCH_SCALE, 0.8, false)}
-      ${inkFilter("ink-animated", SKETCH_SCALE, 0.8, true)}
-      ${inkFilter("ink-subtle", 1.4, 0.6, false)}
-      ${inkFilter("ink-subtle-animated", 1.4, 0.6, true)}
-      ${inkFilter("ink-fine", SKETCH_SCALE, 0.45, false)}
-      ${inkFilter("ink-fine-animated", SKETCH_SCALE, 0.45, true)}
+      ${inkFilter("ink", SKETCH_SCALE, 0.8)}
+      ${inkFilter("ink-subtle", 1.4, 0.6)}
+      ${inkFilter("ink-fine", SKETCH_SCALE, 0.45)}
+      ${Object.entries(BOIL_SCALES)
+        .map(([id, scale]) => boilFilter(id, scale))
+        .join("")}
     </defs>
   </svg>`;
 
