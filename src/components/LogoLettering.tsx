@@ -24,7 +24,7 @@ export function LogoLettering({
             <g key={letter.key}>
               <path d={letter.square} transform="translate(7 7)" className="fill-rust-dark" />
               <path d={letter.square} className="fill-logo-red" />
-              {letter.glyph.map((d) => (
+              {letter.glyph.map((d: string) => (
                 <path key={d} d={d} className="fill-cream" />
               ))}
             </g>
