@@ -14,6 +14,7 @@ import {
   type PageColors,
 } from "@/config/pages";
 import { savePage } from "@/app/admin/actions/pages";
+import { ColorPopover } from "@/app/admin/components/ColorPopover";
 import { PagePreview } from "@/app/admin/components/PagePreview";
 import { SectionFields } from "@/app/admin/components/SectionFields";
 import { useSaveShortcuts } from "@/app/admin/hooks/useSaveShortcuts";
@@ -76,10 +77,13 @@ function conflictNote(theirs: PageContent) {
 function ColorField({
   role,
   value,
+  colors,
   onChange,
 }: {
   role: (typeof colorRoles)[ColorRoleKey];
   value: string;
+  // The draft's colors, to check contrast against
+  colors: Record<ColorRoleKey, string>;
   onChange: (value: string) => void;
 }) {
   const valid = !value || isHexColor(value);
@@ -88,21 +92,12 @@ function ColorField({
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={id}>{role.label}</Label>
       <div className="flex items-center gap-2">
-        <label
-          className={cn(
-            "relative size-8 shrink-0 cursor-pointer rounded-md border",
-            !(value && valid) && "border-dashed",
-          )}
-          style={{ backgroundColor: value && valid ? value : undefined }}
-        >
-          <input
-            type="color"
-            aria-label={`Pick ${role.label.toLowerCase()} color`}
-            className="absolute inset-0 size-full cursor-pointer opacity-0"
-            value={/^#[0-9a-f]{6}$/i.test(value) ? value : "#000000"}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        </label>
+        <ColorPopover
+          role={role}
+          value={value}
+          colors={colors}
+          onChange={onChange}
+        />
         <Input
           id={id}
           value={value}
@@ -271,6 +266,7 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
               key={role.key}
               role={role}
               value={draft.colors[role.key]}
+              colors={draft.colors}
               onChange={(value) => setColor(role.key, value)}
             />
           ))}
