@@ -2,7 +2,6 @@
 
 import {
   forwardRef,
-  useEffect,
   useId,
   useLayoutEffect,
   useRef,
@@ -42,39 +41,17 @@ const HATCH_CLEARANCE = 1.5;
 
 export function BottomNav() {
   const pathname = usePathname();
-  const [hovered, setHovered] = useState(false);
-  const [logoHovered, setLogoHovered] = useState(false);
-
-  useEffect(() => {
-    setHovered(false);
-    setLogoHovered(false);
-  }, [pathname]);
-
-  const itemHoverProps = {
-    onPointerEnter: () => setHovered(true),
-    onPointerLeave: () => setHovered(false),
-  };
-
-  const logoHoverProps = {
-    onPointerEnter: () => {
-      setHovered(true);
-      setLogoHovered(true);
-    },
-    onPointerLeave: () => {
-      setHovered(false);
-      setLogoHovered(false);
-    },
-  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in select-none motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
-      <div className="relative flex items-center justify-center gap-4 px-4 py-2 xs:px-6 xs:py-3">
+      {/* Grows a touch on hover, with the same spring as its entrance */}
+      <div className="relative flex items-center justify-center gap-4 px-4 py-2 transition-[scale] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] xs:px-6 xs:py-3 xs:hover:scale-[1.03]">
         {/* Full-width on phones, the bar runs past the screen edges so the
             sketch filter's wobble can't open a gap along them. The wrapper
             clips that overhang without clipping the logo. */}
         <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
           <div className="absolute -inset-x-2 top-2 bottom-0 xs:inset-0">
-            <PillShadow boiling={hovered} />
+            <PillShadow />
             {/* The fill sits just inside the line, which the ink filter thins
                 in places, so it never shows past the line's outer edge */}
             <div className="absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full" />
@@ -84,13 +61,11 @@ export function BottomNav() {
         <NavLink
           route={routes.blog}
           active={pathname === routes.blog.href}
-          {...(pathname === routes.blog.href ? {} : itemHoverProps)}
         />
 
         <NavLink
           route={routes.events}
           active={pathname === routes.events.href}
-          {...(pathname === routes.events.href ? {} : itemHoverProps)}
         />
 
         <div className={LOGO_SPACER} />
@@ -98,15 +73,10 @@ export function BottomNav() {
         <NavLink
           route={routes.partnerships}
           active={pathname === routes.partnerships.href}
-          {...(pathname === routes.partnerships.href ? {} : itemHoverProps)}
         />
 
         <Dialog>
-          <DialogTrigger
-            render={
-              <NavButton icon={Ellipsis} label="More" {...itemHoverProps} />
-            }
-          />
+          <DialogTrigger render={<NavButton icon={Ellipsis} label="More" />} />
           <DialogContent showCloseButton={false}>
             <DialogTitle className="sr-only">More</DialogTitle>
             <ul className="flex flex-col gap-1">
@@ -208,10 +178,9 @@ export function BottomNav() {
         <Link
           href={routes.home.href}
           className={cn(
-            "absolute mt-0.5 left-1/2 -translate-x-1/2 transition-transform hover:scale-105",
+            "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-transform hover:scale-105",
             LOGO_SIZE,
           )}
-          {...logoHoverProps}
         >
           <Image
             src="/images/dcmc-logo.png"
@@ -219,7 +188,7 @@ export function BottomNav() {
             width={NAV_LOGO_SIZE}
             height={NAV_LOGO_SIZE}
             priority
-            className={cn(LOGO_SIZE, logoHovered && "boil")}
+            className={cn(LOGO_SIZE, "group-hover/logo:boil")}
           />
         </Link>
       </div>
@@ -228,11 +197,10 @@ export function BottomNav() {
 }
 
 // The pill's hard shadow with lighter strokes hatched inside it, masked short
-// of the shadow's edge and the pill's. It sits behind the pill so it can boil
-// while the pill holds still. The shadow and hatching are separate layers,
-// since the ink filter only suits one color on a clear ground, but they share
-// an origin, so they wobble and boil in lockstep. Sized from the pill.
-function PillShadow({ boiling }: { boiling: boolean }) {
+// of the shadow's edge and the pill's. The shadow and hatching are separate
+// layers, since the ink filter only suits one color on a clear ground, but
+// they share an origin, so they wobble in lockstep. Sized from the pill.
+function PillShadow() {
   const ref = useRef<SVGSVGElement>(null);
   const id = useId();
   const [size, setSize] = useState<{ width: number; height: number } | null>(
@@ -254,10 +222,7 @@ function PillShadow({ boiling }: { boiling: boolean }) {
     return () => observer.disconnect();
   }, []);
 
-  const layer = cn(
-    "absolute inset-0 hidden overflow-visible xs:block",
-    boiling && "boil-sm",
-  );
+  const layer = "absolute inset-0 hidden overflow-visible xs:block";
 
   return (
     <>
@@ -350,13 +315,9 @@ const WATERCOLOR_CLASSES = [
 function NavLink({
   route,
   active,
-  onPointerEnter,
-  onPointerLeave,
 }: {
   route: (typeof routes)[keyof typeof routes];
   active: boolean;
-  onPointerEnter?: () => void;
-  onPointerLeave?: () => void;
 }) {
   const Icon = route.icon;
   return (
@@ -369,8 +330,6 @@ function NavLink({
           ? "text-logo-red"
           : "text-foreground hover:scale-110 hover:text-rust focus-visible:text-rust",
       )}
-      onPointerEnter={onPointerEnter}
-      onPointerLeave={onPointerLeave}
     >
       <FocusRing />
       <Icon
