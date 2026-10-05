@@ -75,7 +75,9 @@ export const pageTemplates = {
     href: "/",
     title: false,
     subtitle: false,
-    sections: {},
+    sections: {
+      about: { key: "about", label: "About", kind: "text" },
+    },
   },
   events: {
     key: "events",

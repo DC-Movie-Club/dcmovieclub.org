@@ -284,7 +284,7 @@ function FollowButton() {
       href={LETTERBOXD_PROFILE_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="group/follow relative mx-auto mt-12 block w-fit rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+      className="group/follow relative block w-fit shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
     >
       <span
         aria-hidden
@@ -314,19 +314,16 @@ export function RecentlyWatchedRail({
     .slice(0, POSTER_COUNT);
 
   return (
-    <section className="pb-2">
-      <div className="mx-auto max-w-4xl">
-        <div className="relative mx-6">
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-charcoal sketch"
-          />
-          <h2 className="relative mx-auto w-fit bg-page-bg px-5 text-center text-xl uppercase leading-none tracking-wide text-charcoal sm:text-2xl">
-            What we've been watching
+    <section className="px-6 pb-2">
+      <div className="mx-auto max-w-3xl">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+          <h2 className="text-xl uppercase tracking-wide text-charcoal sm:text-2xl">
+            What we&apos;ve been watching
           </h2>
+          <FollowButton />
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 px-6 xs:grid-cols-3 md:grid-cols-6">
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 xs:grid-cols-3 md:grid-cols-6">
           {featured && (
             <>
               <FilmPoster review={featured} showRating={false} />
@@ -340,7 +337,6 @@ export function RecentlyWatchedRail({
             </div>
           ))}
         </div>
-        <FollowButton />
       </div>
     </section>
   );

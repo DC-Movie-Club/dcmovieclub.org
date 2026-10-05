@@ -2,7 +2,7 @@ import NextLink from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { PageSection, PageView } from "@/lib/pages";
 import { ExternalLink } from "@/components/ui/link";
-import { socials } from "@/config/navigation";
+import { routes, socials } from "@/config/navigation";
 import {
   colorVars,
   pageTemplates,
@@ -163,16 +163,17 @@ function pageSection<K extends SectionKind>(
     : null;
 }
 
-// In the About page's colors: its Mission, then the Partnerships page's
-// partner list
+// In the About page's colors: the home page's About text, then the
+// Partnerships page's partner list
 function AboutSection({
+  blurb,
   about,
   partnerships,
 }: {
+  blurb: (PageSection & { kind: "text" }) | null;
   about: PageView;
   partnerships: PageView | null;
 }) {
-  const mission = pageSection(about, pageTemplates.about.sections.mission);
   const partners =
     partnerships &&
     pageSection(partnerships, pageTemplates.partnerships.sections.partners);
@@ -180,10 +181,10 @@ function AboutSection({
   return (
     <section className="bg-page-bg px-6 py-16" style={colorVars(about.colors)}>
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
-        {mission?.content.trim() && (
+        {blurb?.content.trim() && (
           <div className="relative">
-            <SectionCard label={about.title}>
-              <Markdown>{mission.content}</Markdown>
+            <SectionCard label={blurb.label}>
+              <Markdown>{blurb.content}</Markdown>
             </SectionCard>
             <NextLink
               href={pageTemplates.about.href}
@@ -197,9 +198,10 @@ function AboutSection({
                 aria-hidden
                 className="absolute inset-0 rounded-full border-[2.5px] border-page-accent-edge ink group-hover/more:boil"
               />
-              <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
+              <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-page-accent-text">
+                <routes.about.icon size={16} className="shrink-0" />
                 More about us
-                <ArrowRight size={18} className="shrink-0" />
+                <ArrowRight size={14} className="shrink-0" />
               </span>
             </NextLink>
           </div>
@@ -207,15 +209,29 @@ function AboutSection({
 
         {partners && partners.items.length > 0 && (
           <div className="flex flex-col gap-5 border-t-2 border-dashed border-page-fg/30 pt-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
-                {partners.label}
-              </h2>
-              <OutlineLink href={pageTemplates.partnerships.href}>
-                Partner with us
-              </OutlineLink>
-            </div>
-            <ul className="flex flex-wrap gap-2.5">
+            <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
+              {partners.label}
+            </h2>
+            <ul className="flex flex-wrap items-center gap-2.5">
+              <li className="flex">
+                <NextLink
+                  href={pageTemplates.partnerships.href}
+                  className="group/partner relative rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+                >
+                  <span
+                    aria-hidden
+                    className="absolute inset-px rounded-full bg-page-accent sketch group-hover/partner:boil"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-full border-[2.5px] border-page-accent-edge ink group-hover/partner:boil"
+                  />
+                  <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-page-accent-text">
+                    <routes.partnerships.icon size={16} className="shrink-0" />
+                    Partner with us
+                  </span>
+                </NextLink>
+              </li>
               {partners.items.map((item) => (
                 <li
                   key={item.key}
@@ -266,17 +282,18 @@ export function HomePage({
       style={colorVars(page.colors)}
     >
       <Hero />
-      {/* One flex item, so no gap opens between the two colored bands */}
-      <div>
-        <EventsSection
-          events={events}
-          colors={eventsPage?.colors ?? {}}
-        />
-        {aboutPage && (
-          <AboutSection about={aboutPage} partnerships={partnershipsPage} />
-        )}
-      </div>
+      <EventsSection
+        events={events}
+        colors={eventsPage?.colors ?? {}}
+      />
       {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
+      {aboutPage && (
+        <AboutSection
+          blurb={pageSection(page, pageTemplates.home.sections.about)}
+          about={aboutPage}
+          partnerships={partnershipsPage}
+        />
+      )}
       <div className="mt-auto px-6 pt-14">
         <SiteFooter />
       </div>
