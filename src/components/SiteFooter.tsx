@@ -41,14 +41,14 @@ export function SiteFooter({ className }: { className?: string }) {
       >
         <span
           aria-hidden
-          className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent shadow-lg sketch group-hover/subscribe:sketch-animated"
+          className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent sketch group-hover/subscribe:sketch-animated"
         />
         <span className="relative flex items-center gap-2 px-5 py-2.5 tracking-wider text-page-accent-text">
           Subscribe to our newsletter
           <ArrowUpRight size={18} className="shrink-0" />
         </span>
       </a>
-      <div className="relative flex flex-col gap-4 px-5 pt-10 pb-5">
+      <div className="relative flex flex-col gap-4 px-7 pt-8 pb-5">
         <div className="flex flex-col gap-4 text-page-fg/80 sm:flex-row sm:items-center sm:justify-between">
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
