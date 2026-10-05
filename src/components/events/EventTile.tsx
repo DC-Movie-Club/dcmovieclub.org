@@ -24,10 +24,10 @@ export function EventTile({ event }: { event: CalendarEvent }) {
           className="sm:col-start-1 sm:row-start-1"
         />
         <div className="flex h-full min-w-0 flex-col gap-1 sm:col-span-2 sm:row-start-2 sm:gap-2">
-          <h3 className="truncate text-base uppercase leading-tight tracking-wide text-charcoal transition-colors group-hover/tile:text-rust sm:line-clamp-2 sm:text-lg sm:whitespace-normal">
+          <h3 className="truncate text-base uppercase leading-tight tracking-wide text-page-ink transition-colors group-hover/tile:text-rust sm:line-clamp-2 sm:text-lg sm:whitespace-normal">
             {event.title}
           </h3>
-          <div className="flex min-w-0 flex-col gap-0.5 text-xs uppercase tracking-wider text-charcoal/70 sm:mt-auto">
+          <div className="flex min-w-0 flex-col gap-0.5 text-xs uppercase tracking-wider text-page-ink/80 sm:mt-auto">
             <span className="truncate">
               {weekday}
               {!event.allDay && (
