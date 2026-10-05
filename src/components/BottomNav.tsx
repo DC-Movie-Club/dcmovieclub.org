@@ -79,6 +79,7 @@ export function BottomNav({ accents }: { accents: Record<string, string> }) {
                 active={Boolean(activeMenuRoute)}
                 style={accentVars(
                   activeMenuRoute && accents[activeMenuRoute.href],
+                  accents[menuRoutes[0].href],
                 )}
               />
             }
@@ -323,27 +324,35 @@ const LAYOUTS = {
 
 type NavLayout = keyof typeof LAYOUTS;
 
-function navItemClass(layout: NavLayout, active: boolean) {
+// An item on its own page doesn't respond to hover, unless `hoverable` says
+// it still leads somewhere new, like the More menu
+function navItemClass(
+  layout: NavLayout,
+  active: boolean,
+  hoverable = !active,
+) {
   return cn(
     "group/item relative flex items-center transition-all focus-visible:outline-hidden",
     LAYOUTS[layout].item,
-    active
-      ? "text-nav-active"
-      : cn(
-          "text-foreground hover:text-nav-hover focus-visible:text-nav-hover",
-          LAYOUTS[layout].hover,
-        ),
+    active ? "text-nav-active" : "text-foreground",
+    hoverable &&
+      cn(
+        "hover:text-nav-hover focus-visible:text-nav-hover",
+        LAYOUTS[layout].hover,
+      ),
   );
 }
 
 function NavItemContent({
   layout,
   active,
+  hoverable = !active,
   icon: Icon,
   label,
 }: {
   layout: NavLayout;
   active: boolean;
+  hoverable?: boolean;
   icon: React.ComponentType<{ className?: string }>;
   label: string;
 }) {
@@ -353,16 +362,16 @@ function NavItemContent({
         className={cn(
           LAYOUTS[layout].icon,
           "ink-subtle",
-          !active && "group-hover/item:boil group-focus-visible/item:boil",
+          hoverable && "group-hover/item:boil group-focus-visible/item:boil",
         )}
       />
       <span
         className={cn(
           LAYOUTS[layout].label,
           "rounded-[3px] uppercase tracking-wide transition-[background-color,color,rotate] duration-300 ease-out",
-          active
-            ? "-rotate-1 bg-nav-active text-cream sketch-subtle"
-            : "group-hover/item:boil-sm group-focus-visible/item:boil-sm",
+          active && "-rotate-1 bg-nav-active text-cream sketch-subtle",
+          hoverable &&
+            "group-hover/item:boil-sm group-focus-visible/item:boil-sm",
         )}
       >
         {label}
@@ -371,9 +380,18 @@ function NavItemContent({
   );
 }
 
-// The variable nav items color with, from a page's accent (see globals.css)
-function accentVars(accent: string | undefined): CSSProperties {
-  return accent ? ({ "--nav-accent": accent } as CSSProperties) : {};
+// The variables nav items color with (see globals.css): a page's accent, and
+// for an item that hovers in another color, that one
+function accentVars(
+  accent: string | undefined,
+  hoverAccent?: string,
+): CSSProperties {
+  return Object.fromEntries(
+    [
+      ["--nav-accent", accent],
+      ["--nav-hover-accent", hoverAccent],
+    ].filter(([, color]) => color),
+  );
 }
 
 function BarLink({
@@ -402,7 +420,9 @@ function BarLink({
   );
 }
 
-// The More menu's trigger, active while the current page is in its menu
+// The More menu's trigger. It lights up in the color of whichever page in its
+// menu is current, and since it opens the menu either way, it still responds
+// to hover then, in the color of the menu's first page.
 const NavButton = forwardRef<
   HTMLButtonElement,
   {
@@ -414,10 +434,20 @@ const NavButton = forwardRef<
   return (
     <button
       ref={ref}
-      className={cn(navItemClass("bar", active), "cursor-pointer", className)}
+      className={cn(
+        navItemClass("bar", active, true),
+        "cursor-pointer",
+        className,
+      )}
       {...props}
     >
-      <NavItemContent layout="bar" active={active} icon={icon} label={label} />
+      <NavItemContent
+        layout="bar"
+        active={active}
+        hoverable
+        icon={icon}
+        label={label}
+      />
     </button>
   );
 });

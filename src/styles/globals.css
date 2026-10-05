@@ -118,8 +118,8 @@
   --color-page-accent-text: var(--page-accent-text, var(--color-cream));
 
   /* --- Nav: an item colors with its page's accent (see BottomNav), and an
-     item without a page with these --- */
-  --color-nav-hover: var(--nav-accent, var(--color-rust));
+     item without a page with these. An item can hover in another color. --- */
+  --color-nav-hover: var(--nav-hover-accent, var(--nav-accent, var(--color-rust)));
   --color-nav-active: var(--nav-accent, var(--color-logo-red));
 
   /* --- Semantic --- */
