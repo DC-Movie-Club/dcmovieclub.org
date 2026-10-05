@@ -63,6 +63,9 @@ function TileLink({
       rel="noopener noreferrer"
       className="group/card relative block w-full rounded-lg transition-transform hover:-rotate-1 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rust"
     >
+      {/* A filled twin of the outline, wobbling identically, so the sketch
+          filter never opens a gap to the page between poster and border. */}
+      <SketchOutline className="bg-charcoal group-hover/card:sketch-animated" />
       <div className="relative aspect-poster w-full overflow-hidden rounded-[7px]">
         {children}
       </div>
