@@ -15,7 +15,7 @@ const placeholderLinks = [
 export default function Instagram() {
   return (
     <div className="mx-auto flex max-w-sm flex-col items-center gap-4 px-6 pt-5 pb-16 text-center sm:pt-6">
-      <HomeLink className="mb-1 sm:mb-4" />
+      <HomeLink />
       <h1 className="text-3xl uppercase tracking-wide">DC Movie Club</h1>
       <p className="text-muted-foreground">A community of film lovers in DC</p>
       <div className="mt-4 flex w-full flex-col gap-3">

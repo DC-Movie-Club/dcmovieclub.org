@@ -25,7 +25,7 @@ export function ColorPage({
       </div>
       <div
         className={cn(
-          "mx-auto mt-5 flex max-w-3xl flex-col gap-14 sm:mt-8",
+          "mx-auto flex max-w-3xl flex-col gap-14",
           contentClassName,
         )}
       >
