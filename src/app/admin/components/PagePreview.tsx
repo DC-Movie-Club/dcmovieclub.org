@@ -1,48 +1,78 @@
-import { PageTitle } from "@/components/ColorPage";
-import { FaqEntry } from "@/components/PageSections";
-import { SectionCard } from "@/components/section-cards";
-import { SketchFilter } from "@/components/SketchFilter";
-import { Markdown } from "@/components/Markdown";
-import { colorVars, type PageColors } from "@/config/pages";
-import type { PageSection } from "@/lib/pages";
+"use client";
 
-// A cut-down copy of the page, built from the same components, so color
-// changes can be judged before saving
+import { useDeferredValue } from "react";
+import { PreviewFrame } from "@/app/admin/components/PreviewFrame";
+import { PageBody, type PageData } from "@/components/pages/PageBody";
+import type { PageView } from "@/lib/pages";
+
+// Wide enough for the desktop layout, narrow enough to stay legible
+const DESKTOP_WIDTH = 800;
+
+// Sections render with their key as their id; the page title is its only h1
+function selectorFor(page: PageView, item: string) {
+  if (item === "title") return "h1";
+  return page.sections.some((s) => s.key === item) ? `#${item}` : null;
+}
+
+function sectionSelectors(page: PageView) {
+  return page.sections.map((s) => `#${s.key}`);
+}
+
+function itemAt(page: PageView, target: Element) {
+  if (target.closest("h1")) return "title";
+  const selectors = sectionSelectors(page);
+  return selectors.length > 0
+    ? (target.closest(selectors.join(", "))?.id ?? null)
+    : null;
+}
+
+function highlightCss(page: PageView, selected: string) {
+  const pickable = ["h1", ...sectionSelectors(page)].join(", ");
+  const current = selectorFor(page, selected);
+  return `
+    [data-preview] :is(${pickable}) {
+      cursor: pointer;
+      border-radius: 0.75rem;
+      outline: 3px dashed transparent;
+      outline-offset: 10px;
+      transition: outline-color 150ms;
+    }
+    [data-preview] :is(${pickable}):hover {
+      outline-color: color-mix(in srgb, var(--color-ring) 55%, transparent);
+    }
+    ${current ? `[data-preview] ${current} { outline: 3px solid var(--color-ring); }` : ""}
+  `;
+}
+
+// The page as it will look with the draft, built by the same component as the
+// public route, with live events, posts and reviews. Clicking a part of the
+// page selects it for editing.
 export function PagePreview({
-  title,
-  colors,
-  sections,
+  page,
+  data,
+  selected,
+  onSelect,
+  className,
 }: {
-  title: string;
-  colors: PageColors;
-  sections: PageSection[];
+  page: PageView;
+  data: PageData;
+  selected: string;
+  onSelect: (item: string) => void;
+  className?: string;
 }) {
-  const card = sections.find(
-    (section) => section.kind === "text" && section.label && section.content,
-  );
-  const faq = sections.find((section) => section.kind === "faq");
-  const question = faq?.kind === "faq" ? faq.items[0] : undefined;
-
+  const deferred = useDeferredValue(page);
   return (
-    <div
-      inert
-      className="pointer-events-none overflow-hidden rounded-lg border font-dcmc"
+    <PreviewFrame
+      width={DESKTOP_WIDTH}
+      scrollTo={selectorFor(deferred, selected)}
+      className={className}
+      onClickContent={(target) => {
+        const item = itemAt(deferred, target);
+        if (item) onSelect(item);
+      }}
     >
-      <SketchFilter />
-      <div
-        className="flex flex-col gap-10 bg-page-bg px-6 pt-8 pb-10"
-        style={colorVars(colors)}
-      >
-        <PageTitle className="text-4xl sm:text-4xl">{title}</PageTitle>
-        {card?.kind === "text" && (
-          <SectionCard label={card.label}>
-            <div className="line-clamp-3">
-              <Markdown>{card.content}</Markdown>
-            </div>
-          </SectionCard>
-        )}
-        {question && <FaqEntry item={question} />}
-      </div>
-    </div>
+      <style>{highlightCss(deferred, selected)}</style>
+      <PageBody page={deferred} data={data} />
+    </PreviewFrame>
   );
 }

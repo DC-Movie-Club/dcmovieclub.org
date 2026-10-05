@@ -5,6 +5,12 @@ body {
   --font-heading: system-ui, -apple-system, sans-serif;
 }
 
+/* Page previews (PreviewFrame) treat the frame as the screen, so a page that
+   fills the screen fills the frame */
+[data-preview] .min-h-screen {
+  min-height: var(--preview-height, 100vh);
+}
+
 .editor-table {
   border-collapse: collapse;
   table-layout: fixed;

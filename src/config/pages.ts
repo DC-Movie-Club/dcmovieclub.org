@@ -35,48 +35,16 @@ export function colorVars(colors: PageColors): CSSProperties {
   );
 }
 
-type FieldSpec = { key: string; label: string };
-
-// Content sections hold copy and lists. Sections with `fields` are built by the
-// page from live data (events, posts), and the fields are the words around it.
+// Content sections hold copy and lists. Live data (events, posts, reviews)
+// isn't a section: each page places it itself.
 export const sectionKinds = {
   text: { key: "text", label: "Text" },
   links: { key: "links", label: "Links" },
   tags: { key: "tags", label: "Tags" },
   faq: { key: "faq", label: "Dropdowns" },
-  events: {
-    key: "events",
-    label: "Upcoming events",
-    fields: {
-      featuredLabel: { key: "featuredLabel", label: "Label on the next event" },
-      emptyMessage: { key: "emptyMessage", label: "Message when there are no events" },
-    },
-  },
-  posts: {
-    key: "posts",
-    label: "Newsletter posts",
-    fields: {
-      subscribeLabel: { key: "subscribeLabel", label: "Subscribe button" },
-      latestLabel: { key: "latestLabel", label: "Label on the latest post" },
-      olderHeading: { key: "olderHeading", label: "Heading over older posts" },
-      emptyMessage: { key: "emptyMessage", label: "Message when there are no posts" },
-    },
-  },
-} as const satisfies Record<
-  string,
-  { key: string; label: string; fields?: Record<string, FieldSpec> }
->;
+} as const satisfies Record<string, { key: string; label: string }>;
 
 export type SectionKind = keyof typeof sectionKinds;
-export type FieldsKind = {
-  [K in SectionKind]: (typeof sectionKinds)[K] extends { fields: object }
-    ? K
-    : never;
-}[SectionKind];
-
-export function isFieldsKind(kind: SectionKind): kind is FieldsKind {
-  return "fields" in sectionKinds[kind];
-}
 
 type SectionTemplate = {
   key: string;
@@ -111,7 +79,6 @@ export const pageTemplates = {
     href: "/events",
     subtitle: true,
     sections: {
-      upcoming: { key: "upcoming", label: "Upcoming events", kind: "events" },
       intro: { key: "intro", label: "Intro", kind: "text" },
       types: { key: "types", label: "Event types", kind: "faq", item: "event type" },
     },
@@ -121,9 +88,7 @@ export const pageTemplates = {
     label: "Blog",
     href: "/blog",
     subtitle: true,
-    sections: {
-      posts: { key: "posts", label: "Posts", kind: "posts" },
-    },
+    sections: {},
   },
   about: {
     key: "about",

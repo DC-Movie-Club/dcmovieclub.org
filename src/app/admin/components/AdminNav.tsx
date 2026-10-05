@@ -9,13 +9,13 @@ export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-4 border-b">
+    <nav className="flex gap-4 self-stretch">
       {Object.values(adminTabs).map(({ key, href, label }) => (
         <Link
           key={key}
           href={href}
           className={cn(
-            "border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
+            "flex items-center border-b-2 px-1 text-sm font-medium transition-colors",
             pathname.startsWith(href)
               ? "border-foreground text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"

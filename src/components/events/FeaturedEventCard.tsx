@@ -13,13 +13,7 @@ import type { CalendarEvent } from "@/types/event";
 // either filter it away or display it differently (e.g. "Sold Out" badge,
 // moved to a separate section). For now we always show the first upcoming event.
 
-export function FeaturedEventCard({
-  event,
-  label,
-}: {
-  event: CalendarEvent;
-  label: string;
-}) {
+export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
   const { month, day, weekday } = formatEventDate(event);
   const cta = getEventCta(event);
   const mapUrl = getMapUrl(event.location);
@@ -48,7 +42,7 @@ export function FeaturedEventCard({
             cta && "card-hover:outline-ink-page-accent-edge",
           )}
         >
-          {label}
+          Next Up
         </span>
       </div>
 

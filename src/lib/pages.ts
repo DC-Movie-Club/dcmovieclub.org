@@ -1,3 +1,4 @@
+import "server-only";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { Timestamp } from "firebase-admin/firestore";
@@ -6,8 +7,6 @@ import {
   isColorRoleKey,
   isHexColor,
   pageTemplates,
-  sectionKinds,
-  type FieldsKind,
   type PageColors,
   type PageKey,
   type SectionKind,
@@ -21,8 +20,7 @@ export type FaqItem = { key: string; question: string; answer: string };
 export type PageSection =
   | { key: string; kind: "text"; label: string; content: string }
   | { key: string; kind: "links" | "tags"; label: string; items: LinkItem[] }
-  | { key: string; kind: "faq"; label: string; items: FaqItem[] }
-  | { key: string; kind: FieldsKind; fields: Record<string, string> };
+  | { key: string; kind: "faq"; label: string; items: FaqItem[] };
 
 export type PageContent = {
   key: PageKey;
@@ -33,6 +31,12 @@ export type PageContent = {
   updatedAt: string | null;
   updatedByName: string | null;
 };
+
+// What a page renders from: its content, without the save metadata
+export type PageView = Pick<
+  PageContent,
+  "key" | "title" | "subtitle" | "colors" | "sections"
+>;
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object"
@@ -90,17 +94,6 @@ function toSection(
           answer: text(item.answer),
         })),
       };
-    default:
-      return {
-        key,
-        kind,
-        fields: Object.fromEntries(
-          Object.keys(sectionKinds[kind].fields).map((field) => [
-            field,
-            text(raw[field]),
-          ]),
-        ),
-      };
   }
 }
 
@@ -126,11 +119,6 @@ export function pageFromData(
     updatedAt: isoDate(data.updatedAt),
     updatedByName: text(data.updatedByName) || null,
   };
-}
-
-export function sectionFields(page: PageContent, key: string) {
-  const section = page.sections.find((s) => s.key === key);
-  return section && "fields" in section ? section.fields : {};
 }
 
 // Uncached, for the admin; the public site reads through getPage

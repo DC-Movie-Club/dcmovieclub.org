@@ -1,79 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDown, ArrowUp, ChevronRight, Plus, X } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { capitalize, ItemList } from "@/app/admin/components/ItemList";
 import { RichTextField } from "@/app/admin/components/RichTextField";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+  FieldTitle,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { sectionKinds, type FieldsKind } from "@/config/pages";
 import type { PageSection } from "@/lib/pages";
 
 type SectionOf<K extends PageSection["kind"]> = Extract<PageSection, { kind: K }>;
 type Update<S> = (fn: (section: S) => S) => void;
 
-function capitalize(text: string) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
 function newItemKey() {
   return crypto.randomUUID().slice(0, 8);
-}
-
-function moved<T>(items: T[], from: number, to: number) {
-  const next = [...items];
-  const [item] = next.splice(from, 1);
-  next.splice(to, 0, item);
-  return next;
-}
-
-function ItemControls({
-  index,
-  count,
-  name,
-  onMove,
-  onRemove,
-}: {
-  index: number;
-  count: number;
-  name: string;
-  onMove: (to: number) => void;
-  onRemove: () => void;
-}) {
-  return (
-    <div className="flex shrink-0 items-center">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-xs"
-        aria-label={`Move ${name} up`}
-        disabled={index === 0}
-        onClick={() => onMove(index - 1)}
-      >
-        <ArrowUp />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-xs"
-        aria-label={`Move ${name} down`}
-        disabled={index === count - 1}
-        onClick={() => onMove(index + 1)}
-      >
-        <ArrowDown />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-xs"
-        aria-label={`Remove ${name}`}
-        onClick={onRemove}
-      >
-        <X />
-      </Button>
-    </div>
-  );
 }
 
 function HeadingField({
@@ -86,15 +35,15 @@ function HeadingField({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>Heading</Label>
+    <Field>
+      <FieldLabel htmlFor={id}>Heading</FieldLabel>
       <Input
         id={id}
         value={value}
         placeholder="No heading"
         onChange={(e) => onChange(e.target.value)}
       />
-    </div>
+    </Field>
   );
 }
 
@@ -108,28 +57,36 @@ function TextFields({
   update: Update<SectionOf<"text">>;
 }) {
   return (
-    <>
+    <FieldGroup>
       <HeadingField
         id={`${section.key}-heading`}
         value={section.label}
         onChange={(label) => update((s) => ({ ...s, label }))}
       />
-      <RichTextField
-        label={name}
-        value={section.content}
-        onChange={(content) => update((s) => ({ ...s, content }))}
-      />
-    </>
+      <Field>
+        <FieldTitle>Text</FieldTitle>
+        <RichTextField
+          label={name}
+          value={section.content}
+          onChange={(content) => update((s) => ({ ...s, content }))}
+        />
+        {!section.content.trim() && (
+          <FieldDescription>
+            This part of the page is hidden while it has no text.
+          </FieldDescription>
+        )}
+      </Field>
+    </FieldGroup>
   );
 }
 
 function LinksFields({
   section,
-  item: noun,
+  noun,
   update,
 }: {
   section: SectionOf<"links" | "tags">;
-  item: string;
+  noun: string;
   update: Update<SectionOf<"links" | "tags">>;
 }) {
   const setItem = (key: string, fields: { title?: string; url?: string }) =>
@@ -139,74 +96,61 @@ function LinksFields({
         item.key === key ? { ...item, ...fields } : item,
       ),
     }));
+  const isTags = section.kind === "tags";
 
   return (
-    <>
+    <FieldGroup>
       <HeadingField
         id={`${section.key}-heading`}
         value={section.label}
         onChange={(label) => update((s) => ({ ...s, label }))}
       />
-      <ul className="flex flex-col gap-2">
-        {section.items.map((item, index) => (
-          <li key={item.key} className="flex items-center gap-2">
+      <FieldSet>
+        <FieldLegend variant="label">{`${capitalize(noun)}s`}</FieldLegend>
+        <ItemList
+          items={section.items}
+          noun={noun}
+          nameOf={(item) => item.title}
+          onChange={(items) => update((s) => ({ ...s, items }))}
+          onAdd={() =>
+            update((s) => ({
+              ...s,
+              items: [...s.items, { key: newItemKey(), title: "", url: "" }],
+            }))
+          }
+          head={(item) => (
             <Input
-              aria-label="Title"
-              placeholder="Title"
+              aria-label={isTags ? "Name" : "Title"}
+              placeholder={isTags ? "Name" : "Title"}
               value={item.title}
+              autoFocus={!item.title && !item.url}
               onChange={(e) => setItem(item.key, { title: e.target.value })}
             />
+          )}
+          body={(item) => (
             <Input
               aria-label="Link"
-              placeholder={section.kind === "tags" ? "Link (optional)" : "https://…"}
+              placeholder={isTags ? "Link (optional)" : "https://…"}
               spellCheck={false}
               value={item.url}
+              className="text-muted-foreground focus-visible:text-foreground"
               onChange={(e) => setItem(item.key, { url: e.target.value })}
             />
-            <ItemControls
-              index={index}
-              count={section.items.length}
-              name={item.title || noun}
-              onMove={(to) =>
-                update((s) => ({ ...s, items: moved(s.items, index, to) }))
-              }
-              onRemove={() =>
-                update((s) => ({
-                  ...s,
-                  items: s.items.filter((i) => i.key !== item.key),
-                }))
-              }
-            />
-          </li>
-        ))}
-      </ul>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="self-start"
-        onClick={() =>
-          update((s) => ({
-            ...s,
-            items: [...s.items, { key: newItemKey(), title: "", url: "" }],
-          }))
-        }
-      >
-        <Plus />
-        Add {noun}
-      </Button>
-    </>
+          )}
+        />
+      </FieldSet>
+    </FieldGroup>
   );
 }
 
-// Answers only mount their editor while open, so a long list stays light
+// Text only mounts its editor while open, so a long list stays light
 function FaqFields({
   section,
-  item: noun,
+  noun,
   update,
 }: {
   section: SectionOf<"faq">;
-  item: string;
+  noun: string;
   update: Update<SectionOf<"faq">>;
 }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
@@ -226,22 +170,38 @@ function FaqFields({
     }));
 
   return (
-    <>
+    <FieldGroup>
       <HeadingField
         id={`${section.key}-heading`}
         value={section.label}
         onChange={(label) => update((s) => ({ ...s, label }))}
       />
-      <ul className="flex flex-col gap-2">
-        {section.items.map((item, index) => {
-          const isOpen = open.has(item.key);
-          return (
-            <li key={item.key} className="flex flex-col gap-2 rounded-lg border p-2">
-              <div className="flex items-center gap-2">
+      <FieldSet>
+        <FieldLegend variant="label">{`${capitalize(noun)}s`}</FieldLegend>
+        <FieldDescription>
+          Each one opens on the page to show its text.
+        </FieldDescription>
+        <ItemList
+          items={section.items}
+          noun={noun}
+          nameOf={(item) => item.question}
+          onChange={(items) => update((s) => ({ ...s, items }))}
+          onAdd={() => {
+            const key = newItemKey();
+            update((s) => ({
+              ...s,
+              items: [...s.items, { key, question: "", answer: "" }],
+            }));
+            setOpen((current) => new Set(current).add(key));
+          }}
+          head={(item) => {
+            const isOpen = open.has(item.key);
+            return (
+              <div className="flex items-center gap-1">
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-xs"
+                  size="icon-sm"
                   aria-label={isOpen ? "Hide text" : "Show text"}
                   aria-expanded={isOpen}
                   onClick={() => toggle(item.key)}
@@ -254,82 +214,44 @@ function FaqFields({
                   aria-label={capitalize(noun)}
                   placeholder={capitalize(noun)}
                   value={item.question}
-                  onChange={(e) => setItem(item.key, { question: e.target.value })}
-                />
-                <ItemControls
-                  index={index}
-                  count={section.items.length}
-                  name={item.question || noun}
-                  onMove={(to) =>
-                    update((s) => ({ ...s, items: moved(s.items, index, to) }))
-                  }
-                  onRemove={() =>
-                    update((s) => ({
-                      ...s,
-                      items: s.items.filter((i) => i.key !== item.key),
-                    }))
+                  autoFocus={!item.question && !item.answer}
+                  onChange={(e) =>
+                    setItem(item.key, { question: e.target.value })
                   }
                 />
               </div>
-              {isOpen && (
-                <RichTextField
-                  label={`Text for ${item.question}`}
-                  value={item.answer}
-                  onChange={(answer) => setItem(item.key, { answer })}
-                />
-              )}
-            </li>
-          );
-        })}
-      </ul>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="self-start"
-        onClick={() => {
-          const key = newItemKey();
-          update((s) => ({
-            ...s,
-            items: [...s.items, { key, question: "", answer: "" }],
-          }));
-          setOpen((current) => new Set(current).add(key));
-        }}
-      >
-        <Plus />
-        Add {noun}
-      </Button>
-    </>
+            );
+          }}
+          body={(item) =>
+            open.has(item.key) ? (
+              <RichTextField
+                label={`Text for ${item.question || noun}`}
+                value={item.answer}
+                onChange={(answer) => setItem(item.key, { answer })}
+              />
+            ) : (
+              <button
+                type="button"
+                className="line-clamp-2 cursor-pointer pr-2 pl-9 text-left text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => toggle(item.key)}
+              >
+                {item.answer.trim() ? plainText(item.answer) : "No text yet"}
+              </button>
+            )
+          }
+        />
+      </FieldSet>
+    </FieldGroup>
   );
 }
 
-function FieldsFields({
-  section,
-  update,
-}: {
-  section: SectionOf<FieldsKind>;
-  update: Update<SectionOf<FieldsKind>>;
-}) {
-  return Object.values(sectionKinds[section.kind].fields).map(
-    (field: { key: string; label: string }) => {
-      const id = `${section.key}-${field.key}`;
-      return (
-        <div key={field.key} className="flex flex-col gap-1.5">
-          <Label htmlFor={id}>{field.label}</Label>
-          <Input
-            id={id}
-            value={section.fields[field.key] ?? ""}
-            onChange={(e) =>
-              update((s) => ({
-                ...s,
-                fields: { ...s.fields, [field.key]: e.target.value },
-              }))
-            }
-          />
-        </div>
-      );
-    },
-  );
+// A one-line glimpse of an answer, without its markdown
+function plainText(markdown: string) {
+  return markdown
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[*_#>`]|^\s*[-+]\s|^\s*\d+\.\s/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function SectionFields({
@@ -358,7 +280,7 @@ export function SectionFields({
       return (
         <LinksFields
           section={section}
-          item={item ?? "link"}
+          noun={item ?? "link"}
           update={(fn) =>
             update((s) => (s.kind === "links" || s.kind === "tags" ? fn(s) : s))
           }
@@ -368,15 +290,8 @@ export function SectionFields({
       return (
         <FaqFields
           section={section}
-          item={item ?? "item"}
+          noun={item ?? "item"}
           update={(fn) => update((s) => (s.kind === "faq" ? fn(s) : s))}
-        />
-      );
-    default:
-      return (
-        <FieldsFields
-          section={section}
-          update={(fn) => update((s) => ("fields" in s ? fn(s) : s))}
         />
       );
   }

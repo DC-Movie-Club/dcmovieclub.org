@@ -3,13 +3,7 @@ import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { SectionCard } from "@/components/section-cards";
 import { Link, ExternalLink } from "@/components/ui/link";
-import type { FieldsKind } from "@/config/pages";
 import type { FaqItem, LinkItem, PageSection } from "@/lib/pages";
-
-// Renders a section the page builds itself from live data, given its fields
-export type SectionRenderers = Partial<
-  Record<FieldsKind, (fields: Record<string, string>) => React.ReactNode>
->;
 
 function LinkListItem({ item }: { item: LinkItem }) {
   if (!item.url) return <li>{item.title}</li>;
@@ -71,13 +65,7 @@ export function FaqEntry({ item }: { item: FaqItem }) {
   );
 }
 
-function Section({
-  section,
-  renderers,
-}: {
-  section: PageSection;
-  renderers: SectionRenderers;
-}) {
+function Section({ section }: { section: PageSection }) {
   switch (section.kind) {
     case "text":
       return section.content.trim() ? (
@@ -120,19 +108,11 @@ function Section({
           </div>
         </section>
       ) : null;
-    default:
-      return renderers[section.kind]?.(section.fields) ?? null;
   }
 }
 
-export function PageSections({
-  sections,
-  renderers = {},
-}: {
-  sections: PageSection[];
-  renderers?: SectionRenderers;
-}) {
+export function PageSections({ sections }: { sections: PageSection[] }) {
   return sections.map((section) => (
-    <Section key={section.key} section={section} renderers={renderers} />
+    <Section key={section.key} section={section} />
   ));
 }

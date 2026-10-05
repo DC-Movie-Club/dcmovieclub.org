@@ -1,25 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowUpRight, Maximize2, Minimize2, Undo2 } from "lucide-react";
 import {
   colorRoles,
   isHexColor,
   pageTemplates,
-  sectionKinds,
   sectionTemplate,
   type ColorRoleKey,
   type PageColors,
 } from "@/config/pages";
 import { savePage } from "@/app/admin/actions/pages";
-import { ColorPopover } from "@/app/admin/components/ColorPopover";
+import { ColorFields } from "@/app/admin/components/ColorFields";
+import {
+  outlineItems,
+  PageOutline,
+} from "@/app/admin/components/PageOutline";
 import { PagePreview } from "@/app/admin/components/PagePreview";
 import { SectionFields } from "@/app/admin/components/SectionFields";
+import { useLeaveGuard } from "@/app/admin/hooks/useLeaveGuard";
 import { useSaveShortcuts } from "@/app/admin/hooks/useSaveShortcuts";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +30,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import type { PageData } from "@/components/pages/PageBody";
 import type { PageContent, PageSection } from "@/lib/pages";
 
 type Draft = {
@@ -53,84 +64,157 @@ function draftOf(page: PageContent): Draft {
   };
 }
 
+// Leaves out colors that aren't set, and any still being typed
 function colorsOf(draft: Draft): PageColors {
   return Object.fromEntries(
-    Object.entries(draft.colors).filter(([, hex]) => hex),
+    Object.entries(draft.colors).filter(([, hex]) => isHexColor(hex)),
   );
 }
 
-function savedStatus(page: PageContent) {
-  if (!page.updatedAt) return "Not saved yet";
-  const time = new Date(page.updatedAt).toLocaleString();
-  return `Live · saved ${time}${page.updatedByName ? ` by ${page.updatedByName}` : ""}`;
+function same(a: unknown, b: unknown) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+// The outline's items are "title", "colors" and the template's section keys
+function itemChanged(draft: Draft, base: Draft, item: string) {
+  if (item === "title") {
+    return draft.title !== base.title || draft.subtitle !== base.subtitle;
+  }
+  if (item === "colors") return !same(draft.colors, base.colors);
+  return !same(
+    draft.sections.find((s) => s.key === item),
+    base.sections.find((s) => s.key === item),
+  );
+}
+
+function withItemFrom(draft: Draft, base: Draft, item: string): Draft {
+  if (item === "title") {
+    return { ...draft, title: base.title, subtitle: base.subtitle };
+  }
+  if (item === "colors") return { ...draft, colors: base.colors };
+  return {
+    ...draft,
+    sections: draft.sections.map((s) =>
+      s.key === item ? (base.sections.find((b) => b.key === item) ?? s) : s,
+    ),
+  };
+}
+
+function savedAt(page: PageContent) {
+  if (!page.updatedAt) return null;
+  return new Date(page.updatedAt).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function liveStatus(page: PageContent) {
+  const when = savedAt(page);
+  if (!when) return "Not saved yet";
+  const by = page.updatedByName ? ` by ${page.updatedByName}` : "";
+  return `Live on the site · saved ${when}${by}`;
 }
 
 function conflictNote(theirs: PageContent) {
   const who = theirs.updatedByName ?? "Another admin";
-  const when = theirs.updatedAt
-    ? ` at ${new Date(theirs.updatedAt).toLocaleString()}`
-    : "";
-  return `${who} saved this page${when}. Load their version, or overwrite it with yours.`;
+  const when = savedAt(theirs);
+  const at = when ? ` (${when})` : "";
+  return `${who} saved this page${at} while you were editing. Load their version to start again from it, or overwrite it with yours.`;
 }
 
-function ColorField({
-  role,
-  value,
-  colors,
+function TitleFields({
+  draft,
+  hasSubtitle,
   onChange,
 }: {
-  role: (typeof colorRoles)[ColorRoleKey];
-  value: string;
-  // The draft's colors, to check contrast against
-  colors: Record<ColorRoleKey, string>;
-  onChange: (value: string) => void;
+  draft: Draft;
+  hasSubtitle: boolean;
+  onChange: (fields: Partial<Pick<Draft, "title" | "subtitle">>) => void;
 }) {
-  const valid = !value || isHexColor(value);
-  const id = `color-${role.key}`;
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{role.label}</Label>
-      <div className="flex items-center gap-2">
-        <ColorPopover
-          role={role}
-          value={value}
-          colors={colors}
-          onChange={onChange}
-        />
+    <FieldGroup>
+      <Field>
+        <FieldLabel htmlFor="page-title">Title</FieldLabel>
         <Input
-          id={id}
-          value={value}
-          placeholder="Not set"
-          spellCheck={false}
-          aria-invalid={!valid}
-          className="font-mono"
-          onChange={(e) => onChange(e.target.value.trim())}
+          id="page-title"
+          value={draft.title}
+          onChange={(e) => onChange({ title: e.target.value })}
         />
-      </div>
-    </div>
+        <FieldDescription>The big lettering at the top of the page.</FieldDescription>
+      </Field>
+      {hasSubtitle && (
+        <Field>
+          <FieldLabel htmlFor="page-subtitle">Subtitle</FieldLabel>
+          <Input
+            id="page-subtitle"
+            value={draft.subtitle}
+            placeholder="No subtitle"
+            onChange={(e) => onChange({ subtitle: e.target.value })}
+          />
+          <FieldDescription>The line under the title.</FieldDescription>
+        </Field>
+      )}
+    </FieldGroup>
   );
 }
 
-export function PageEditor({ initialPage }: { initialPage: PageContent }) {
-  const template = pageTemplates[initialPage.key];
+// Edits one page: the outline lists its parts, the form edits the picked part,
+// and the preview shows the whole page with every unsaved change. Save
+// publishes the page.
+export function PageEditor({
+  initialPage,
+  initialItem,
+  data,
+}: {
+  initialPage: PageContent;
+  initialItem: string | null;
+  data: PageData;
+}) {
+  const router = useRouter();
+  const pageKey = initialPage.key;
+  const template = pageTemplates[pageKey];
   const [saved, setSaved] = useState(initialPage);
   const [draft, setDraft] = useState(() => draftOf(initialPage));
-  // Remounts the rich text fields, which only read their value when mounted
-  const [fieldsKey, setFieldsKey] = useState(0);
+  // Remounts the form, whose rich text fields only read their value on mount
+  const [revision, setRevision] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [conflict, setConflict] = useState<PageContent | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  // Hides the form so the preview gets the whole canvas. On phones, where
+  // they don't fit side by side, it's the Edit/Preview switch.
+  const [previewOnly, setPreviewOnly] = useState(false);
 
-  const isDirty = JSON.stringify(draft) !== JSON.stringify(draftOf(saved));
+  const base = useMemo(() => draftOf(saved), [saved]);
+  const items = outlineItems(pageKey, (item) => itemChanged(draft, base, item));
+  // Opens on the first section, since copy is what changes most; a page with
+  // no sections opens on its title
+  const [selected, setSelected] = useState(
+    () =>
+      items.find((item) => item.key === initialItem)?.key ??
+      items[items.length > 2 ? 1 : 0].key,
+  );
+  const current = items.find((item) => item.key === selected) ?? items[0];
+
+  const isDirty = items.some((item) => item.dirty);
   const isValid = Object.values(draft.colors).every(
     (hex) => !hex || isHexColor(hex),
   );
   const canSave = isDirty && isValid && !saving;
+  const guard = useLeaveGuard(isDirty);
+
+  const select = (item: string) => {
+    setSelected(item);
+    setPreviewOnly(false);
+    window.history.replaceState(null, "", `?edit=${item}`);
+  };
 
   const load = (page: PageContent) => {
     setSaved(page);
     setDraft(draftOf(page));
-    setFieldsKey((k) => k + 1);
+    setRevision((r) => r + 1);
     setConflict(null);
   };
 
@@ -139,7 +223,7 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
     setError("");
     try {
       const result = await savePage({
-        page: saved.key,
+        page: pageKey,
         draft: {
           title: draft.title,
           subtitle: draft.subtitle,
@@ -153,20 +237,25 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
         setSaved(result.saved);
         setDraft(draftOf(result.saved));
         setConflict(null);
-      } else {
-        setConflict(result.conflict);
+        return true;
       }
+      setConflict(result.conflict);
     } catch {
-      setError("Failed to save");
+      setError("Couldn't save. Check your connection and try again.");
     } finally {
       setSaving(false);
     }
+    return false;
+  };
+
+  const leave = async (andSave: boolean) => {
+    const href = guard.pending;
+    guard.cancel();
+    if (!href || (andSave && !(await save()))) return;
+    router.push(href);
   };
 
   useSaveShortcuts(canSave, () => save());
-
-  const setColor = (role: ColorRoleKey, value: string) =>
-    setDraft((d) => ({ ...d, colors: { ...d.colors, [role]: value } }));
 
   const updateSection = (
     key: string,
@@ -179,35 +268,76 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
 
   let status: string;
   if (error) status = error;
-  else if (saving) status = "Saving...";
+  else if (saving) status = "Saving…";
   else if (!isValid) status = "Colors need to be hex values, like #a2390a";
-  else if (isDirty) status = "Unsaved changes";
-  else status = savedStatus(saved);
+  else if (isDirty) status = "Unsaved changes. The site updates when you save.";
+  else status = liveStatus(saved);
+
+  const section = draft.sections.find((s) => s.key === current.key);
+  let form: React.ReactNode;
+  if (current.key === "title") {
+    form = (
+      <TitleFields
+        draft={draft}
+        hasSubtitle={template.subtitle}
+        onChange={(fields) => setDraft((d) => ({ ...d, ...fields }))}
+      />
+    );
+  } else if (current.key === "colors") {
+    form = (
+      <ColorFields
+        colors={draft.colors}
+        onChange={(role, value) =>
+          setDraft((d) => ({ ...d, colors: { ...d.colors, [role]: value } }))
+        }
+      />
+    );
+  } else if (section) {
+    form = (
+      <SectionFields
+        name={current.label}
+        item={sectionTemplate(pageKey, section.key)?.item}
+        section={section}
+        update={(fn) => updateSection(section.key, fn)}
+      />
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="sticky top-0 z-20 -mx-4 flex items-center justify-between gap-3 border-b bg-background px-4 py-3">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin/pages"
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+      <aside className="max-h-60 shrink-0 overflow-y-auto border-b md:max-h-none md:w-52 md:border-r md:border-b-0">
+        <PageOutline
+          page={pageKey}
+          items={items}
+          selected={current.key}
+          onSelect={select}
+        />
+      </aside>
+
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex flex-wrap items-center gap-x-2 gap-y-2 border-b px-4 py-2.5">
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <h1 className="text-sm font-semibold">{template.label}</h1>
+            <p
+              role="status"
+              className={cn(
+                "truncate text-xs text-muted-foreground",
+                (error || !isValid) && "text-destructive",
+              )}
             >
-              <ArrowLeft className="size-4" />
-              Pages
-            </Link>
-            <h2 className="font-semibold">{template.label}</h2>
+              {status}
+            </p>
           </div>
-          <p
-            className={cn(
-              "truncate text-xs text-muted-foreground",
-              (error || !isValid) && "text-destructive",
-            )}
+          <Tabs
+            value={previewOnly ? "preview" : "edit"}
+            onValueChange={(value) => setPreviewOnly(value === "preview")}
+            className="md:hidden"
           >
-            {status}
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
+            <TabsList>
+              <TabsTrigger value="edit">Edit</TabsTrigger>
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+            </TabsList>
+          </Tabs>
           <Button
             variant="ghost"
             size="sm"
@@ -216,101 +346,83 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
               <a href={template.href} target="_blank" rel="noopener noreferrer" />
             }
           >
-            View page
+            View live
             <ArrowUpRight />
           </Button>
           {isDirty && (
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => load(saved)}
               disabled={saving}
+              onClick={() => setConfirmDiscard(true)}
             >
-              Revert
+              Discard
             </Button>
           )}
           <Button size="sm" onClick={() => save()} disabled={!canSave}>
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving…" : "Save"}
           </Button>
-        </div>
-      </div>
+        </header>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="page-title">Title</Label>
-        <Input
-          id="page-title"
-          value={draft.title}
-          onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-        />
-      </div>
-
-      {template.subtitle && (
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="page-subtitle">Subtitle</Label>
-          <Input
-            id="page-subtitle"
-            value={draft.subtitle}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, subtitle: e.target.value }))
-            }
-          />
-        </div>
-      )}
-
-      <section className="flex flex-col gap-4">
-        <h3 className="font-semibold">Colors</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {Object.values(colorRoles).map((role) => (
-            <ColorField
-              key={role.key}
-              role={role}
-              value={draft.colors[role.key]}
-              colors={draft.colors}
-              onChange={(value) => setColor(role.key, value)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="font-semibold">Preview</h3>
-          <p className="text-xs text-muted-foreground">
-            How the page looks with these colors. Changes show here as you make
-            them, and on the site once you save.
-          </p>
-        </div>
-        <PagePreview
-          title={draft.title}
-          colors={isValid ? colorsOf(draft) : saved.colors}
-          sections={draft.sections}
-        />
-      </section>
-
-      <section key={fieldsKey} className="flex flex-col gap-4">
-        <h3 className="font-semibold">Sections</h3>
-        {draft.sections.map((section) => {
-          const { label: name, item } = sectionTemplate(saved.key, section.key);
-          return (
-            <section key={section.key} className="rounded-lg border">
-              <header className="flex items-baseline justify-between gap-3 border-b px-4 py-3">
-                <h4 className="font-medium">{name}</h4>
-                <span className="text-xs text-muted-foreground">
-                  {sectionKinds[section.kind].label}
-                </span>
-              </header>
-              <div className="flex flex-col gap-4 p-4">
-                <SectionFields
-                  name={name}
-                  item={item}
-                  section={section}
-                  update={(fn) => updateSection(section.key, fn)}
-                />
+        <div className="flex min-h-0 flex-1">
+          <section
+            aria-label={current.label}
+            className={cn(
+              "flex min-h-0 w-full flex-col overflow-y-auto md:w-[22rem] md:shrink-0 md:border-r xl:w-[26rem]",
+              previewOnly && "hidden",
+            )}
+          >
+            <div className="flex flex-col gap-5 p-5">
+              <div className="flex min-h-7 items-center justify-between gap-3">
+                <h2 className="font-semibold">{current.label}</h2>
+                {current.dirty && (
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={() => {
+                      setDraft((d) => withItemFrom(d, base, current.key));
+                      setRevision((r) => r + 1);
+                    }}
+                  >
+                    <Undo2 />
+                    Undo changes
+                  </Button>
+                )}
               </div>
-            </section>
-          );
-        })}
-      </section>
+              <div key={`${current.key}:${revision}`}>{form}</div>
+            </div>
+          </section>
+
+          <section
+            aria-label="Preview"
+            className={cn(
+              "flex min-h-0 min-w-0 flex-1 flex-col bg-muted/50",
+              !previewOnly && "max-md:hidden",
+            )}
+          >
+            <div className="flex h-10 items-center gap-3 px-4 text-xs text-muted-foreground">
+              <span className="font-medium">Preview</span>
+              <span className="truncate">Click part of the page to edit it</span>
+              <Button
+                variant="ghost"
+                size="xs"
+                className="ml-auto max-md:hidden"
+                onClick={() => setPreviewOnly((p) => !p)}
+              >
+                {previewOnly ? <Minimize2 /> : <Maximize2 />}
+                {previewOnly ? "Show the form" : "Bigger preview"}
+              </Button>
+            </div>
+            <PagePreview
+              page={{ key: pageKey, ...draft, colors: colorsOf(draft) }}
+              data={data}
+              selected={current.key}
+              onSelect={select}
+              className="mx-4 mb-4 flex-1 rounded-lg border shadow-sm"
+            />
+          </section>
+        </div>
+      </div>
 
       <Dialog
         open={conflict !== null}
@@ -320,7 +432,7 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Someone else saved changes</DialogTitle>
+            <DialogTitle>Someone else saved this page</DialogTitle>
             <DialogDescription>
               {conflict && conflictNote(conflict)}
             </DialogDescription>
@@ -338,7 +450,60 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
               onClick={() => save(true)}
               disabled={saving}
             >
-              {saving ? "Saving..." : "Overwrite"}
+              {saving ? "Saving…" : "Overwrite with mine"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Discard your changes?</DialogTitle>
+            <DialogDescription>
+              {`Everything you changed on ${template.label} goes back to what's live on the site.`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setConfirmDiscard(false)}>
+              Keep editing
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                load(saved);
+                setConfirmDiscard(false);
+              }}
+            >
+              Discard changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={guard.pending !== null}
+        onOpenChange={(open) => {
+          if (!open) guard.cancel();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{`Save your changes to ${template.label}?`}</DialogTitle>
+            <DialogDescription>
+              They aren&apos;t on the site yet, and leaving without saving loses
+              them.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => leave(false)}>
+              Don&apos;t save
+            </Button>
+            <Button variant="outline" onClick={guard.cancel}>
+              Keep editing
+            </Button>
+            <Button onClick={() => leave(true)} disabled={!isValid || saving}>
+              Save and continue
             </Button>
           </DialogFooter>
         </DialogContent>

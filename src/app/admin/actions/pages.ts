@@ -9,7 +9,6 @@ import {
   isHexColor,
   isPageKey,
   pageTemplates,
-  sectionKinds,
   type PageColors,
   type PageKey,
 } from "@/config/pages";
@@ -120,21 +119,6 @@ function sectionsData(page: PageKey, sections: PageSection[]) {
               })),
             },
           ];
-        default: {
-          const fields = sectionKinds[section.kind].fields;
-          return [
-            section.key,
-            {
-              key: section.key,
-              ...Object.fromEntries(
-                Object.keys(fields).map((field) => [
-                  field,
-                  text(section.fields?.[field]).trim(),
-                ]),
-              ),
-            },
-          ];
-        }
       }
     }),
   );

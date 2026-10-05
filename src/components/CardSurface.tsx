@@ -71,8 +71,12 @@ export function CardSurface({ className }: { className?: string }) {
       setSize((prev) =>
         prev?.width === width && prev.height === height ? prev : { width, height },
       );
+    // Inside a display: none ancestor (like a hidden admin preview) the size
+    // is "auto"; the observer measures it once it shows
     const style = getComputedStyle(el);
-    update(parseFloat(style.width), parseFloat(style.height));
+    const width = parseFloat(style.width);
+    const height = parseFloat(style.height);
+    if (Number.isFinite(width) && Number.isFinite(height)) update(width, height);
     const observer = new ResizeObserver(([entry]) =>
       update(entry.contentRect.width, entry.contentRect.height),
     );
