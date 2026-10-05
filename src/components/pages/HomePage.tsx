@@ -49,10 +49,10 @@ function Hero() {
     <>
       <section className="flex flex-col items-center pt-8">
         <AudienceMarquee />
-        <h1 className="relative w-full max-w-225 px-4">
+        <h1 className="relative w-full px-6">
           <span className="sr-only">DC Movie Club</span>
-          <LogoLettering layout="stacked" className="sm:hidden" />
-          <LogoLettering layout="row" className="max-sm:hidden" />
+          <LogoLettering layout="stacked" className="mx-auto max-w-3xl sm:hidden" />
+          <LogoLettering layout="row" className="mx-auto max-w-3xl max-sm:hidden" />
         </h1>
         <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl">
           <TaglineBanner className="-rotate-2">
