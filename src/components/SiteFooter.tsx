@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { routes, socials } from "@/config/navigation";
 
 const EMAIL = "hello@dcmovieclub.org";
+const FOUNDED = 2023;
 
 // The bottom nav's order, with About and Contact in the place of the More menu
 // they live in
@@ -76,6 +77,9 @@ export function SiteFooter({ className }: { className?: string }) {
         </div>
 
         <div className="flex flex-col gap-2 text-page-fg/60 sm:flex-row sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} DC Movie Club · Est. {FOUNDED}
+          </p>
           <a
             href="https://gus.siteless.co"
             target="_blank"
@@ -85,7 +89,6 @@ export function SiteFooter({ className }: { className?: string }) {
             Site by Gus
             <ArrowUpRight size={12} />
           </a>
-          <p>© {new Date().getFullYear()} DC Movie Club</p>
         </div>
       </div>
     </footer>
