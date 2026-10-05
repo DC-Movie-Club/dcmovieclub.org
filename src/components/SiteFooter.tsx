@@ -47,7 +47,7 @@ export function SiteFooter({ className }: { className?: string }) {
           aria-hidden
           className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/subscribe:boil"
         />
-        <span className="relative flex items-center gap-2 px-5 py-2.5 tracking-wider text-page-accent-text">
+        <span className="relative flex items-center gap-2 px-5 py-2.5 tracking-wider whitespace-nowrap text-page-accent-text">
           Subscribe to our newsletter
           <ArrowUpRight size={18} className="shrink-0" />
         </span>
