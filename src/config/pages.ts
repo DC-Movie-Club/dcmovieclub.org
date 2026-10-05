@@ -15,7 +15,6 @@ export const colorRoles = {
 
 export type ColorRoleKey = keyof typeof colorRoles;
 export type PageColors = Partial<Record<ColorRoleKey, string>>;
-export type PageAccent = Pick<PageColors, "accent" | "accentText">;
 
 export function isColorRoleKey(value: string): value is ColorRoleKey {
   return Object.hasOwn(colorRoles, value);

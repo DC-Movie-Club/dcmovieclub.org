@@ -14,7 +14,6 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Ellipsis, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { routes, socials } from "@/config/navigation";
-import type { PageAccent } from "@/config/pages";
 import {
   Dialog,
   DialogClose,
@@ -38,14 +37,10 @@ const HATCH_WIDTH = 1.6;
 const HATCH_INSET = 1.75;
 const HATCH_CLEARANCE = 1.5;
 
-// `accents` holds each page's accent colors by route; an item takes its page's
-// for hover and the active state, and an item without a page keeps the
-// defaults in globals.css
-export function BottomNav({
-  accents,
-}: {
-  accents: Record<string, PageAccent>;
-}) {
+// `accents` holds each page's accent color by route; an item takes its page's
+// for hover and the active state, and an item without one keeps the defaults
+// in globals.css
+export function BottomNav({ accents }: { accents: Record<string, string> }) {
   const pathname = usePathname();
   const activeMenuRoute = menuRoutes.find((route) => route.href === pathname);
 
@@ -352,7 +347,7 @@ function NavItemContent({
           LAYOUTS[layout].label,
           "rounded-[3px] uppercase tracking-wide transition-[background-color,color,rotate] duration-300 ease-out",
           active
-            ? "-rotate-1 bg-nav-active text-nav-active-text sketch-subtle"
+            ? "-rotate-1 bg-nav-active text-cream sketch-subtle"
             : "group-hover/item:boil-sm group-focus-visible/item:boil-sm",
         )}
       >
@@ -362,14 +357,9 @@ function NavItemContent({
   );
 }
 
-// The variables nav items color with, from a page's accent (see globals.css)
-function accentVars(accent: PageAccent | undefined): CSSProperties {
-  return Object.fromEntries(
-    [
-      ["--nav-accent", accent?.accent],
-      ["--nav-accent-text", accent?.accentText],
-    ].filter(([, hex]) => hex),
-  );
+// The variable nav items color with, from a page's accent (see globals.css)
+function accentVars(accent: string | undefined): CSSProperties {
+  return accent ? ({ "--nav-accent": accent } as CSSProperties) : {};
 }
 
 function BarLink({
@@ -379,7 +369,7 @@ function BarLink({
 }: {
   route: (typeof routes)[keyof typeof routes];
   pathname: string;
-  accents: Record<string, PageAccent>;
+  accents: Record<string, string>;
 }) {
   const active = pathname === route.href;
   return (
