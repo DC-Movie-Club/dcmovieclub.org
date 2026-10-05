@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronRight, ImageOff, LoaderCircle } from "lucide-react";
+import { getLinkPreview } from "@/app/admin/actions/link-preview";
 import { capitalize, ItemList } from "@/app/admin/components/ItemList";
 import { RichTextField } from "@/app/admin/components/RichTextField";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,9 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { webUrl } from "@/lib/link-preview";
 import { cn } from "@/lib/utils";
-import type { PageSection } from "@/lib/pages";
+import type { CardItem, PageSection } from "@/lib/pages";
 
 type SectionOf<K extends PageSection["kind"]> = Extract<PageSection, { kind: K }>;
 type Update<S> = (fn: (section: S) => S) => void;
@@ -137,6 +139,200 @@ function LinksFields({
               onChange={(e) => setItem(item.key, { url: e.target.value })}
             />
           )}
+        />
+      </FieldSet>
+    </FieldGroup>
+  );
+}
+
+type PreviewStatus = "loading" | "failed" | "no-image" | null;
+
+const previewMessages = {
+  loading: "Getting the picture and headline from this link…",
+  failed:
+    "Couldn't read this link, so the card has no picture. You can still type its headline and outlet.",
+  "no-image": "This link's site has no preview picture, so the card shows without one.",
+} as const;
+
+function CardThumbnail({ image, loading }: { image: string; loading: boolean }) {
+  const [broken, setBroken] = useState("");
+  let content: React.ReactNode = <ImageOff className="size-3.5" />;
+  if (loading) content = <LoaderCircle className="size-3.5 animate-spin" />;
+  else if (image && image !== broken) {
+    content = (
+      // A plain img, since next/image only loads from listed sites and these
+      // pictures come from whichever site the link is on
+      <img
+        src={image}
+        alt=""
+        referrerPolicy="no-referrer"
+        className="size-full object-cover"
+        onError={() => setBroken(image)}
+      />
+    );
+  }
+  return (
+    <div className="flex aspect-video h-8 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-muted text-muted-foreground">
+      {content}
+    </div>
+  );
+}
+
+// Pasting a link, or typing one and leaving the field, fills the card from
+// what the link's site offers for previews. A new link brings its own picture,
+// so it replaces the old one even when the site has none; the headline and
+// outlet are replaced only by ones the site has.
+function CardLinkField({
+  item,
+  status,
+  setStatus,
+  setItem,
+  fillFrom,
+}: {
+  item: CardItem;
+  status: PreviewStatus;
+  setStatus: (status: PreviewStatus) => void;
+  setItem: (fields: Partial<CardItem>) => void;
+  // Fills the card unless its link changed again since `link` was read
+  fillFrom: (link: string, fields: Partial<CardItem>) => void;
+}) {
+  // The link the card was last filled from. A saved link counts as filled; a
+  // link that couldn't be read is tried again.
+  const filledFrom = useRef<string | null>(item.url.trim());
+
+  const fill = async (value: string) => {
+    const link = value.trim();
+    if (link === filledFrom.current || !webUrl(link)) return;
+    filledFrom.current = link;
+    setStatus("loading");
+    const preview = await getLinkPreview(link).catch(() => null);
+    if (filledFrom.current !== link) return;
+    if (!preview) filledFrom.current = null;
+    setStatus(!preview ? "failed" : preview.image ? null : "no-image");
+    fillFrom(link, {
+      image: preview?.image ?? "",
+      ...(preview?.title && { title: preview.title }),
+      ...(preview?.source && { source: preview.source }),
+    });
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <CardThumbnail image={item.image} loading={status === "loading"} />
+      <Input
+        aria-label="Link"
+        placeholder="Paste a link"
+        spellCheck={false}
+        value={item.url}
+        autoFocus={!item.title && !item.url}
+        className="text-muted-foreground focus-visible:text-foreground"
+        onChange={(e) => {
+          setItem({ url: e.target.value });
+          const { inputType } = e.nativeEvent as InputEvent;
+          if (inputType === "insertFromPaste" || inputType === "insertFromDrop") {
+            fill(e.target.value);
+          }
+        }}
+        onBlur={(e) => fill(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") fill(e.currentTarget.value);
+        }}
+      />
+    </div>
+  );
+}
+
+function CardsFields({
+  section,
+  noun,
+  update,
+}: {
+  section: SectionOf<"cards">;
+  noun: string;
+  update: Update<SectionOf<"cards">>;
+}) {
+  // Kept here rather than in each row's link field so the message under the
+  // row can say how reading its link went
+  const [statuses, setStatuses] = useState<Record<string, PreviewStatus>>({});
+  const setItem = (key: string, fields: Partial<CardItem>) =>
+    update((s) => ({
+      ...s,
+      items: s.items.map((item) =>
+        item.key === key ? { ...item, ...fields } : item,
+      ),
+    }));
+  const fillFrom = (key: string, link: string, fields: Partial<CardItem>) =>
+    update((s) => ({
+      ...s,
+      items: s.items.map((item) =>
+        item.key === key && item.url.trim() === link
+          ? { ...item, ...fields }
+          : item,
+      ),
+    }));
+
+  return (
+    <FieldGroup>
+      <HeadingField
+        id={`${section.key}-heading`}
+        value={section.label}
+        onChange={(label) => update((s) => ({ ...s, label }))}
+      />
+      <FieldSet>
+        <FieldLegend variant="label">{`${capitalize(noun)}s`}</FieldLegend>
+        <FieldDescription>
+          Each one is a card with a picture. Paste a link to an article or
+          video, and its picture, headline and outlet fill in from the site.
+        </FieldDescription>
+        <ItemList
+          items={section.items}
+          noun={noun}
+          nameOf={(item) => item.title || item.source}
+          onChange={(items) => update((s) => ({ ...s, items }))}
+          onAdd={() =>
+            update((s) => ({
+              ...s,
+              items: [
+                ...s.items,
+                { key: newItemKey(), title: "", url: "", source: "", image: "" },
+              ],
+            }))
+          }
+          head={(item) => (
+            <CardLinkField
+              item={item}
+              status={statuses[item.key] ?? null}
+              setStatus={(status) =>
+                setStatuses((current) => ({ ...current, [item.key]: status }))
+              }
+              setItem={(fields) => setItem(item.key, fields)}
+              fillFrom={(link, fields) => fillFrom(item.key, link, fields)}
+            />
+          )}
+          body={(item) => {
+            const status = statuses[item.key];
+            return (
+              <div className="flex flex-col gap-2">
+                <Input
+                  aria-label="Headline"
+                  placeholder="Headline"
+                  value={item.title}
+                  onChange={(e) => setItem(item.key, { title: e.target.value })}
+                />
+                <Input
+                  aria-label="Outlet"
+                  placeholder="Outlet, like City Cast DC"
+                  value={item.source}
+                  onChange={(e) => setItem(item.key, { source: e.target.value })}
+                />
+                {status && (
+                  <p role="status" className="px-1 text-xs text-muted-foreground">
+                    {previewMessages[status]}
+                  </p>
+                )}
+              </div>
+            );
+          }}
         />
       </FieldSet>
     </FieldGroup>
@@ -284,6 +480,14 @@ export function SectionFields({
           update={(fn) =>
             update((s) => (s.kind === "links" || s.kind === "tags" ? fn(s) : s))
           }
+        />
+      );
+    case "cards":
+      return (
+        <CardsFields
+          section={section}
+          noun={item ?? "link"}
+          update={(fn) => update((s) => (s.kind === "cards" ? fn(s) : s))}
         />
       );
     case "faq":

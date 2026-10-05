@@ -5,6 +5,7 @@ import {
   AlignLeft,
   ChevronRight,
   Heading,
+  LayoutGrid,
   Link as LinkIcon,
   ListCollapse,
   Palette,
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 const kindIcons = {
   text: { key: "text", icon: AlignLeft },
   links: { key: "links", icon: LinkIcon },
+  cards: { key: "cards", icon: LayoutGrid },
   tags: { key: "tags", icon: Tags },
   faq: { key: "faq", icon: ListCollapse },
 } as const satisfies Record<SectionKind, { key: SectionKind; icon: LucideIcon }>;

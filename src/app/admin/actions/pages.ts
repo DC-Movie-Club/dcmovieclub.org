@@ -4,6 +4,7 @@ import { updateTag } from "next/cache";
 import { Timestamp } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { requireAdmin } from "@/lib/admin-session";
+import { webUrl } from "@/lib/link-preview";
 import {
   isColorRoleKey,
   isHexColor,
@@ -104,6 +105,20 @@ function sectionsData(page: PageKey, sections: PageSection[]) {
               items: keyedItems(section.items, (item) => ({
                 title: text(item.title).trim(),
                 url: text(item.url).trim(),
+              })),
+            },
+          ];
+        case "cards":
+          return [
+            section.key,
+            {
+              key: section.key,
+              label: text(section.label).trim(),
+              items: keyedItems(section.items, (item) => ({
+                title: text(item.title).trim(),
+                url: text(item.url).trim(),
+                source: text(item.source).trim(),
+                image: webUrl(text(item.image))?.href ?? "",
               })),
             },
           ];

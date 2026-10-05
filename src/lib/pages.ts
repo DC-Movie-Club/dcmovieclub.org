@@ -15,11 +15,15 @@ import {
 export const PAGES_COLLECTION = "pages";
 
 export type LinkItem = { key: string; title: string; url: string };
+// `source` is who published the link, like "City Cast DC"; `image` is the
+// address of the picture the link's site offers for previews
+export type CardItem = LinkItem & { source: string; image: string };
 export type FaqItem = { key: string; question: string; answer: string };
 
 export type PageSection =
   | { key: string; kind: "text"; label: string; content: string }
   | { key: string; kind: "links" | "tags"; label: string; items: LinkItem[] }
+  | { key: string; kind: "cards"; label: string; items: CardItem[] }
   | { key: string; kind: "faq"; label: string; items: FaqItem[] };
 
 export type PageContent = {
@@ -82,6 +86,18 @@ function toSection(
           key: item.key,
           title: text(item.title),
           url: text(item.url),
+        })),
+      };
+    case "cards":
+      return {
+        ...base,
+        kind,
+        items: orderedItems(raw.items).map((item) => ({
+          key: item.key,
+          title: text(item.title),
+          url: text(item.url),
+          source: text(item.source),
+          image: text(item.image),
         })),
       };
     case "faq":

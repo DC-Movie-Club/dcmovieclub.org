@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { LinkCard } from "@/components/LinkCard";
 import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { SectionCard } from "@/components/section-cards";
@@ -32,6 +33,16 @@ function TagItem({ item }: { item: LinkItem }) {
         <span className="relative">{item.title}</span>
       )}
     </li>
+  );
+}
+
+// For sections whose items are their own cards, so the heading sits on the
+// page instead of on a card
+function ListHeading({ children }: { children: string }) {
+  return (
+    <h2 className="text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-5xl">
+      {children}
+    </h2>
   );
 }
 
@@ -93,14 +104,23 @@ function Section({ section }: { section: PageSection }) {
           </ul>
         </SectionCard>
       ) : null;
+    case "cards":
+      return section.items.length > 0 ? (
+        <section id={section.key} className="flex scroll-mt-8 flex-col gap-8">
+          {section.label && <ListHeading>{section.label}</ListHeading>}
+          <ul className="grid gap-4 sm:grid-cols-3">
+            {section.items.map((item) => (
+              <li key={item.key}>
+                <LinkCard item={item} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null;
     case "faq":
       return section.items.length > 0 ? (
         <section id={section.key} className="flex scroll-mt-8 flex-col gap-8">
-          {section.label && (
-            <h2 className="text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-5xl">
-              {section.label}
-            </h2>
-          )}
+          {section.label && <ListHeading>{section.label}</ListHeading>}
           <div className="flex flex-col gap-4">
             {section.items.map((item) => (
               <FaqEntry key={item.key} item={item} />

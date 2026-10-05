@@ -40,6 +40,7 @@ export function colorVars(colors: PageColors): CSSProperties {
 export const sectionKinds = {
   text: { key: "text", label: "Text" },
   links: { key: "links", label: "Links" },
+  cards: { key: "cards", label: "Link cards" },
   tags: { key: "tags", label: "Tags" },
   faq: { key: "faq", label: "Dropdowns" },
 } as const satisfies Record<string, { key: string; label: string }>;
@@ -104,7 +105,7 @@ export const pageTemplates = {
     sections: {
       intro: { key: "intro", label: "Intro", kind: "text" },
       mission: { key: "mission", label: "Mission", kind: "text" },
-      news: { key: "news", label: "In the News", kind: "links", item: "link" },
+      news: { key: "news", label: "In the News", kind: "cards", item: "link" },
       follow: { key: "follow", label: "Follow Us", kind: "text" },
       faq: { key: "faq", label: "FAQ", kind: "faq", item: "question" },
       conduct: { key: "conduct", label: "Code of Conduct", kind: "text" },
