@@ -64,7 +64,15 @@ export function BottomNav() {
         <BarLink route={routes.about} pathname={pathname} />
 
         <Dialog>
-          <DialogTrigger render={<NavButton icon={Ellipsis} label="More" />} />
+          <DialogTrigger
+            render={
+              <NavButton
+                icon={Ellipsis}
+                label="More"
+                active={menuRoutes.some((route) => route.href === pathname)}
+              />
+            }
+          />
           <DialogContent showCloseButton={false}>
             <DialogTitle className="sr-only">More</DialogTitle>
             <ul className="flex flex-col gap-1">
@@ -360,20 +368,22 @@ function BarLink({
   );
 }
 
+// The More menu's trigger, active while the current page is in its menu
 const NavButton = forwardRef<
   HTMLButtonElement,
   {
     icon: React.ComponentType<{ className?: string }>;
     label: string;
+    active: boolean;
   } & React.ButtonHTMLAttributes<HTMLButtonElement>
->(function NavButton({ icon, label, className, ...props }, ref) {
+>(function NavButton({ icon, label, active, className, ...props }, ref) {
   return (
     <button
       ref={ref}
-      className={cn(navItemClass("bar", false), "cursor-pointer", className)}
+      className={cn(navItemClass("bar", active), "cursor-pointer", className)}
       {...props}
     >
-      <NavItemContent layout="bar" active={false} icon={icon} label={label} />
+      <NavItemContent layout="bar" active={active} icon={icon} label={label} />
     </button>
   );
 });

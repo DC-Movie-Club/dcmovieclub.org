@@ -6,14 +6,14 @@ import { routes, socials } from "@/config/navigation";
 const EMAIL = "hello@dcmovieclub.org";
 const FOUNDED = 2023;
 
-// The bottom nav's order, with About and Contact in the place of the More menu
-// they live in
+// The bottom nav's order, with Partnerships and Contact in the place of the
+// More menu they live in
 const footerLinks = [
-  routes.blog,
   routes.events,
+  routes.blog,
   routes.home,
-  routes.partnerships,
   routes.about,
+  routes.partnerships,
 ];
 
 const LINK =
