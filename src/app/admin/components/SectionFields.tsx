@@ -311,15 +311,13 @@ function FieldsFields({
   update: Update<SectionOf<FieldsKind>>;
 }) {
   return Object.values(sectionKinds[section.kind].fields).map(
-    (field: { key: string; label: string; type?: string; hint?: string }) => {
+    (field: { key: string; label: string }) => {
       const id = `${section.key}-${field.key}`;
       return (
         <div key={field.key} className="flex flex-col gap-1.5">
           <Label htmlFor={id}>{field.label}</Label>
           <Input
             id={id}
-            type={field.type === "number" ? "number" : "text"}
-            min={field.type === "number" ? 0 : undefined}
             value={section.fields[field.key] ?? ""}
             onChange={(e) =>
               update((s) => ({
@@ -328,9 +326,6 @@ function FieldsFields({
               }))
             }
           />
-          {field.hint && (
-            <p className="text-xs text-muted-foreground">{field.hint}</p>
-          )}
         </div>
       );
     },

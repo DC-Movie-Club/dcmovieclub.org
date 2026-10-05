@@ -6,7 +6,6 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import {
   colorRoles,
   isHexColor,
-  isPageKey,
   pageTemplates,
   sectionKinds,
   sectionTemplate,
@@ -291,10 +290,7 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
       <section key={fieldsKey} className="flex flex-col gap-4">
         <h3 className="font-semibold">Sections</h3>
         {draft.sections.map((section) => {
-          const { label: name, item, colorsFrom } = sectionTemplate(
-            saved.key,
-            section.key,
-          );
+          const { label: name, item } = sectionTemplate(saved.key, section.key);
           return (
             <section key={section.key} className="rounded-lg border">
               <header className="flex items-baseline justify-between gap-3 border-b px-4 py-3">
@@ -304,11 +300,6 @@ export function PageEditor({ initialPage }: { initialPage: PageContent }) {
                 </span>
               </header>
               <div className="flex flex-col gap-4 p-4">
-                {colorsFrom && isPageKey(colorsFrom) && (
-                  <p className="text-xs text-muted-foreground">
-                    {`Uses the ${pageTemplates[colorsFrom].label} page's colors`}
-                  </p>
-                )}
                 <SectionFields
                   name={name}
                   item={item}

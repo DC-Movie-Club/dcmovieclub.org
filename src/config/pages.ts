@@ -35,50 +35,21 @@ export function colorVars(colors: PageColors): CSSProperties {
   );
 }
 
-type FieldSpec = {
-  key: string;
-  label: string;
-  type?: "number";
-  hint?: string;
-};
+type FieldSpec = { key: string; label: string };
 
 // Content sections hold copy and lists. Sections with `fields` are built by the
-// page from live data (events, posts, films), and the fields are the words
-// around it.
+// page from live data (events, posts), and the fields are the words around it.
 export const sectionKinds = {
   text: { key: "text", label: "Text" },
   links: { key: "links", label: "Links" },
   tags: { key: "tags", label: "Tags" },
   faq: { key: "faq", label: "Dropdowns" },
-  hero: {
-    key: "hero",
-    label: "Banner",
-    fields: {
-      line1: {
-        key: "line1",
-        label: "Tagline, line 1",
-        hint: "On wide screens, lines 1 and 2 share a banner",
-      },
-      line2: { key: "line2", label: "Tagline, line 2" },
-      line3: { key: "line3", label: "Tagline, line 3" },
-    },
-  },
   events: {
     key: "events",
     label: "Upcoming events",
     fields: {
       featuredLabel: { key: "featuredLabel", label: "Label on the next event" },
       emptyMessage: { key: "emptyMessage", label: "Message when there are no events" },
-    },
-  },
-  eventsPreview: {
-    key: "eventsPreview",
-    label: "Upcoming events",
-    fields: {
-      featuredLabel: { key: "featuredLabel", label: "Label on the next event" },
-      moreHeading: { key: "moreHeading", label: "Heading over the events after it" },
-      count: { key: "count", label: "How many events after it", type: "number" },
-      viewAllLabel: { key: "viewAllLabel", label: "Link to the Events page" },
     },
   },
   posts: {
@@ -89,16 +60,6 @@ export const sectionKinds = {
       latestLabel: { key: "latestLabel", label: "Label on the latest post" },
       olderHeading: { key: "olderHeading", label: "Heading over older posts" },
       emptyMessage: { key: "emptyMessage", label: "Message when there are no posts" },
-    },
-  },
-  watching: {
-    key: "watching",
-    label: "Letterboxd",
-    fields: {
-      heading: { key: "heading", label: "Heading" },
-      count: { key: "count", label: "How many films", type: "number" },
-      followTitle: { key: "followTitle", label: "Follow tile title" },
-      followSubtitle: { key: "followSubtitle", label: "Follow tile subtitle" },
     },
   },
 } as const satisfies Record<
@@ -121,8 +82,6 @@ type SectionTemplate = {
   key: string;
   label: string;
   kind: SectionKind;
-  // Colors this section with another page's colors instead of its own page's
-  colorsFrom?: string;
   // What one item in a list is called, for buttons like "Add question"
   item?: string;
 };
@@ -144,16 +103,7 @@ export const pageTemplates = {
     label: "Home",
     href: "/",
     subtitle: false,
-    sections: {
-      hero: { key: "hero", label: "Banner", kind: "hero" },
-      events: {
-        key: "events",
-        label: "Upcoming events",
-        kind: "eventsPreview",
-        colorsFrom: "events",
-      },
-      watching: { key: "watching", label: "Recently watched", kind: "watching" },
-    },
+    sections: {},
   },
   events: {
     key: "events",
