@@ -125,7 +125,13 @@ export function ExpandableDescription({
         >
           <span
             aria-hidden
-            className="absolute inset-0 rounded-full border-2 border-charcoal/25 bg-cream shadow-md sketch-subtle group-hover/toggle:border-charcoal/40 group-hover/toggle:sketch-subtle-animated"
+            className="absolute inset-px rounded-full bg-cream shadow-md sketch-subtle group-hover/toggle:boil"
+          />
+          {/* Faded with opacity, since the ink filter cuts away a
+              translucent line */}
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full border-2 border-charcoal opacity-25 ink-subtle group-hover/toggle:opacity-40 group-hover/toggle:boil"
           />
           <span className="relative flex items-center gap-1 px-4 py-1.5 text-xs uppercase tracking-wider">
             {expanded ? "Show less" : "Read more"}

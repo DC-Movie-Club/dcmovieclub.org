@@ -2,7 +2,7 @@
 
 import { useId, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { SKETCH_NOISE, SKETCH_SCALE } from "@/components/SketchFilter";
+import { INK, SKETCH_NOISE, SKETCH_SCALE } from "@/components/SketchFilter";
 
 const STROKE = 3;
 // rounded-2xl
@@ -21,6 +21,10 @@ const BLEED = 4;
 const OVERLAP = 1;
 // Source pixels the displacement can pull in from past a strip's edge
 const MARGIN = 4;
+// How far the ink line's blur and spread read past a strip's edge. Its wobble
+// is drawn this much wider and the finished line cropped back to the strip,
+// or the pressure cut would see the strip's edge and notch the line at seams.
+const INK_PAD = 3;
 
 type Rect = { x: number; y: number; width: number; height: number };
 
@@ -97,12 +101,18 @@ export function CardSurface({ className }: { className?: string }) {
       {size ? (
         <SketchedBox id={id} {...size} />
       ) : (
-        <div className="absolute inset-0 rounded-2xl border-[3px] border-page-edge bg-cream sketch" />
+        <>
+          <div className="absolute inset-px rounded-2xl bg-cream sketch" />
+          <div className="absolute inset-0 rounded-2xl border-[3px] border-page-edge ink" />
+        </>
       )}
     </div>
   );
 }
 
+// The ink line only suits one color on a clear ground, so each strip is drawn
+// twice: the fill under the plain wobble, then the line in ink over it. Both
+// take the same displacement, so the fill's edge stays under the line.
 function SketchedBox({ id, width, height }: { id: string; width: number; height: number }) {
   const { strips, interior } = layout(width, height);
   const outline = {
@@ -118,29 +128,72 @@ function SketchedBox({ id, width, height }: { id: string; width: number; height:
     <svg className="absolute inset-0 overflow-visible" width={width} height={height}>
       <defs>
         {strips.map((strip, i) => (
-          <filter
-            key={i}
-            id={`${id}-${i}`}
-            filterUnits="userSpaceOnUse"
-            primitiveUnits="userSpaceOnUse"
-            {...grow(strip, MARGIN)}
-          >
-            <feTurbulence {...strip} type="turbulence" {...SKETCH_NOISE} result="noise" />
-            <feDisplacementMap
-              {...strip}
-              in="SourceGraphic"
-              in2="noise"
-              scale={SKETCH_SCALE}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
+          <StripFilters key={i} id={`${id}-${i}`} strip={strip} />
         ))}
       </defs>
       {strips.map((_, i) => (
-        <rect key={i} {...outline} filter={`url(#${id}-${i})`} />
+        <rect key={i} {...outline} stroke="none" filter={`url(#${id}-${i}-fill)`} />
       ))}
       {interior && <rect {...interior} stroke="none" />}
+      {strips.map((_, i) => (
+        <rect key={i} {...outline} fill="none" filter={`url(#${id}-${i}-line)`} />
+      ))}
     </svg>
+  );
+}
+
+function Wobble({ area, result }: { area: Rect; result?: string }) {
+  return (
+    <>
+      <feTurbulence {...area} type="turbulence" {...SKETCH_NOISE} result="noise" />
+      <feDisplacementMap
+        {...area}
+        in="SourceGraphic"
+        in2="noise"
+        scale={SKETCH_SCALE}
+        xChannelSelector="R"
+        yChannelSelector="G"
+        result={result}
+      />
+    </>
+  );
+}
+
+// A strip's fill filter (the sketch wobble) and line filter (the ink filter's
+// steps, as in SketchFilter)
+function StripFilters({ id, strip }: { id: string; strip: Rect }) {
+  const wide = grow(strip, INK_PAD);
+
+  return (
+    <>
+      <filter
+        id={`${id}-fill`}
+        filterUnits="userSpaceOnUse"
+        primitiveUnits="userSpaceOnUse"
+        {...grow(strip, MARGIN)}
+      >
+        <Wobble area={strip} />
+      </filter>
+      <filter
+        id={`${id}-line`}
+        filterUnits="userSpaceOnUse"
+        primitiveUnits="userSpaceOnUse"
+        {...grow(wide, MARGIN)}
+      >
+        <Wobble area={wide} result="wobbled" />
+        <feGaussianBlur {...wide} in="wobbled" stdDeviation={INK.blur} result="blurred" />
+        <feTurbulence {...strip} type="fractalNoise" {...INK.pressure} result="pressure" />
+        <feComposite
+          {...strip}
+          in="blurred"
+          in2="pressure"
+          operator="arithmetic"
+          {...INK.cut}
+          result="stroke"
+        />
+        <feMorphology {...wide} in="wobbled" operator="dilate" radius={INK.spread} result="ink" />
+        <feComposite {...strip} in="ink" in2="stroke" operator="in" />
+      </filter>
+    </>
   );
 }

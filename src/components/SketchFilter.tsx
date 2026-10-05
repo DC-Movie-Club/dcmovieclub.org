@@ -11,19 +11,29 @@ function sketchFilter(id: string, scale: number, animated: boolean) {
   </filter>`;
 }
 
+// The brush pen line's settings, shared with CardSurface, which draws the
+// `ink` line in strips. `blur` is that line's; the subtler lines blur less.
+export const INK = {
+  blur: 0.8,
+  pressure: { baseFrequency: 0.035, numOctaves: 1, seed: 4 },
+  cut: { k1: 0, k2: 4, k3: -2.28, k4: -0.336 },
+  spread: 1.5,
+};
+
 // A brush pen line: the sketch wobble, then the stroke's edge is re-cut
 // against slow noise so it swells and thins like changing pen pressure. The
 // cut is made on a blurred copy, which also smooths away the one-pixel steps
 // the displacement leaves. Only for single-color strokes: the color comes
 // from dilating the wobbled source, which would blend neighboring colors.
 function inkFilter(id: string, scale: number, blur: number) {
+  const { pressure, cut } = INK;
   return `<filter id="${id}" x="-5%" y="-15%" width="110%" height="130%" filterUnits="objectBoundingBox">
     <feTurbulence type="turbulence" baseFrequency="${SKETCH_NOISE.baseFrequency}" numOctaves="${SKETCH_NOISE.numOctaves}" seed="${SKETCH_NOISE.seed}" result="noise" />
     <feDisplacementMap in="SourceGraphic" in2="noise" scale="${scale}" xChannelSelector="R" yChannelSelector="G" result="wobbled" />
     <feGaussianBlur in="wobbled" stdDeviation="${blur}" result="blurred" />
-    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="1" seed="4" result="pressure" />
-    <feComposite in="blurred" in2="pressure" operator="arithmetic" k1="0" k2="4" k3="-2.28" k4="-0.336" result="stroke" />
-    <feMorphology in="wobbled" operator="dilate" radius="1.5" result="ink" />
+    <feTurbulence type="fractalNoise" baseFrequency="${pressure.baseFrequency}" numOctaves="${pressure.numOctaves}" seed="${pressure.seed}" result="pressure" />
+    <feComposite in="blurred" in2="pressure" operator="arithmetic" k1="${cut.k1}" k2="${cut.k2}" k3="${cut.k3}" k4="${cut.k4}" result="stroke" />
+    <feMorphology in="wobbled" operator="dilate" radius="${INK.spread}" result="ink" />
     <feComposite in="ink" in2="stroke" operator="in" />
   </filter>`;
 }
@@ -49,7 +59,7 @@ export function SketchFilter() {
       ${sketchFilter("sketch-animated", SKETCH_SCALE, true)}
       ${sketchFilter("sketch-subtle", 1.4, false)}
       ${sketchFilter("sketch-subtle-animated", 1.4, true)}
-      ${inkFilter("ink", SKETCH_SCALE, 0.8)}
+      ${inkFilter("ink", SKETCH_SCALE, INK.blur)}
       ${inkFilter("ink-subtle", 1.4, 0.6)}
       ${inkFilter("ink-fine", SKETCH_SCALE, 0.45)}
       ${Object.entries(BOIL_SCALES)

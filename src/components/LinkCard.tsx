@@ -16,7 +16,11 @@ export function LinkCard({ item }: { item: CardItem }) {
     <>
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream sketch"
+        className="absolute inset-px rounded-xl bg-cream sketch"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge ink"
       />
       <div className="relative grid grid-cols-[auto_1fr] items-start gap-x-4 p-3 sm:flex sm:h-full sm:flex-col sm:items-stretch sm:gap-3">
         {image ? (

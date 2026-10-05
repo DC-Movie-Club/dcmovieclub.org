@@ -135,7 +135,11 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
       >
         <span
           aria-hidden
-          className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent shadow-lg sketch card-hover:sketch-animated"
+          className="absolute inset-px rounded-full bg-page-accent shadow-lg sketch card-hover:boil"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink card-hover:boil"
         />
         <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
           <span className="sm:hidden">Read</span>
@@ -157,7 +161,11 @@ function PostTile({ post }: { post: SubstackPost }) {
     >
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream transition-colors sketch group-hover/tile:border-page-accent-edge"
+        className="absolute inset-px rounded-xl bg-cream sketch"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge transition-colors ink group-hover/tile:border-page-accent-edge"
       />
       <div
         className={cn(
@@ -186,7 +194,7 @@ function PostTile({ post }: { post: SubstackPost }) {
       </div>
       <OpensOverlay
         className="group-hover/tile:opacity-100"
-        washClassName="rounded-xl sketch"
+        washClassName="inset-px rounded-xl sketch"
       />
       <DatePill pubDate={post.pubDate} className="absolute -top-3.5 left-4" />
     </a>
@@ -252,7 +260,11 @@ export function BlogPage({
         >
           <span
             aria-hidden
-            className="absolute inset-0 rounded-full border-2 border-page-fg transition-colors sketch-subtle group-hover/subscribe:bg-page-fg group-hover/subscribe:sketch-subtle-animated"
+            className="absolute inset-px rounded-full transition-colors sketch-subtle group-hover/subscribe:bg-page-fg group-hover/subscribe:boil"
+          />
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full border-2 border-page-fg ink-subtle group-hover/subscribe:boil"
           />
           <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-page-fg transition-colors group-hover/subscribe:text-charcoal">
             <Mail size={14} />

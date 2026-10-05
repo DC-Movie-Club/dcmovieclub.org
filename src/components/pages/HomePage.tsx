@@ -98,7 +98,13 @@ function OutlineLink({
     >
       <span
         aria-hidden
-        className="absolute inset-0 rounded-full border-2 border-page-fg/70 transition-colors sketch-subtle group-hover/outline:border-page-fg group-hover/outline:bg-page-fg group-hover/outline:sketch-subtle-animated"
+        className="absolute inset-px rounded-full transition-colors sketch-subtle group-hover/outline:bg-page-fg group-hover/outline:boil"
+      />
+      {/* Faded with opacity, since the ink filter cuts away a translucent
+          line */}
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-full border-2 border-page-fg opacity-70 transition-opacity ink-subtle group-hover/outline:opacity-100 group-hover/outline:boil"
       />
       <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-page-fg transition-colors group-hover/outline:text-charcoal">
         {children}
@@ -185,7 +191,11 @@ function AboutSection({
             >
               <span
                 aria-hidden
-                className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent shadow-lg sketch group-hover/more:sketch-animated"
+                className="absolute inset-px rounded-full bg-page-accent shadow-md sketch group-hover/more:boil"
+              />
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-full border-[2.5px] border-page-accent-edge ink group-hover/more:boil"
               />
               <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
                 More about us

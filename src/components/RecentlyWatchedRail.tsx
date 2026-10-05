@@ -39,7 +39,7 @@ function SketchOutline({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute -inset-[2px] rounded-lg border-[3px] border-charcoal sketch",
+        "pointer-events-none absolute -inset-[2px] rounded-lg border-[3px] border-charcoal ink",
         className,
       )}
     />
@@ -62,13 +62,14 @@ function TileLink({
       rel="noopener noreferrer"
       className="group/card relative block w-full rounded-lg transition-transform hover:-rotate-1 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rust"
     >
-      {/* A filled twin of the outline, wobbling identically, so the sketch
-          filter never opens a gap to the page between poster and border. */}
-      <SketchOutline className="bg-charcoal group-hover/card:sketch-animated" />
+      {/* A filled twin of the outline, wobbling identically, so the ink
+          filter never opens a gap to the page between poster and border. It's
+          all one color, so it takes ink without smearing. */}
+      <SketchOutline className="bg-charcoal group-hover/card:boil-sm" />
       <div className="relative aspect-poster w-full overflow-hidden rounded-[7px]">
         {children}
       </div>
-      <SketchOutline className="group-hover/card:sketch-animated" />
+      <SketchOutline className="group-hover/card:boil-sm" />
       {badge}
     </a>
   );
@@ -287,7 +288,11 @@ function FollowButton() {
     >
       <span
         aria-hidden
-        className="absolute inset-0 rounded-full border-[3px] border-charcoal transition-colors sketch group-hover/follow:bg-charcoal group-hover/follow:sketch-animated"
+        className="absolute inset-px rounded-full transition-colors sketch group-hover/follow:bg-charcoal group-hover/follow:boil"
+      />
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-full border-[3px] border-charcoal ink group-hover/follow:boil"
       />
       <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-charcoal transition-colors group-hover/follow:text-cream">
         <Letterboxd size={20} />

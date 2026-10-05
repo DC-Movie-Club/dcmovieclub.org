@@ -50,9 +50,10 @@ function ListHeading({ children }: { children: string }) {
 // just toggles
 export function FaqEntry({ item }: { item: FaqItem }) {
   return (
-    // The card is drawn with ::before because any child element other than
-    // <summary> lands in ::details-content, which is hidden while closed.
-    <details className="group/faq relative [interpolate-size:allow-keywords] before:absolute before:inset-0 before:rounded-xl before:border-[2.5px] before:border-page-edge before:bg-cream before:shadow-lg before:content-[''] before:sketch [&::details-content]:h-0 [&::details-content]:overflow-hidden [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto">
+    // The card is drawn with ::before (its fill) and ::after (its line, over
+    // everything, so it lets clicks through) because any child element other
+    // than <summary> lands in ::details-content, which is hidden while closed.
+    <details className="group/faq relative [interpolate-size:allow-keywords] before:absolute before:inset-px before:rounded-xl before:bg-cream before:shadow-lg before:content-[''] before:sketch after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:border-[2.5px] after:border-page-edge after:content-[''] after:ink [&::details-content]:h-0 [&::details-content]:overflow-hidden [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto">
       <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:px-6 [&::-webkit-details-marker]:hidden">
         <span className="text-xl uppercase leading-snug tracking-wider text-page-ink sm:text-2xl">
           {item.question}
@@ -60,7 +61,11 @@ export function FaqEntry({ item }: { item: FaqItem }) {
         <span className="relative flex size-8 shrink-0 items-center justify-center text-page-accent-text">
           <span
             aria-hidden
-            className="absolute inset-0 rounded-full border-2 border-page-accent-edge bg-page-accent sketch-subtle group-hover/faq:sketch-subtle-animated"
+            className="absolute inset-px rounded-full bg-page-accent sketch-subtle group-hover/faq:boil"
+          />
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full border-2 border-page-accent-edge ink-subtle group-hover/faq:boil"
           />
           <Plus
             size={16}
