@@ -2,6 +2,7 @@ import type { CalendarEvent } from "@/types/event"
 import type { LetterboxdReview } from "@/types/letterboxd"
 import type { SubstackPost } from "@/types/post"
 import { extractTicket, isHoldEvent } from "@/lib/event-description"
+import { splitReview } from "@/lib/letterboxd-review"
 
 const CALENDAR_ID =
   "5a3c273aeca64dfd79ebc3784f4249046a77febbc71d5281e4a92a71c2f5c5c8@group.calendar.google.com"
@@ -152,6 +153,7 @@ export async function getRecentLetterboxdReviews(
       const poster =
         entry.film.poster?.sizes?.find((s) => s.width >= 150) ??
         entry.film.poster?.sizes?.[0]
+      const review = entry.review ? splitReview(entry.review.text) : null
       return {
         id: entry.id,
         filmTitle: entry.film.name,
@@ -159,7 +161,8 @@ export async function getRecentLetterboxdReviews(
         posterUrl: poster?.url ?? null,
         rating: entry.rating ?? null,
         liked: entry.like,
-        review: entry.review?.text ?? null,
+        review: review?.quote || null,
+        reviewer: review?.reviewer ?? null,
         diaryDate: entry.diaryDetails?.diaryDate ?? null,
         url: entry.links?.find((l) => l.type === "letterboxd")?.url
           ?? `https://letterboxd.com/DCMovieClub/film/${entry.film.id}/`,

@@ -3,11 +3,10 @@
 import { useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, Heart, Star, StarHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ExternalLink } from "@/components/ui/link";
 import { Letterboxd } from "@/components/icons/Letterboxd";
 import type { LetterboxdReview } from "@/types/letterboxd";
 
-const MAX_FILMS = 11;
+const POSTER_COUNT = 3;
 const SHORT_REVIEW_CHARS = 60;
 const LETTERBOXD_PROFILE_URL = "https://letterboxd.com/DCMovieClub/";
 
@@ -223,19 +222,13 @@ function FilmPoster({
   );
 }
 
-// A card beside the poster. The card is absolutely positioned so the
+// A card beside the featured poster. The card is absolutely positioned so the
 // text never stretches the row; overflow is clipped and faded out.
-function ReviewCard({
-  review,
-  text,
-}: {
-  review: LetterboxdReview;
-  text: string;
-}) {
-  const clipRef = useRef<HTMLDivElement>(null);
+function FeaturedReviewCard({ review }: { review: LetterboxdReview }) {
+  const clipRef = useRef<HTMLParagraphElement>(null);
   const [isClipped, setIsClipped] = useState(false);
-  const isShort =
-    text.replace(/<[^>]+>/g, "").trim().length <= SHORT_REVIEW_CHARS;
+  const text = review.review ?? "";
+  const isShort = text.length <= SHORT_REVIEW_CHARS;
 
   useLayoutEffect(() => {
     const clip = clipRef.current;
@@ -251,35 +244,32 @@ function ReviewCard({
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative xs:col-span-2">
       <div className="absolute inset-0">
         <div
           aria-hidden
           className="absolute -inset-[2px] rounded-lg bg-cream sketch"
         />
-        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[7px]">
+        <div className="absolute inset-0 flex flex-col gap-3 overflow-hidden rounded-[7px] p-4 text-charcoal">
           {review.rating !== null && (
-            <div className="shrink-0 px-4 pt-4 text-rust">
+            <div className="shrink-0 text-rust">
               <StarRating rating={review.rating} size={14} />
             </div>
           )}
-          <div
+          <p
             ref={clipRef}
             className={cn(
-              "min-h-0 flex-1 overflow-hidden px-4 pt-3 first:pt-4 text-charcoal [&_a]:text-rust [&_a]:underline [&_p+p]:mt-3",
+              "min-h-0 flex-1 overflow-hidden",
               isShort ? "text-2xl leading-tight" : "text-sm leading-normal",
-              isClipped && "mask-b-from-[calc(100%-2.5rem)]",
+              isClipped && "mask-b-from-[calc(100%-2rem)]",
             )}
-            dangerouslySetInnerHTML={{ __html: text }}
-          />
-          {isClipped && (
-            <ExternalLink
-              href={review.url}
-              className="flex h-9 shrink-0 items-center gap-1 whitespace-nowrap px-4 text-xs uppercase tracking-wide text-rust"
-            >
-              <span className="min-w-0 truncate">More on Letterboxd</span>
-              <ArrowUpRight size={12} className="shrink-0" />
-            </ExternalLink>
+          >
+            {text}
+          </p>
+          {review.reviewer && (
+            <p className="shrink-0 text-xs tracking-wide text-charcoal/55">
+              — {review.reviewer}
+            </p>
           )}
         </div>
       </div>
@@ -287,27 +277,24 @@ function ReviewCard({
   );
 }
 
-function FollowTile() {
+function FollowButton() {
   return (
-    <TileLink href={LETTERBOXD_PROFILE_URL}>
-      <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-teal p-4 text-center text-cream transition-colors group-hover/card:bg-teal-dark">
-        <span className="relative size-10">
-          <Letterboxd
-            size={40}
-            className="absolute inset-0 transition-opacity group-hover/card:opacity-0"
-          />
-          <ArrowUpRight
-            size={40}
-            strokeWidth={2.5}
-            className="absolute inset-0 opacity-0 transition-opacity sketch group-hover/card:opacity-100"
-          />
-        </span>
-        <span className="flex flex-col uppercase leading-tight tracking-wide">
-          <span className="text-xl">Follow us</span>
-          <span className="text-sm text-cream/70">on Letterboxd</span>
-        </span>
-      </div>
-    </TileLink>
+    <a
+      href={LETTERBOXD_PROFILE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group/follow relative mx-auto mt-12 block w-fit rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+    >
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-full border-[3px] border-charcoal transition-colors sketch group-hover/follow:bg-charcoal group-hover/follow:sketch-animated"
+      />
+      <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-charcoal transition-colors group-hover/follow:text-cream">
+        <Letterboxd size={20} />
+        Follow us on Letterboxd
+        <ArrowUpRight size={16} />
+      </span>
+    </a>
   );
 }
 
@@ -316,6 +303,11 @@ export function RecentlyWatchedRail({
 }: {
   reviews: LetterboxdReview[];
 }) {
+  const featured = reviews.find((review) => review.review);
+  const posters = reviews
+    .filter((review) => review !== featured)
+    .slice(0, POSTER_COUNT);
+
   return (
     <section className="pb-2">
       <div className="mx-auto max-w-4xl">
@@ -329,22 +321,21 @@ export function RecentlyWatchedRail({
           </h2>
         </div>
 
-        <div className="mt-8 grid auto-rows-fr grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-8 px-6 xs:grid-cols-3 sm:gap-x-5 md:grid-cols-4">
-          {reviews.slice(0, MAX_FILMS).map((review) =>
-            review.review ? (
-              <div
-                key={review.id}
-                className="col-span-2 grid grid-cols-subgrid"
-              >
-                <FilmPoster review={review} showRating={false} />
-                <ReviewCard review={review} text={review.review} />
-              </div>
-            ) : (
-              <FilmPoster key={review.id} review={review} showRating />
-            ),
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 px-6 xs:grid-cols-3 md:grid-cols-6">
+          {featured && (
+            <>
+              <FilmPoster review={featured} showRating={false} />
+              <FeaturedReviewCard review={featured} />
+            </>
           )}
-          <FollowTile />
+          {posters.map((review, i) => (
+            // Phones fit two posters under the featured row
+            <div key={review.id} className={cn(i >= 2 && "max-xs:hidden")}>
+              <FilmPoster review={review} showRating />
+            </div>
+          ))}
         </div>
+        <FollowButton />
       </div>
     </section>
   );
