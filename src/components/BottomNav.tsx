@@ -149,9 +149,7 @@ export function BottomNav() {
                   nativeButton={false}
                   render={
                     <a
-                      href="https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=hello@dcmovieclub.org"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="mailto:hello@dcmovieclub.org"
                       className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
                     />
                   }
