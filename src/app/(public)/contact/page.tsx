@@ -1,5 +1,5 @@
 {/* Simple contact page. Likely a form or mailto link to hello@dcmovieclub.org.
-    May also surface social links and Discord invite. */}
+    May also surface social links. */}
 
 import { ExternalLink } from "@/components/ui/link";
 
