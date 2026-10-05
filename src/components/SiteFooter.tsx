@@ -44,7 +44,7 @@ export function SiteFooter({ className }: { className?: string }) {
           className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge bg-page-accent shadow-lg sketch group-hover/subscribe:sketch-animated"
         />
         <span className="relative flex items-center gap-2 px-5 py-2.5 tracking-wider text-page-accent-text">
-          Subscribe to newsletter
+          Subscribe to our newsletter
           <ArrowUpRight size={18} className="shrink-0" />
         </span>
       </a>
