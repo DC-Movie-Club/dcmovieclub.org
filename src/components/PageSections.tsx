@@ -43,7 +43,7 @@ export function FaqEntry({ item }: { item: FaqItem }) {
     // <summary> lands in ::details-content, which is hidden while closed.
     <details className="group/faq relative [interpolate-size:allow-keywords] before:absolute before:inset-0 before:rounded-xl before:border-[2.5px] before:border-page-edge before:bg-cream before:shadow-lg before:content-[''] before:sketch [&::details-content]:h-0 [&::details-content]:overflow-hidden [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto">
       <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:px-6 [&::-webkit-details-marker]:hidden">
-        <span className="text-lg uppercase leading-snug tracking-wider text-charcoal sm:text-xl">
+        <span className="text-xl uppercase leading-snug tracking-wider text-page-ink sm:text-2xl">
           {item.question}
         </span>
         <span className="relative flex size-8 shrink-0 items-center justify-center text-page-accent-text">
