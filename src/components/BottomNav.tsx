@@ -21,12 +21,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-const menuRoutes = [routes.about];
+const menuRoutes = [routes.partnerships];
 const NAV_LOGO_SIZE = 112;
 
-const ICON_SIZE = "size-7 xs:size-8";
-const LABEL_SIZE = "text-[9px] xs:text-[11px]";
-const ITEM_PADDING = "px-2 py-1 xs:px-3 xs:py-1.5";
 const LOGO_SIZE = "size-24 -top-8 xs:size-28 xs:-top-8";
 const LOGO_SPACER = "w-[88px] xs:w-[120px]";
 
@@ -44,8 +41,9 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in select-none motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
-      {/* Grows a touch on hover, with the same spring as its entrance */}
-      <div className="relative flex items-center justify-center gap-4 px-4 py-2 transition-[scale] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] xs:px-6 xs:py-3 xs:hover:scale-[1.03]">
+      {/* Grows a touch on hover or keyboard focus, with the same spring as
+          its entrance */}
+      <div className="relative flex items-center justify-center gap-4 px-4 py-2 transition-[scale] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] xs:px-6 xs:py-3 xs:hover:scale-[1.03] xs:has-[:focus-visible]:scale-[1.03]">
         {/* Full-width on phones, the bar runs past the screen edges so the
             sketch filter's wobble can't open a gap along them. The wrapper
             clips that overhang without clipping the logo. */}
@@ -58,30 +56,19 @@ export function BottomNav() {
             <div className="absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2" />
           </div>
         </div>
-        <NavLink
-          route={routes.blog}
-          active={pathname === routes.blog.href}
-        />
-
-        <NavLink
-          route={routes.events}
-          active={pathname === routes.events.href}
-        />
+        <BarLink route={routes.events} pathname={pathname} />
+        <BarLink route={routes.blog} pathname={pathname} />
 
         <div className={LOGO_SPACER} />
 
-        <NavLink
-          route={routes.partnerships}
-          active={pathname === routes.partnerships.href}
-        />
+        <BarLink route={routes.about} pathname={pathname} />
 
         <Dialog>
           <DialogTrigger render={<NavButton icon={Ellipsis} label="More" />} />
           <DialogContent showCloseButton={false}>
             <DialogTitle className="sr-only">More</DialogTitle>
             <ul className="flex flex-col gap-1">
-              {menuRoutes.map((route, i) => {
-                const Icon = route.icon;
+              {menuRoutes.map((route) => {
                 const active = pathname === route.href;
                 return (
                   <li key={route.key}>
@@ -90,43 +77,16 @@ export function BottomNav() {
                       render={
                         <Link
                           href={route.href}
-                          className={cn(
-                            "group/item flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
-                            active
-                              ? "text-rust"
-                              : "text-foreground hover:text-rust",
-                          )}
+                          className={navItemClass("menu", active)}
                         />
                       }
                     >
-                      <div className="relative">
-                        {active && (
-                          <svg
-                            className={cn(
-                              "absolute -inset-1 h-[calc(100%+8px)] w-[calc(100%+8px)] overflow-visible",
-                              WATERCOLOR_CLASSES[i % WATERCOLOR_CLASSES.length],
-                            )}
-                            viewBox="0 0 100 100"
-                            preserveAspectRatio="none"
-                          >
-                            <path
-                              d="M20,10 L40,5 L60,6 L78,10 L91,24 L95,45 L93,65 L85,82 L66,93 L45,95 L24,89 L10,74 L5,52 L8,30Z"
-                              fill="#e8cfc5"
-                            />
-                          </svg>
-                        )}
-                        <Icon
-                          size={24}
-                          className={cn(
-                            "relative sketch-subtle",
-                            !active &&
-                              "group-hover/item:sketch-subtle-animated",
-                          )}
-                        />
-                      </div>
-                      <span className="text-base uppercase tracking-wide">
-                        {route.label}
-                      </span>
+                      <NavItemContent
+                        layout="menu"
+                        active={active}
+                        icon={route.icon}
+                        label={route.label}
+                      />
                     </DialogClose>
                   </li>
                 );
@@ -137,20 +97,19 @@ export function BottomNav() {
                   render={
                     <a
                       href="mailto:hello@dcmovieclub.org"
-                      className="group/item flex items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:text-rust"
+                      className={navItemClass("menu", false)}
                     />
                   }
                 >
-                  <Mail
-                    size={24}
-                    className="sketch-subtle group-hover/item:sketch-subtle-animated"
+                  <NavItemContent
+                    layout="menu"
+                    active={false}
+                    icon={Mail}
+                    label={routes.contact.label}
                   />
-                  <span className="flex-1 text-base uppercase tracking-wide">
-                    Contact
-                  </span>
                   <ArrowUpRight
                     size={12}
-                    className="text-muted-foreground group-hover/item:text-rust"
+                    className="ml-auto text-muted-foreground group-hover/item:text-rust group-focus-visible/item:text-rust"
                   />
                 </DialogClose>
               </li>
@@ -178,7 +137,7 @@ export function BottomNav() {
         <Link
           href={routes.home.href}
           className={cn(
-            "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-transform hover:scale-105",
+            "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-transform hover:scale-105 focus-visible:scale-105 focus-visible:outline-hidden",
             LOGO_SIZE,
           )}
         >
@@ -188,7 +147,10 @@ export function BottomNav() {
             width={NAV_LOGO_SIZE}
             height={NAV_LOGO_SIZE}
             priority
-            className={cn(LOGO_SIZE, "group-hover/logo:boil")}
+            className={cn(
+              LOGO_SIZE,
+              "group-hover/logo:boil group-focus-visible/logo:boil",
+            )}
           />
         </Link>
       </div>
@@ -305,99 +267,113 @@ function pillRect(
   };
 }
 
-const WATERCOLOR_CLASSES = [
-  "watercolor-0",
-  "watercolor-1",
-  "watercolor-2",
-  "watercolor-3",
-] as const;
+// The nav's items, as a column in the bar or a row in the More menu. Both
+// share the active style (a red icon over a red label tag) and the hover
+// style, which keyboard focus also takes.
+const LAYOUTS = {
+  bar: {
+    key: "bar",
+    item: "flex-col gap-0.5 px-2 py-1 xs:px-3 xs:py-1.5",
+    // Scaling a whole menu row would shift it, so only the bar grows
+    hover: "hover:scale-110 focus-visible:scale-110",
+    icon: "size-7 xs:size-8",
+    // Padding is always applied (and cancelled by negative margins) so only
+    // color and rotation change when the tag appears.
+    label: "-mx-1 -my-px px-1 py-px text-[9px] xs:text-[11px]",
+  },
+  menu: {
+    key: "menu",
+    item: "gap-3 rounded-lg px-4 py-3",
+    hover: "",
+    icon: "size-6",
+    label: "-mx-1.5 -my-0.5 px-1.5 py-0.5 text-base",
+  },
+} as const;
 
-function NavLink({
-  route,
+type NavLayout = keyof typeof LAYOUTS;
+
+function navItemClass(layout: NavLayout, active: boolean) {
+  return cn(
+    "group/item relative flex items-center transition-all focus-visible:outline-hidden",
+    LAYOUTS[layout].item,
+    active
+      ? "text-logo-red"
+      : cn(
+          "text-foreground hover:text-rust focus-visible:text-rust",
+          LAYOUTS[layout].hover,
+        ),
+  );
+}
+
+function NavItemContent({
+  layout,
   active,
+  icon: Icon,
+  label,
 }: {
-  route: (typeof routes)[keyof typeof routes];
+  layout: NavLayout;
   active: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
 }) {
-  const Icon = route.icon;
   return (
-    <Link
-      href={route.href}
-      className={cn(
-        "group/item relative flex flex-col items-center gap-0.5 transition-all focus-visible:outline-hidden",
-        ITEM_PADDING,
-        active
-          ? "text-logo-red"
-          : "text-foreground hover:scale-110 hover:text-rust focus-visible:text-rust",
-      )}
-    >
-      <FocusRing />
+    <>
       <Icon
         className={cn(
-          ICON_SIZE,
+          LAYOUTS[layout].icon,
           "ink-subtle",
-          !active && "group-hover/item:boil",
+          !active && "group-hover/item:boil group-focus-visible/item:boil",
         )}
       />
       <span
         className={cn(
-          LABEL_SIZE,
-          // Padding is always applied (and cancelled by negative margins) so
-          // only color and rotation change when the tag appears.
-          "-mx-1 -my-px rounded-[3px] px-1 py-px uppercase tracking-wide transition-[background-color,color,rotate] duration-300 ease-out",
+          LAYOUTS[layout].label,
+          "rounded-[3px] uppercase tracking-wide transition-[background-color,color,rotate] duration-300 ease-out",
           active
             ? "-rotate-1 bg-logo-red text-cream sketch-subtle"
-            : "group-hover/item:boil-sm",
+            : "group-hover/item:boil-sm group-focus-visible/item:boil-sm",
         )}
       >
-        {route.labelShort}
+        {label}
       </span>
-    </Link>
+    </>
   );
 }
 
-// A hand-drawn ring around a nav item, in place of the browser's focus box
-function FocusRing() {
+function BarLink({
+  route,
+  pathname,
+}: {
+  route: (typeof routes)[keyof typeof routes];
+  pathname: string;
+}) {
+  const active = pathname === route.href;
   return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute -inset-1 rounded-[50%] border-2 border-rust opacity-0 ink-subtle group-focus-visible/item:opacity-100"
-    />
+    <Link href={route.href} className={navItemClass("bar", active)}>
+      <NavItemContent
+        layout="bar"
+        active={active}
+        icon={route.icon}
+        label={route.labelShort}
+      />
+    </Link>
   );
 }
 
 const NavButton = forwardRef<
   HTMLButtonElement,
   {
-    icon: React.ComponentType<{ size?: number; className?: string }>;
+    icon: React.ComponentType<{ className?: string }>;
     label: string;
   } & React.ButtonHTMLAttributes<HTMLButtonElement>
->(function NavButton({ icon: Icon, label, className, ...props }, ref) {
+>(function NavButton({ icon, label, className, ...props }, ref) {
   return (
     <button
       ref={ref}
-      className={cn(
-        "group/item relative flex cursor-pointer flex-col items-center gap-0.5 text-foreground transition-all hover:scale-110 hover:text-rust focus-visible:text-rust focus-visible:outline-hidden",
-        ITEM_PADDING,
-        className,
-      )}
+      className={cn(navItemClass("bar", false), "cursor-pointer", className)}
       {...props}
     >
-      <FocusRing />
-      <Icon
-        className={cn(
-          ICON_SIZE,
-          "ink-subtle group-hover/item:boil",
-        )}
-      />
-      <span
-        className={cn(
-          LABEL_SIZE,
-          "uppercase tracking-wide group-hover/item:boil-sm",
-        )}
-      >
-        {label}
-      </span>
+      <NavItemContent layout="bar" active={false} icon={icon} label={label} />
     </button>
   );
 });
