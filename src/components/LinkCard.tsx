@@ -18,7 +18,7 @@ export function LinkCard({ item }: { item: CardItem }) {
         aria-hidden
         className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge bg-cream sketch"
       />
-      <div className="relative grid grid-cols-[auto_1fr] items-center gap-x-4 p-3 sm:flex sm:h-full sm:flex-col sm:items-stretch sm:gap-3">
+      <div className="relative grid grid-cols-[auto_1fr] items-start gap-x-4 p-3 sm:flex sm:h-full sm:flex-col sm:items-stretch sm:gap-3">
         {image ? (
           <img
             src={image}
@@ -38,25 +38,32 @@ export function LinkCard({ item }: { item: CardItem }) {
             <Newspaper size={28} className="sketch-subtle" />
           </div>
         )}
-        <div className="flex min-w-0 flex-col gap-1 sm:px-1 sm:pb-1">
-          <div className="flex items-center justify-between gap-2 empty:hidden">
-            {item.source && (
-              <span className="truncate text-xs uppercase tracking-wider text-page-ink/80">
-                {item.source}
-              </span>
-            )}
-            {item.url && (
-              <ArrowUpRight
-                size={16}
-                className="ml-auto shrink-0 text-rust sketch-subtle group-hover/tile:sketch-subtle-animated"
-              />
-            )}
-          </div>
+        <div
+          className={cn(
+            "flex min-w-0 flex-col gap-1 sm:px-1 sm:pb-1",
+            item.url && "pr-5",
+          )}
+        >
+          {item.source && (
+            <span className="truncate text-xs uppercase tracking-wider text-page-ink/80">
+              {item.source}
+            </span>
+          )}
           <h3 className="line-clamp-3 text-base uppercase leading-tight tracking-wide text-page-ink transition-colors group-hover/tile:text-rust sm:text-lg">
             {item.title}
           </h3>
         </div>
       </div>
+      {item.url && (
+        // On wider screens the picture fills the card's top, so the arrow
+        // sits on a chip over the picture's corner
+        <span className="absolute top-3 right-3 flex rounded-full text-rust sm:top-4.5 sm:right-4.5 sm:bg-cream sm:p-1 sm:shadow-md">
+          <ArrowUpRight
+            size={16}
+            className="sketch-subtle group-hover/tile:sketch-subtle-animated"
+          />
+        </span>
+      )}
     </>
   );
 
