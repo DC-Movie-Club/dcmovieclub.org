@@ -15,6 +15,8 @@ export type PageData = {
   posts: SubstackPost[];
   reviews: LetterboxdReview[];
   eventsPage: PageView | null;
+  aboutPage: PageView | null;
+  partnershipsPage: PageView | null;
 };
 
 // Renders any page from its content, for the public route and the admin preview
@@ -25,6 +27,8 @@ export function PageBody({ page, data }: { page: PageView; data: PageData }) {
         <HomePage
           page={page}
           eventsPage={data.eventsPage}
+          aboutPage={data.aboutPage}
+          partnershipsPage={data.partnershipsPage}
           events={data.events}
           reviews={data.reviews}
         />
