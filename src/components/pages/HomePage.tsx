@@ -36,13 +36,13 @@ function TaglineBanner({
   );
 }
 
-function Hero({ title }: { title: string }) {
+function Hero() {
   return (
     <>
       <section className="flex flex-col items-center pt-8">
         <AudienceMarquee />
         <h1 className="relative -mt-4 px-4 text-center text-[3.5rem] whitespace-nowrap uppercase leading-none text-page-fg max-[349px]:text-5xl sm:-mt-9 sm:text-8xl">
-          {title}
+          DC Movie Club
         </h1>
         <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl">
           <TaglineBanner className="-rotate-2">
@@ -143,7 +143,7 @@ export function HomePage({
       className="-mb-24 flex min-h-screen flex-col gap-10 bg-page-bg pb-34"
       style={colorVars(page.colors)}
     >
-      <Hero title={page.title} />
+      <Hero />
       <EventsSection
         events={events}
         colors={eventsPage?.colors ?? {}}

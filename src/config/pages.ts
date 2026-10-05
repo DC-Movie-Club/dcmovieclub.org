@@ -58,18 +58,21 @@ type PageTemplate = {
   key: string;
   label: string;
   href: string;
+  // Whether admins edit the page's title and subtitle
+  title: boolean;
   subtitle: boolean;
   sections: Record<string, SectionTemplate>;
 };
 
 // The structure of each page, in render order. Labels here only name things in
-// the admin; everything shown on the page (titles, headings, content, colors)
-// lives in Firestore at pages/{key}.
+// the admin; everything admins edit (titles, headings, content, colors) lives
+// in Firestore at pages/{key}.
 export const pageTemplates = {
   home: {
     key: "home",
     label: "Home",
     href: "/",
+    title: false,
     subtitle: false,
     sections: {},
   },
@@ -77,6 +80,7 @@ export const pageTemplates = {
     key: "events",
     label: "Events",
     href: "/events",
+    title: true,
     subtitle: true,
     sections: {
       intro: { key: "intro", label: "Intro", kind: "text" },
@@ -87,6 +91,7 @@ export const pageTemplates = {
     key: "blog",
     label: "Blog",
     href: "/blog",
+    title: true,
     subtitle: true,
     sections: {},
   },
@@ -94,6 +99,7 @@ export const pageTemplates = {
     key: "about",
     label: "About",
     href: "/about",
+    title: true,
     subtitle: false,
     sections: {
       intro: { key: "intro", label: "Intro", kind: "text" },
@@ -108,6 +114,7 @@ export const pageTemplates = {
     key: "partnerships",
     label: "Partnerships",
     href: "/partnerships",
+    title: true,
     subtitle: false,
     sections: {
       collab: { key: "collab", label: "Collaborate", kind: "text" },

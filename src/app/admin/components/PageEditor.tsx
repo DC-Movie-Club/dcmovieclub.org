@@ -190,7 +190,7 @@ export function PageEditor({
   const base = useMemo(() => draftOf(saved), [saved]);
   const items = outlineItems(pageKey, (item) => itemChanged(draft, base, item));
   // Opens on the first section, since copy is what changes most; a page with
-  // no sections opens on its title
+  // no sections opens on its first part
   const [selected, setSelected] = useState(
     () =>
       items.find((item) => item.key === initialItem)?.key ??
@@ -402,7 +402,6 @@ export function PageEditor({
           >
             <div className="flex h-10 items-center gap-3 px-4 text-xs text-muted-foreground">
               <span className="font-medium">Preview</span>
-              <span className="truncate">Click part of the page to edit it</span>
               <Button
                 variant="ghost"
                 size="xs"
@@ -417,7 +416,6 @@ export function PageEditor({
               page={{ key: pageKey, ...draft, colors: colorsOf(draft) }}
               data={data}
               selected={current.key}
-              onSelect={select}
               className="mx-4 mb-4 flex-1 rounded-lg border shadow-sm"
             />
           </section>

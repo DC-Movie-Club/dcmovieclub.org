@@ -14,13 +14,11 @@ const SCROLL_MARGIN = 16;
 export function PreviewFrame({
   width,
   scrollTo,
-  onClickContent,
   className,
   children,
 }: {
   width: number;
   scrollTo: string | null;
-  onClickContent?: (target: Element) => void;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -82,12 +80,10 @@ export function PreviewFrame({
           } as React.CSSProperties
         }
         onClickCapture={(e) => {
-          const target = e.target as Element;
-          if (target.closest("a")) {
+          if ((e.target as Element).closest("a")) {
             e.preventDefault();
             e.stopPropagation();
           }
-          onClickContent?.(target);
         }}
       >
         <SketchFilter />

@@ -28,8 +28,8 @@ export type OutlineItem = {
   dirty: boolean;
 };
 
-// The editable parts of a page, in the order they appear on it: the title,
-// each section, then the page's colors
+// The editable parts of a page, in the order they appear on it: the title (if
+// admins edit it), each section, then the page's colors
 export function outlineItems(
   page: PageKey,
   isDirty: (item: string) => boolean,
@@ -42,8 +42,11 @@ export function outlineItems(
   });
   const sections: Record<string, { key: string; label: string; kind: SectionKind }> =
     pageTemplates[page].sections;
+  const { title, subtitle } = pageTemplates[page];
   return [
-    item("title", pageTemplates[page].subtitle ? "Title & subtitle" : "Title", Heading),
+    ...(title
+      ? [item("title", subtitle ? "Title & subtitle" : "Title", Heading)]
+      : []),
     ...Object.values(sections).map((section) =>
       item(section.key, section.label, kindIcons[section.kind].icon),
     ),
