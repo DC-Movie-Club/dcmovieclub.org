@@ -2,8 +2,9 @@ import { BottomNav } from "@/components/BottomNav";
 import { PageReveal } from "@/components/PageReveal";
 import { SketchFilter } from "@/components/SketchFilter";
 import { WatercolorFilter } from "@/components/WatercolorFilter";
+import { getPageAccents } from "@/lib/pages";
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ export default function PublicLayout({
       <SketchFilter />
       <WatercolorFilter />
       <main className="pb-24 animate-page-fade-in">{children}</main>
-      <BottomNav />
+      <BottomNav accents={await getPageAccents()} />
       <PageReveal />
     </div>
   );

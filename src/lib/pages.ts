@@ -7,6 +7,7 @@ import {
   isColorRoleKey,
   isHexColor,
   pageTemplates,
+  type PageAccent,
   type PageColors,
   type PageKey,
   type SectionKind,
@@ -155,3 +156,15 @@ export const getPage = cache((key: PageKey) =>
     revalidate: 1800,
   })(),
 );
+
+// Each page's accent colors by route, which the bottom nav colors its items
+// with. Read through getPage, so saving a page's colors updates the nav too.
+export async function getPageAccents(): Promise<Record<string, PageAccent>> {
+  const accents = await Promise.all(
+    Object.values(pageTemplates).map(async ({ key, href }) => {
+      const { colors } = await getPage(key);
+      return [href, { accent: colors.accent, accentText: colors.accentText }];
+    }),
+  );
+  return Object.fromEntries(accents);
+}

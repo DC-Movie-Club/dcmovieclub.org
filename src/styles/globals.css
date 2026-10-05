@@ -117,6 +117,12 @@
   --color-page-accent-edge: var(--page-accent-edge, var(--color-charcoal));
   --color-page-accent-text: var(--page-accent-text, var(--color-cream));
 
+  /* --- Nav: an item colors with its page's accent (see BottomNav), and an
+     item without a page with these --- */
+  --color-nav-hover: var(--nav-accent, var(--color-rust));
+  --color-nav-active: var(--nav-accent, var(--color-logo-red));
+  --color-nav-active-text: var(--nav-accent-text, var(--color-cream));
+
   /* --- Semantic --- */
   --color-background: #f5f3e8;
   --color-foreground: #393a3e;
