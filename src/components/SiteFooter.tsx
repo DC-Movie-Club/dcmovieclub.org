@@ -5,7 +5,8 @@ import { routes, socials } from "@/config/navigation";
 
 const EMAIL = "hello@dcmovieclub.org";
 
-// The bottom nav's order, with About in the place of the More menu it lives in
+// The bottom nav's order, with About and Contact in the place of the More menu
+// they live in
 const footerLinks = [
   routes.blog,
   routes.events,
@@ -31,7 +32,7 @@ export function SiteFooter({ className }: { className?: string }) {
         aria-hidden
         className="absolute inset-0 rounded-2xl bg-black/10 sketch"
       />
-      <div className="relative flex flex-col gap-4 px-6 py-5 sm:px-8">
+      <div className="relative flex flex-col gap-4 px-5 py-5">
         <div className="flex flex-col gap-4 text-page-fg/80 sm:flex-row sm:items-center sm:justify-between">
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
@@ -42,6 +43,15 @@ export function SiteFooter({ className }: { className?: string }) {
                   </NextLink>
                 </li>
               ))}
+              <li>
+                <a
+                  href={`mailto:${EMAIL}`}
+                  className={cn("flex items-center gap-1", LINK)}
+                >
+                  {routes.contact.labelShort}
+                  <ArrowUpRight size={12} />
+                </a>
+              </li>
             </ul>
           </nav>
 
@@ -75,13 +85,7 @@ export function SiteFooter({ className }: { className?: string }) {
             Site by Gus
             <ArrowUpRight size={12} />
           </a>
-          <p className="flex flex-wrap gap-x-2">
-            <span>© {new Date().getFullYear()} DC Movie Club</span>
-            <span aria-hidden>·</span>
-            <a href={`mailto:${EMAIL}`} className={LINK}>
-              {EMAIL}
-            </a>
-          </p>
+          <p>© {new Date().getFullYear()} DC Movie Club</p>
         </div>
       </div>
     </footer>
