@@ -42,6 +42,7 @@ const HATCH_CLEARANCE = 1.5;
 // in globals.css
 export function BottomNav({ accents }: { accents: Record<string, string> }) {
   const pathname = usePathname();
+  const homeTitleInView = useHomeTitleInView(pathname);
   const activeMenuRoute = menuRoutes.find((route) => route.href === pathname);
 
   return (
@@ -154,7 +155,8 @@ export function BottomNav({ accents }: { accents: Record<string, string> }) {
         <Link
           href={routes.home.href}
           className={cn(
-            "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-transform hover:scale-105 focus-visible:scale-105 focus-visible:outline-hidden",
+            "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-[scale] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] hover:scale-105 focus-visible:scale-105 focus-visible:outline-hidden",
+            homeTitleInView && "scale-75",
             LOGO_SIZE,
           )}
         >
@@ -166,6 +168,10 @@ export function BottomNav({ accents }: { accents: Record<string, string> }) {
             priority
             className={cn(
               LOGO_SIZE,
+              "transition-[filter] duration-300",
+              // The boil replaces the whole filter, so hovering also brings
+              // back the color while the logo is gray
+              homeTitleInView && "grayscale",
               "group-hover/logo:boil group-focus-visible/logo:boil",
             )}
           />
@@ -173,6 +179,31 @@ export function BottomNav({ accents }: { accents: Record<string, string> }) {
       </div>
     </nav>
   );
+}
+
+// On the home page, whether its title (the page's h1, the big DC Movie Club
+// lettering) is on screen. While it is, the nav's logo waits small and gray so
+// the two don't compete, and it takes over once the title scrolls away.
+function useHomeTitleInView(pathname: string) {
+  const [inView, setInView] = useState(true);
+
+  // Before paint, so arriving at home mid-page doesn't flash the gray logo
+  useLayoutEffect(() => {
+    if (pathname !== "/") return;
+    const title = document.querySelector("main h1");
+    if (!title) {
+      setInView(false);
+      return;
+    }
+    setInView(title.getBoundingClientRect().bottom > 0);
+    const observer = new IntersectionObserver(([entry]) =>
+      setInView(entry.isIntersecting),
+    );
+    observer.observe(title);
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  return pathname === "/" && inView;
 }
 
 // The pill's hard shadow with lighter strokes hatched inside it, masked short
