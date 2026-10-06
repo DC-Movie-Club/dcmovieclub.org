@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,63 +30,36 @@ export function ExpandableDescription({
   actionClassName,
 }: ExpandableDescriptionProps) {
   const [expanded, setExpanded] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
   // Seeded from text length so the server render is close; corrected by
   // measuring once the real line wrapping is known.
   const [overflowing, setOverflowing] = useState(
     () => html.replace(/<[^>]*>/g, "").length > threshold,
   );
+  // While newly opened text fades in: where the collapsed text began fading
+  // out, in px
+  const [revealFrom, setRevealFrom] = useState<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const collapsedHeight = useRef(0);
   const safeHtml = useMemo(() => withExternalLinks(html), [html]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
     const content = contentRef.current;
-    if (!wrapper || !content || !collapsed) return;
+    if (!wrapper || !content || expanded) return;
     const observer = new ResizeObserver(() => {
       setOverflowing(content.offsetHeight > wrapper.clientHeight + 1);
     });
     observer.observe(content);
     return () => observer.disconnect();
-  }, [collapsed]);
+  }, [expanded]);
 
-  // Height is driven imperatively: pin the current pixel height, change the
-  // content, then set the target height so the CSS transition has two concrete
-  // values to interpolate between. Height returns to auto once it settles.
-  function settle(collapsing: boolean) {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    if (collapsing) setCollapsed(true);
-    wrapper.style.height = "";
-  }
-
-  // With reduced motion there is no transition, so transitionend never fires.
-  function settleIfNotAnimating(collapsing: boolean) {
-    if (wrapperRef.current?.getAnimations().length === 0) settle(collapsing);
-  }
-
+  // The text opens to full height in one frame and the new lines fade in
+  // after. Growing it over time made the card around it redraw its
+  // hand-drawn edges every frame, which phones couldn't keep up with.
   function toggle() {
     const wrapper = wrapperRef.current;
-    const content = contentRef.current;
-    if (!wrapper || !content) return;
-
-    if (!expanded) {
-      collapsedHeight.current = wrapper.offsetHeight;
-      wrapper.style.height = `${collapsedHeight.current}px`;
-      flushSync(() => {
-        setCollapsed(false);
-        setExpanded(true);
-      });
-      wrapper.style.height = `${content.offsetHeight}px`;
-    } else {
-      wrapper.style.height = `${wrapper.offsetHeight}px`;
-      void wrapper.offsetHeight;
-      wrapper.style.height = `${collapsedHeight.current}px`;
-      setExpanded(false);
-    }
-    settleIfNotAnimating(expanded);
+    setRevealFrom(!expanded && wrapper ? wrapper.clientHeight / 2 : null);
+    setExpanded(!expanded);
   }
 
   const showToggle = overflowing || expanded;
@@ -98,14 +70,18 @@ export function ExpandableDescription({
       <div
         ref={wrapperRef}
         className={cn(
-          "overflow-hidden transition-[height] duration-300 ease-out motion-reduce:transition-none",
-          collapsed && "max-h-[4lh]",
+          "overflow-hidden",
+          !expanded && "max-h-[4lh]",
           showToggle && !expanded && "mask-b-from-50%",
+          revealFrom !== null && "animate-reveal motion-reduce:animate-none",
         )}
-        onTransitionEnd={(e) => {
-          if (e.target === e.currentTarget && e.propertyName === "height") {
-            settle(!expanded);
-          }
+        style={
+          revealFrom !== null
+            ? ({ "--reveal-from": `${revealFrom}px` } as React.CSSProperties)
+            : undefined
+        }
+        onAnimationEnd={(e) => {
+          if (e.target === e.currentTarget) setRevealFrom(null);
         }}
       >
         <div

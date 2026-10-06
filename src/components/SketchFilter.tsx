@@ -1,11 +1,19 @@
 export const SKETCH_NOISE = { baseFrequency: 0.03, numOctaves: 2, seed: 1 };
 export const SKETCH_SCALE = 3;
 
-function sketchFilter(id: string, scale: number, animated: boolean) {
+const SKETCH_REGION = 'x="-5%" y="-5%" width="110%" height="110%"';
+const BOIL_REGION = 'x="-5%" y="-15%" width="110%" height="130%"';
+
+function sketchFilter(
+  id: string,
+  scale: number,
+  animated: boolean,
+  region = SKETCH_REGION,
+) {
   const animate = animated
     ? `<animate attributeName="seed" values="1;20;42;65;88" dur="0.5s" calcMode="discrete" repeatCount="indefinite" />`
     : "";
-  return `<filter id="${id}" x="-5%" y="-5%" width="110%" height="110%" filterUnits="objectBoundingBox">
+  return `<filter id="${id}" ${region} filterUnits="objectBoundingBox">
     <feTurbulence type="turbulence" baseFrequency="${SKETCH_NOISE.baseFrequency}" numOctaves="${SKETCH_NOISE.numOctaves}" seed="${SKETCH_NOISE.seed}" result="noise">${animate}</feTurbulence>
     <feDisplacementMap in="SourceGraphic" in2="noise" scale="${scale}" xChannelSelector="R" yChannelSelector="G" />
   </filter>`;
@@ -44,7 +52,7 @@ function inkFilter(id: string, scale: number, blur: number) {
 const BOIL_SCALES = { "boil-sm": 0.7, boil: 1.4, "boil-lg": 3 };
 
 function boilFilter(id: string, scale: number) {
-  return `<filter id="${id}" x="-5%" y="-15%" width="110%" height="130%" filterUnits="objectBoundingBox">
+  return `<filter id="${id}" ${BOIL_REGION} filterUnits="objectBoundingBox">
     <feTurbulence type="turbulence" baseFrequency="${SKETCH_NOISE.baseFrequency}" numOctaves="${SKETCH_NOISE.numOctaves}" seed="7" result="noise">
       <animate attributeName="seed" values="7;31;53;76;97" dur="0.5s" calcMode="discrete" repeatCount="indefinite" />
     </feTurbulence>
@@ -59,6 +67,8 @@ export function SketchFilter() {
       ${sketchFilter("sketch-animated", SKETCH_SCALE, true)}
       ${sketchFilter("sketch-subtle", 1.4, false)}
       ${sketchFilter("sketch-subtle-animated", 1.4, true)}
+      ${sketchFilter("sketch-boiling", SKETCH_SCALE, false, BOIL_REGION)}
+      ${sketchFilter("sketch-subtle-boiling", 1.4, false, BOIL_REGION)}
       ${inkFilter("ink", SKETCH_SCALE, INK.blur)}
       ${inkFilter("ink-subtle", 1.4, 0.6)}
       ${inkFilter("ink-fine", SKETCH_SCALE, 0.45)}

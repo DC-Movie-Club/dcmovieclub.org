@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
 import { INK, SKETCH_NOISE, SKETCH_SCALE } from "@/components/SketchFilter";
 
@@ -81,8 +82,10 @@ export function CardSurface({ className }: { className?: string }) {
     const width = parseFloat(style.width);
     const height = parseFloat(style.height);
     if (Number.isFinite(width) && Number.isFinite(height)) update(width, height);
+    // Redrawn synchronously, in the same frame as the resize, or the card's
+    // content shows past its old edges until the redraw lands
     const observer = new ResizeObserver(([entry]) =>
-      update(entry.contentRect.width, entry.contentRect.height),
+      flushSync(() => update(entry.contentRect.width, entry.contentRect.height)),
     );
     observer.observe(el);
     return () => observer.disconnect();
