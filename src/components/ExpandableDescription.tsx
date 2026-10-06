@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +9,11 @@ interface ExpandableDescriptionProps {
   html: string;
   threshold?: number;
   className?: string;
+  htmlClassName?: string;
+  collapsedClassName?: string;
   actionClassName?: string;
+  // Shown after the HTML, so it's only reached once expanded
+  children?: React.ReactNode;
 }
 
 function withExternalLinks(html: string) {
@@ -27,7 +32,10 @@ export function ExpandableDescription({
   html,
   threshold = 220,
   className,
+  htmlClassName,
+  collapsedClassName = "max-h-[4lh]",
   actionClassName,
+  children,
 }: ExpandableDescriptionProps) {
   const [expanded, setExpanded] = useState(false);
   // Seeded from text length so the server render is close; corrected by
@@ -40,6 +48,7 @@ export function ExpandableDescription({
   const [revealFrom, setRevealFrom] = useState<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const safeHtml = useMemo(() => withExternalLinks(html), [html]);
 
   useEffect(() => {
@@ -58,8 +67,17 @@ export function ExpandableDescription({
   // hand-drawn edges every frame, which phones couldn't keep up with.
   function toggle() {
     const wrapper = wrapperRef.current;
-    setRevealFrom(!expanded && wrapper ? wrapper.clientHeight / 2 : null);
-    setExpanded(!expanded);
+    const toggleTop = toggleRef.current?.getBoundingClientRect().top;
+    flushSync(() => {
+      setRevealFrom(!expanded && wrapper ? wrapper.clientHeight / 2 : null);
+      setExpanded(!expanded);
+    });
+    // Collapsing shrinks the page above a reader deep in a long text, so it
+    // scrolls to keep this button where it was on screen
+    const toggleNow = toggleRef.current?.getBoundingClientRect().top;
+    if (expanded && toggleTop !== undefined && toggleNow !== undefined) {
+      window.scrollBy({ top: toggleNow - toggleTop, behavior: "instant" });
+    }
   }
 
   const showToggle = overflowing || expanded;
@@ -71,7 +89,7 @@ export function ExpandableDescription({
         ref={wrapperRef}
         className={cn(
           "overflow-hidden",
-          !expanded && "max-h-[4lh]",
+          !expanded && collapsedClassName,
           showToggle && !expanded && "mask-b-from-50%",
           revealFrom !== null && "animate-reveal motion-reduce:animate-none",
         )}
@@ -84,13 +102,17 @@ export function ExpandableDescription({
           if (e.target === e.currentTarget) setRevealFrom(null);
         }}
       >
-        <div
-          ref={contentRef}
-          dangerouslySetInnerHTML={{ __html: safeHtml }}
-        />
+        <div ref={contentRef}>
+          <div
+            className={htmlClassName}
+            dangerouslySetInnerHTML={{ __html: safeHtml }}
+          />
+          {children}
+        </div>
       </div>
       {showToggle && (
         <button
+          ref={toggleRef}
           type="button"
           onClick={toggle}
           aria-expanded={expanded}

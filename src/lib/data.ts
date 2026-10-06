@@ -3,6 +3,7 @@ import type { LetterboxdReview } from "@/types/letterboxd"
 import type { SubstackPost } from "@/types/post"
 import { extractTickets, isHoldEvent } from "@/lib/event-description"
 import { splitReview } from "@/lib/letterboxd-review"
+import { cleanSubstackBody } from "@/lib/substack-body"
 
 const CALENDAR_ID =
   "5a3c273aeca64dfd79ebc3784f4249046a77febbc71d5281e4a92a71c2f5c5c8@group.calendar.google.com"
@@ -173,9 +174,15 @@ export async function getRecentLetterboxdReviews(
   }
 }
 
+// Covers come either through Substack's image CDN or straight from its S3
+// bucket, which the CDN can fetch from too
 function toTinyUrl(url: string): string {
   const match = url.match(/^(https:\/\/substackcdn\.com\/image\/fetch\/)[^/]+(\/.+)$/)
-  return match ? `${match[1]}w_24,q_20,f_webp${match[2]}` : url
+  if (match) return `${match[1]}w_24,q_20,f_webp${match[2]}`
+  if (url.startsWith("https://substack-post-media.s3.amazonaws.com/")) {
+    return `https://substackcdn.com/image/fetch/w_24,q_20,f_webp/${encodeURIComponent(url)}`
+  }
+  return url
 }
 
 // Unbounded, per-process cache. Fine for the blog since the RSS feed rotates old
@@ -204,11 +211,49 @@ async function generateBlurDataUrl(
   }
 }
 
-const SUBSTACK_FEED_URL = "https://dcmovieclub.substack.com/feed"
+const SUBSTACK_URL = "https://dcmovieclub.substack.com"
+
+type SubstackArchivePost = {
+  slug: string
+  postTags?: { name: string }[]
+}
+
+// Tags aren't in the RSS feed, only in the JSON behind Substack's own archive
+// page. It isn't a documented API, so if it fails no post counts as an event.
+async function getEventPostSlugs(limit: number): Promise<Set<string>> {
+  try {
+    const res = await fetch(
+      `${SUBSTACK_URL}/api/v1/archive?sort=new&limit=${limit}`,
+      { next: { revalidate: 3600 } },
+    )
+    if (!res.ok) return new Set()
+    const posts: SubstackArchivePost[] = await res.json()
+    return new Set(
+      posts
+        .filter((post) =>
+          post.postTags?.some((tag) => tag.name.toLowerCase() === "events"),
+        )
+        .map((post) => post.slug),
+    )
+  } catch {
+    return new Set()
+  }
+}
+
+function postSlug(link: string): string | undefined {
+  try {
+    return new URL(link).pathname.split("/").pop()
+  } catch {
+    return undefined
+  }
+}
 
 export async function getRecentPosts(limit = 10): Promise<SubstackPost[]> {
   try {
-    const res = await fetch(SUBSTACK_FEED_URL, { next: { revalidate: 3600 } })
+    const [res, eventSlugs] = await Promise.all([
+      fetch(`${SUBSTACK_URL}/feed`, { next: { revalidate: 3600 } }),
+      getEventPostSlugs(limit),
+    ])
     if (!res.ok) return []
 
     const xml = await res.text()
@@ -223,7 +268,11 @@ export async function getRecentPosts(limit = 10): Promise<SubstackPost[]> {
         title: item.title ?? "Untitled",
         link: item.link ?? "",
         description: item.contentSnippet ?? null,
+        bodyHtml: item["content:encoded"]
+          ? cleanSubstackBody(item["content:encoded"])
+          : null,
         pubDate: item.pubDate ?? "",
+        isEvent: eventSlugs.has(postSlug(item.link ?? "") ?? ""),
         imageUrl: item.enclosure?.url ?? null,
         blurDataUrl: item.enclosure?.url
           ? await generateBlurDataUrl(item.enclosure.url)

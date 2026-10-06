@@ -9,6 +9,8 @@ type Props = {
   blurDataUrl: string | null;
   sizes: string;
   priority?: boolean;
+  // "contain" shows the whole image, over its blur stretched to fill the frame
+  fit?: "cover" | "contain";
   className?: string;
 };
 
@@ -17,28 +19,17 @@ export function ThumbnailImage({
   blurDataUrl,
   sizes,
   priority,
+  fit = "cover",
   className,
 }: Props) {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <div className={cn("relative overflow-hidden", className)}>
-      <Image
-        src={src}
-        alt=""
-        fill
-        sizes={sizes}
-        priority={priority}
-        className="object-cover"
-        onLoad={() => setLoaded(true)}
-      />
       {blurDataUrl && (
         <div
           aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-500",
-            loaded ? "opacity-0" : "opacity-100",
-          )}
+          className="pointer-events-none absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${blurDataUrl})`,
             filter: "blur(16px)",
@@ -46,6 +37,19 @@ export function ThumbnailImage({
           }}
         />
       )}
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes={sizes}
+        priority={priority}
+        className={cn(
+          "transition-opacity duration-500",
+          fit === "cover" ? "object-cover" : "object-contain",
+          blurDataUrl && !loaded && "opacity-0",
+        )}
+        onLoad={() => setLoaded(true)}
+      />
     </div>
   );
 }

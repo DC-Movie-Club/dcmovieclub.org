@@ -44,10 +44,12 @@ function DialogOverlay({
 
 function DialogContent({
   className,
+  surfaceClassName,
   children,
   showCloseButton = true,
   ...props
 }: DialogPrimitive.Popup.Props & {
+  surfaceClassName?: string;
   showCloseButton?: boolean;
 }) {
   return (
@@ -61,7 +63,12 @@ function DialogContent({
         )}
         {...props}
       >
-        <div className="absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-surface sketch" />
+        <div
+          className={cn(
+            "absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-surface sketch",
+            surfaceClassName,
+          )}
+        />
         <div className="relative">{children}</div>
         {showCloseButton && (
           <DialogPrimitive.Close

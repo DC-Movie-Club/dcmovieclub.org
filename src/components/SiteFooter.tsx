@@ -1,6 +1,7 @@
 import NextLink from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { routes, socials } from "@/config/navigation";
 
 const EMAIL = "hello@dcmovieclub.org";
@@ -33,11 +34,13 @@ export function SiteFooter({ className }: { className?: string }) {
         aria-hidden
         className="absolute inset-0 rounded-2xl bg-black/10 sketch"
       />
-      <a
-        href={socials.substack.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group/subscribe absolute top-0 left-1/2 z-10 block -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+      <SubscribeDialog
+        trigger={
+          <button
+            type="button"
+            className="group/subscribe absolute top-0 left-1/2 z-10 block -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+          />
+        }
       >
         <span
           aria-hidden
@@ -47,11 +50,11 @@ export function SiteFooter({ className }: { className?: string }) {
           aria-hidden
           className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/subscribe:boil"
         />
-        <span className="relative flex items-center gap-2 px-5 py-2.5 tracking-wider whitespace-nowrap text-page-accent-text">
+        <span className="relative flex items-center gap-2 px-5 py-2.5 uppercase tracking-wider whitespace-nowrap text-page-accent-text">
+          <Mail size={18} className="shrink-0" />
           Subscribe to our newsletter
-          <ArrowUpRight size={18} className="shrink-0" />
         </span>
-      </a>
+      </SubscribeDialog>
       <div className="relative flex flex-col gap-4 px-7 pt-8 pb-5">
         <div className="flex flex-col gap-4 text-page-fg/80 sm:flex-row sm:items-center sm:justify-between">
           <nav aria-label="Footer">
