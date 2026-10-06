@@ -18,6 +18,7 @@ function SubstackSignup({ className }: { className?: string }) {
     <iframe
       src={`${socials.substack.href}/embed`}
       title="Substack signup form"
+      loading="lazy"
       className={cn("h-80 w-full border-0", className)}
     />
   );
