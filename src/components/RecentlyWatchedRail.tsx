@@ -284,6 +284,7 @@ function FollowButton() {
       href={LETTERBOXD_PROFILE_URL}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label="Follow us on Letterboxd"
       className="group/follow relative block w-fit shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
     >
       <span
@@ -296,7 +297,7 @@ function FollowButton() {
       />
       <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-charcoal transition-colors group-hover/follow:text-cream">
         <Letterboxd size={20} />
-        Follow us on Letterboxd
+        Follow us
         <ArrowUpRight size={16} />
       </span>
     </a>
