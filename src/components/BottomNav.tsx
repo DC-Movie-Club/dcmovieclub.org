@@ -345,8 +345,10 @@ const LAYOUTS = {
   bar: {
     key: "bar",
     item: "flex-col gap-0.5 px-2 py-1 xs:px-3 xs:py-1.5",
-    // Scaling a whole menu row would shift it, so only the bar grows
+    // Scaling a whole menu row would shift it, so only the bar grows. On its
+    // own page an item sits at its hover size, like the logo on home.
     hover: "hover:scale-110 focus-visible:scale-110",
+    active: "scale-110",
     icon: "size-7 xs:size-8",
     // Padding is always applied (and cancelled by negative margins) so only
     // color and rotation change when the tag appears.
@@ -356,6 +358,7 @@ const LAYOUTS = {
     key: "menu",
     item: "gap-3 rounded-lg px-4 py-3",
     hover: "",
+    active: "",
     icon: "size-6",
     label: "-mx-1.5 -my-0.5 px-1.5 py-0.5 text-base",
   },
@@ -374,6 +377,7 @@ function navItemClass(
     "group/item relative flex items-center transition-all focus-visible:outline-hidden",
     LAYOUTS[layout].item,
     active ? "text-nav-active" : "text-foreground",
+    active && LAYOUTS[layout].active,
     hoverable &&
       cn(
         "hover:text-nav-hover focus-visible:text-nav-hover",
