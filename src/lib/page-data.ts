@@ -15,6 +15,7 @@ const EMPTY: PageData = {
   eventsPage: null,
   aboutPage: null,
   partnershipsPage: null,
+  blogPage: null,
 };
 
 // `read` loads another page's content: cached for the public site, fresh for
@@ -25,15 +26,32 @@ export async function loadPageData(
 ): Promise<PageData> {
   switch (key) {
     case "home": {
-      const [events, reviews, eventsPage, aboutPage, partnershipsPage] =
-        await Promise.all([
-          getUpcomingEvents(),
-          getRecentLetterboxdReviews(),
-          read("events"),
-          read("about"),
-          read("partnerships"),
-        ]);
-      return { ...EMPTY, events, reviews, eventsPage, aboutPage, partnershipsPage };
+      const [
+        events,
+        posts,
+        reviews,
+        eventsPage,
+        aboutPage,
+        partnershipsPage,
+        blogPage,
+      ] = await Promise.all([
+        getUpcomingEvents(),
+        getRecentPosts(),
+        getRecentLetterboxdReviews(),
+        read("events"),
+        read("about"),
+        read("partnerships"),
+        read("blog"),
+      ]);
+      return {
+        events,
+        posts,
+        reviews,
+        eventsPage,
+        aboutPage,
+        partnershipsPage,
+        blogPage,
+      };
     }
     case "events":
       return { ...EMPTY, events: await getUpcomingEvents() };

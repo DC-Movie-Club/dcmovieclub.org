@@ -16,6 +16,10 @@ import { CardEdgeLink, SectionCard } from "@/components/section-cards";
 import { textStyles } from "@/components/textStyles";
 import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
+import type { SubstackPost } from "@/types/post";
+import { latestPost } from "@/lib/posts";
+import { LatestPost } from "@/components/posts/LatestPost";
+import { SubscribePlainCard } from "@/components/SubscribeDialog";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
 import { AudienceMarquee } from "@/components/AudienceMarquee";
 import { LogoLettering } from "@/components/LogoLettering";
@@ -156,6 +160,29 @@ function EventsSection({
   );
 }
 
+// In the Blog page's colors: the post the blog leads with, then Substack's
+// signup
+function NewsletterSection({
+  post,
+  colors,
+}: {
+  post: SubstackPost;
+  colors: PageColors;
+}) {
+  return (
+    <section className="bg-page-bg px-6 pt-16 pb-14" style={colorVars(colors)}>
+      <div className="mx-auto flex max-w-3xl flex-col gap-10">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className={textStyles.pageHeading}>From the newsletter</h2>
+          <OutlineLink href={pageTemplates.blog.href}>Blog</OutlineLink>
+        </div>
+        <LatestPost post={post} />
+        <SubscribePlainCard />
+      </div>
+    </section>
+  );
+}
+
 function pageSection<K extends SectionKind>(
   page: PageView,
   template: { key: string; kind: K },
@@ -251,7 +278,9 @@ export function HomePage({
   eventsPage,
   aboutPage,
   partnershipsPage,
+  blogPage,
   events,
+  posts,
   reviews,
 }: {
   page: PageView;
@@ -259,9 +288,13 @@ export function HomePage({
   eventsPage: PageView | null;
   aboutPage: PageView | null;
   partnershipsPage: PageView | null;
+  blogPage: PageView | null;
   events: CalendarEvent[];
+  posts: SubstackPost[];
   reviews: LetterboxdReview[];
 }) {
+  const post = latestPost(posts);
+
   return (
     // The negative margin cancels the layout's bottom padding (reserved for the
     // nav) so the background runs to the bottom edge; pb-34 re-adds it.
@@ -270,18 +303,24 @@ export function HomePage({
       style={colorVars(page.colors)}
     >
       <Hero />
-      <EventsSection
-        events={events}
-        colors={eventsPage?.colors ?? {}}
-      />
-      {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
-      {aboutPage && (
-        <AboutSection
-          blurb={pageSection(page, pageTemplates.home.sections.about)}
-          about={aboutPage}
-          partnerships={partnershipsPage}
+      {/* Colored bands back to back, without the page's cream between them */}
+      <div>
+        <EventsSection
+          events={events}
+          colors={eventsPage?.colors ?? {}}
         />
-      )}
+        {post && (
+          <NewsletterSection post={post} colors={blogPage?.colors ?? {}} />
+        )}
+        {aboutPage && (
+          <AboutSection
+            blurb={pageSection(page, pageTemplates.home.sections.about)}
+            about={aboutPage}
+            partnerships={partnershipsPage}
+          />
+        )}
+      </div>
+      {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
       <div className="mt-auto px-6 pt-14">
         <SiteFooter />
       </div>
