@@ -54,15 +54,17 @@ function Hero() {
           <LogoLettering layout="stacked" className="mx-auto max-w-3xl sm:hidden" />
           <LogoLettering layout="row" className="mx-auto max-w-3xl max-sm:hidden" />
         </h1>
+        {/* The offsets stagger the strips while keeping them, shadows
+            included, centered as a group in the tagline's space */}
         <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl">
-          <TaglineBanner className="-rotate-[0.75deg] sm:-rotate-[0.35deg]">
+          <TaglineBanner className="-translate-x-[9px] -translate-y-[2px] -rotate-[1.3deg] sm:-translate-x-[3px] sm:-translate-y-[3px] sm:-rotate-[0.35deg]">
             DC’s inclusive and
             <span className="max-sm:hidden"> (mostly) unpretentious community</span>
           </TaglineBanner>
-          <TaglineBanner className="rotate-[0.4deg] sm:hidden">
+          <TaglineBanner className="translate-x-[2px] rotate-[0.3deg] sm:hidden">
             (mostly) unpretentious community
           </TaglineBanner>
-          <TaglineBanner className="-rotate-[0.4deg] sm:rotate-[0.25deg]">
+          <TaglineBanner className="-translate-x-[2px] translate-y-[2px] -rotate-[0.5deg] sm:-translate-x-[3px] sm:translate-y-[3px] sm:rotate-[0.35deg]">
             for discussing movies and making friends!
           </TaglineBanner>
         </p>
