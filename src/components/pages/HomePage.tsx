@@ -31,7 +31,7 @@ function TaglineBanner({
   children: React.ReactNode;
 }) {
   return (
-    <span className={cn("relative px-3 py-1.5 text-balance sm:px-5 sm:py-2.5", className)}>
+    <span className={cn("relative px-[0.45em] py-[0.3em] text-balance sm:px-5 sm:py-2.5", className)}>
       {/* Separate shadow layer: an offset box-shadow would be clipped by the
           sketch filter's region */}
       <span
@@ -55,8 +55,10 @@ function Hero() {
           <LogoLettering layout="row" className="mx-auto max-w-3xl max-sm:hidden" />
         </h1>
         {/* The offsets stagger the strips while keeping them, shadows
-            included, centered as a group in the tagline's space */}
-        <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-base uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl">
+            included, centered as a group in the tagline's space. On phones
+            the text scales with the title, which spans the screen less its
+            padding. */}
+        <p className="mt-5 flex flex-col items-center gap-0.5 px-4 text-center text-[length:calc((100vw-3rem)*0.0437)] leading-tight uppercase tracking-wide text-page-accent-text sm:mt-7 sm:gap-1 sm:text-xl sm:leading-[1.4]">
           <TaglineBanner className="-translate-x-[9px] -translate-y-[2px] -rotate-[1.3deg] sm:-translate-x-[3px] sm:-translate-y-[3px] sm:-rotate-[0.35deg]">
             DC’s inclusive and
             <span className="max-sm:hidden"> (mostly) unpretentious community</span>
