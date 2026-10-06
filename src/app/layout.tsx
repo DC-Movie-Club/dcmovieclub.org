@@ -17,7 +17,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    // React's view transitions leave the page out of the animation unless the
+    // root names itself inline, so navigating crossfades the whole screen
+    // under the nav's own crossfade (see BottomNav)
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      style={{ viewTransitionName: "root" }}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: markLoading }} />
       </head>

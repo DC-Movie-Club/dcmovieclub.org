@@ -7,6 +7,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  ViewTransition,
 } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -71,155 +72,159 @@ export function BottomNav({
         className="pointer-events-none absolute top-0 left-0 z-40 size-5 animate-page-fade-in bg-page-bg"
         style={pageBackground}
       />
-      <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in select-none motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
-        {/* Grows a touch on hover or keyboard focus, with the same spring as
-            its entrance */}
-        <div className="relative flex items-center justify-center gap-4 px-4 py-2 transition-[scale] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] xs:px-6 xs:py-3 xs:hover:scale-[1.03] xs:has-[:focus-visible]:scale-[1.03]">
-          {/* Full-width on phones, the bar runs past the screen edges so the
-              sketch filter's wobble can't open a gap along them. The wrapper
-              clips that overhang without clipping the logo. */}
-          <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
-            <div className="absolute -inset-x-2 top-2 bottom-0 xs:inset-0">
-              <PillShadow />
-              {/* The fill sits just inside the line, which the ink filter thins
-                  in places, so it never shows past the line's outer edge */}
-              <div className="absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full" />
-              <div className="absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2" />
-            </div>
-          </div>
-          <BarLink route={routes.events} pathname={pathname} accents={accents} />
-          <BarLink route={routes.blog} pathname={pathname} accents={accents} />
-
-          <div className={LOGO_SPACER} />
-
-          <BarLink route={routes.about} pathname={pathname} accents={accents} />
-
-          <Dialog>
-            <DialogTrigger
-              render={
-                <NavButton
-                  icon={Ellipsis}
-                  label="More"
-                  active={Boolean(activeMenuRoute)}
-                  style={accentVars(
-                    activeMenuRoute && accents[activeMenuRoute.href],
-                    accents[menuRoutes[0].href],
-                  )}
-                />
-              }
-            />
-            <DialogContent showCloseButton={false}>
-              <DialogTitle className="sr-only">More</DialogTitle>
-              <ul className="flex flex-col gap-1">
-                {menuRoutes.map((route) => {
-                  const active = pathname === route.href;
-                  return (
-                    <li key={route.key}>
-                      <DialogClose
-                        nativeButton={false}
-                        render={
-                          <Link
-                            href={route.href}
-                            className={navItemClass("menu", active)}
-                            style={accentVars(accents[route.href])}
-                          />
-                        }
-                      >
-                        <NavItemContent
-                          layout="menu"
-                          active={active}
-                          icon={route.icon}
-                          label={route.label}
-                        />
-                      </DialogClose>
-                    </li>
-                  );
-                })}
-                <li key="contact">
-                  <DialogClose
-                    nativeButton={false}
-                    render={
-                      <a
-                        href="mailto:hello@dcmovieclub.org"
-                        className={navItemClass("menu", false)}
-                      />
-                    }
-                  >
-                    <NavItemContent
-                      layout="menu"
-                      active={false}
-                      icon={Mail}
-                      label={routes.contact.label}
-                    />
-                    <ArrowUpRight
-                      size={12}
-                      className="ml-auto text-muted-foreground group-hover/item:text-nav-hover group-focus-visible/item:text-nav-hover"
-                    />
-                  </DialogClose>
-                </li>
-              </ul>
-              <hr className="sketch border-t-2 border-charcoal/20 my-2" />
-              <div className="flex items-center justify-center gap-4 py-2">
-                {Object.values(socials).map((link) => (
-                  <a
-                    key={link.key}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group/item text-muted-foreground transition-colors hover:text-rust"
-                  >
-                    <link.icon
-                      size={24}
-                      className="sketch-subtle group-hover/item:sketch-subtle-animated"
-                    />
-                  </a>
-                ))}
+      {/* Navigating crossfades the bar into its new state, over the page's
+          own crossfade (see the root layout) */}
+      <ViewTransition default="none" update="auto">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in select-none motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
+          {/* Grows a touch on hover or keyboard focus, with the same spring as
+              its entrance */}
+          <div className="relative flex items-center justify-center gap-4 px-4 py-2 transition-[scale] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] xs:px-6 xs:py-3 xs:hover:scale-[1.03] xs:has-[:focus-visible]:scale-[1.03]">
+            {/* Full-width on phones, the bar runs past the screen edges so the
+                sketch filter's wobble can't open a gap along them. The wrapper
+                clips that overhang without clipping the logo. */}
+            <div className="absolute inset-x-0 -top-2 -bottom-2 overflow-hidden xs:inset-0 xs:overflow-visible">
+              <div className="absolute -inset-x-2 top-2 bottom-0 xs:inset-0">
+                <PillShadow />
+                {/* The fill sits just inside the line, which the ink filter thins
+                    in places, so it never shows past the line's outer edge */}
+                <div className="absolute inset-x-0 top-px bottom-0 bg-surface sketch xs:inset-px xs:rounded-full" />
+                <div className="absolute inset-0 border-t-2 border-charcoal ink xs:rounded-full xs:border-2" />
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+            <BarLink route={routes.events} pathname={pathname} accents={accents} />
+            <BarLink route={routes.blog} pathname={pathname} accents={accents} />
 
-          <Link
-            href={routes.home.href}
-            className={cn(
-              "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-[scale,translate] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] focus-visible:outline-hidden",
-              // Home is the logo's page, so there it's full size and in color, and
-              // stays a link without hover feedback, like the other items on
-              // their own pages. Elsewhere it's drawn in line, smaller and lower
-              // in the bar; on hover it boils and turns logo red, grows by about
-              // as much as the other items, and rises to where it sits on home.
-              !onHome &&
-                "translate-y-1 scale-90 hover:translate-y-0 hover:scale-[0.99] focus-visible:translate-y-0 focus-visible:scale-[0.99]",
-              LOGO_SIZE,
-            )}
-          >
-            <Image
-              src="/images/dcmc-logo.png"
-              alt="DC Movie Club"
-              width={NAV_LOGO_SIZE}
-              height={NAV_LOGO_SIZE}
-              priority
+            <div className={LOGO_SPACER} />
+
+            <BarLink route={routes.about} pathname={pathname} accents={accents} />
+
+            <Dialog>
+              <DialogTrigger
+                render={
+                  <NavButton
+                    icon={Ellipsis}
+                    label="More"
+                    active={Boolean(activeMenuRoute)}
+                    style={accentVars(
+                      activeMenuRoute && accents[activeMenuRoute.href],
+                      accents[menuRoutes[0].href],
+                    )}
+                  />
+                }
+              />
+              <DialogContent showCloseButton={false}>
+                <DialogTitle className="sr-only">More</DialogTitle>
+                <ul className="flex flex-col gap-1">
+                  {menuRoutes.map((route) => {
+                    const active = pathname === route.href;
+                    return (
+                      <li key={route.key}>
+                        <DialogClose
+                          nativeButton={false}
+                          render={
+                            <Link
+                              href={route.href}
+                              className={navItemClass("menu", active)}
+                              style={accentVars(accents[route.href])}
+                            />
+                          }
+                        >
+                          <NavItemContent
+                            layout="menu"
+                            active={active}
+                            icon={route.icon}
+                            label={route.label}
+                          />
+                        </DialogClose>
+                      </li>
+                    );
+                  })}
+                  <li key="contact">
+                    <DialogClose
+                      nativeButton={false}
+                      render={
+                        <a
+                          href="mailto:hello@dcmovieclub.org"
+                          className={navItemClass("menu", false)}
+                        />
+                      }
+                    >
+                      <NavItemContent
+                        layout="menu"
+                        active={false}
+                        icon={Mail}
+                        label={routes.contact.label}
+                      />
+                      <ArrowUpRight
+                        size={12}
+                        className="ml-auto text-muted-foreground group-hover/item:text-nav-hover group-focus-visible/item:text-nav-hover"
+                      />
+                    </DialogClose>
+                  </li>
+                </ul>
+                <hr className="sketch border-t-2 border-charcoal/20 my-2" />
+                <div className="flex items-center justify-center gap-4 py-2">
+                  {Object.values(socials).map((link) => (
+                    <a
+                      key={link.key}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/item text-muted-foreground transition-colors hover:text-rust"
+                    >
+                      <link.icon
+                        size={24}
+                        className="sketch-subtle group-hover/item:sketch-subtle-animated"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Link
+              href={routes.home.href}
               className={cn(
+                "group/logo absolute mt-0.5 left-1/2 -translate-x-1/2 transition-[scale,translate] duration-300 ease-[cubic-bezier(0.3,1.35,0.5,1)] focus-visible:outline-hidden",
+                // Home is the logo's page, so there it's full size and in color, and
+                // stays a link without hover feedback, like the other items on
+                // their own pages. Elsewhere it's drawn in line, smaller and lower
+                // in the bar; on hover it boils and turns logo red, grows by about
+                // as much as the other items, and rises to where it sits on home.
+                !onHome &&
+                  "translate-y-1 scale-90 hover:translate-y-0 hover:scale-[0.99] focus-visible:translate-y-0 focus-visible:scale-[0.99]",
                 LOGO_SIZE,
-                "transition-opacity duration-300 ease-out",
-                !onHome && "opacity-0",
               )}
-            />
-            {/* Mounted on every page, so arriving home crossfades it into the
-                color logo */}
-            <LogoOutline
-              className={cn(
-                "pointer-events-none absolute inset-0 transition-[color,opacity] duration-300 ease-out",
-                onHome
-                  ? "opacity-0"
-                  : "group-hover/logo:text-logo-red group-focus-visible/logo:text-logo-red",
-              )}
-              layerClassName={cn(
-                !onHome && "group-hover/logo:boil group-focus-visible/logo:boil",
-              )}
-            />
-          </Link>
-        </div>
-      </nav>
+            >
+              <Image
+                src="/images/dcmc-logo.png"
+                alt="DC Movie Club"
+                width={NAV_LOGO_SIZE}
+                height={NAV_LOGO_SIZE}
+                priority
+                className={cn(
+                  LOGO_SIZE,
+                  "transition-opacity duration-300 ease-out",
+                  !onHome && "opacity-0",
+                )}
+              />
+              {/* Mounted on every page, so arriving home crossfades it into the
+                  color logo */}
+              <LogoOutline
+                className={cn(
+                  "pointer-events-none absolute inset-0 transition-[color,opacity] duration-300 ease-out",
+                  onHome
+                    ? "opacity-0"
+                    : "group-hover/logo:text-logo-red group-focus-visible/logo:text-logo-red",
+                )}
+                layerClassName={cn(
+                  !onHome && "group-hover/logo:boil group-focus-visible/logo:boil",
+                )}
+              />
+            </Link>
+          </div>
+        </nav>
+      </ViewTransition>
     </>
   );
 }

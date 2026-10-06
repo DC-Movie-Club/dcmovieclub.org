@@ -190,6 +190,20 @@ html[data-loading] .animate-nav-spring-in {
   animation-play-state: paused;
 }
 
+/* Navigating crossfades the page and the nav (see BottomNav), a little slower
+   than the browser's default */
+::view-transition-group(*) {
+  animation-duration: 400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
 @utility h-screen-mobile {
   height: 100vh;
   height: 100dvh;
