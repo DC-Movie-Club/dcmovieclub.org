@@ -29,6 +29,12 @@ function galleryImage(attribs: sanitizeHtml.Attributes): string | null {
 // Removal goes through marker attributes and exclusiveFilter: renaming a tag to
 // one that isn't allowed leaves sanitize-html renaming a later closing tag.
 export function cleanSubstackBody(html: string): string {
+  // exclusiveFilter only lists a tag's direct media children, so a paragraph
+  // holding an image inside a link or span would look empty. Instead each
+  // paragraph notes how many images and embeds were kept when it opened.
+  let mediaKept = 0
+  const paragraphStarts: number[] = []
+
   return sanitizeHtml(html, {
     allowedTags: [
       "p", "br", "strong", "b", "em", "i", "u", "s", "a", "mark",
@@ -62,11 +68,22 @@ export function cleanSubstackBody(html: string): string {
         tagName,
         attribs: hasClass(attribs, ["image-link"]) ? UNWRAP : attribs,
       }),
+      p: (tagName, attribs) => {
+        paragraphStarts.push(mediaKept)
+        return { tagName, attribs }
+      },
     },
     exclusiveFilter: (frame) => {
+      if (frame.tag === "p") {
+        return !frame.text.trim() && mediaKept === paragraphStarts.pop()
+      }
       if ("data-drop" in frame.attribs) return true
       if ("data-unwrap" in frame.attribs) return "excludeTag"
-      return frame.tag === "p" && !frame.text.trim() && !frame.mediaChildren.length
+      // An embed from a host that isn't allowed loses its src, which would
+      // leave a blank box
+      if (frame.tag === "iframe" && !frame.attribs.src) return true
+      if (frame.tag === "img" || frame.tag === "iframe") mediaKept++
+      return false
     },
   })
 }

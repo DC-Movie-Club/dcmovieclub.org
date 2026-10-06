@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { webUrl } from "@/lib/link-preview";
+import { plainText } from "@/lib/plain-text";
 import { cn } from "@/lib/utils";
 import type { CardItem, PageSection } from "@/lib/pages";
 
@@ -439,15 +440,6 @@ function FaqFields({
       </FieldSet>
     </FieldGroup>
   );
-}
-
-// A one-line glimpse of an answer, without its markdown
-function plainText(markdown: string) {
-  return markdown
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/[*_#>`]|^\s*[-+]\s|^\s*\d+\.\s/gm, "")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 export function SectionFields({

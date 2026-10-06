@@ -2,7 +2,8 @@ import type { EventTicket } from "@/types/event"
 import { decodeEntities } from "./link-preview.ts"
 
 // TODO: use Ticket Tailor API (TICKET_TAILOR_API_KEY) to fetch event images (images.header / images.thumbnail) for events with a TT link
-const TICKET_TAILOR_RE = /https?:\/\/(?:(?:www\.|app\.)?tickettailor\.com|buytickets\.at)\/[^\s<"']*/i
+// Punctuation after a bare URL ends the sentence, not the URL
+const TICKET_TAILOR_RE = /https?:\/\/(?:(?:www\.|app\.)?tickettailor\.com|buytickets\.at)\/[^\s<"']*[^\s<"'.,;:!?)]/i
 
 const ANCHOR_RE = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi
 const CTA_TEXT_RE = /ticket|register|reserve|rsvp|sign up|buy/i
@@ -31,7 +32,7 @@ export function extractTickets(description?: string): {
     }
   }
   const match = !tickets.length && description.match(TICKET_TAILOR_RE)
-  if (match) tickets.push({ label: "Tickets", url: match[0] })
+  if (match) tickets.push({ label: "Tickets", url: match[0].replace(/&amp;/g, "&") })
   return { tickets, description: tidyDescription(description) }
 }
 
@@ -46,7 +47,8 @@ function ticketLabel(text: string) {
 }
 
 const EMPTY_INLINE_RE = /<(b|strong|u|em|i)>((?:\s|<br\s*\/?>)*)<\/\1>/gi
-const EDGE_BREAKS_RE = /^(?:\s|<br\s*\/?>|<p>\s*<\/p>)+|(?:\s|<br\s*\/?>|<p>\s*<\/p>)+$/gi
+const EDGE_BREAKS_RE =
+  /^(?:\s|<br\s*\/?>|<p>(?:\s|<br\s*\/?>)*<\/p>)+|(?:\s|<br\s*\/?>|<p>(?:\s|<br\s*\/?>)*<\/p>)+$/gi
 const REPEATED_BREAKS_RE = /(?:<br\s*\/?>\s*){3,}/gi
 
 export function tidyDescription(html: string): string | null {

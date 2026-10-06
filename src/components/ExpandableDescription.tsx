@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { withExternalLinks } from "@/lib/external-links";
 import { cn } from "@/lib/utils";
 
 interface ExpandableDescriptionProps {
@@ -14,18 +15,6 @@ interface ExpandableDescriptionProps {
   actionClassName?: string;
   // Shown after the HTML, so it's only reached once expanded
   children?: React.ReactNode;
-}
-
-function withExternalLinks(html: string) {
-  return html.replace(/<a\b([^>]*)>/gi, (_match, attrs: string) => {
-    const hasTarget = /\btarget\s*=/.test(attrs);
-    const hasRel = /\brel\s*=/.test(attrs);
-    let out = `<a${attrs}`;
-    if (!hasTarget) out += ' target="_blank"';
-    if (!hasRel) out += ' rel="noopener noreferrer"';
-    out += ">";
-    return out;
-  });
 }
 
 export function ExpandableDescription({

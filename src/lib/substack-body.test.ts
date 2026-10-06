@@ -34,6 +34,33 @@ describe("cleanSubstackBody", () => {
     assert.equal(cleanSubstackBody("<p>One</p><p></p><div><hr></div>"), "<p>One</p><div><hr /></div>")
   })
 
+  it("keeps a paragraph whose only content is an image inside a link or span", () => {
+    assert.equal(
+      cleanSubstackBody('<p><a href="https://example.com/full"><img src="https://substackcdn.com/a.png" alt=""></a></p>'),
+      '<p><a href="https://example.com/full"><img src="https://substackcdn.com/a.png" alt="" /></a></p>',
+    )
+    assert.equal(
+      cleanSubstackBody('<p><span><img src="https://substackcdn.com/a.png"></span></p>'),
+      '<p><img src="https://substackcdn.com/a.png" /></p>',
+    )
+  })
+
+  it("still drops an empty paragraph after one holding an image", () => {
+    assert.equal(
+      cleanSubstackBody('<p><span><img src="https://substackcdn.com/a.png"></span></p><p><a href="https://example.com"></a></p>'),
+      '<p><img src="https://substackcdn.com/a.png" /></p>',
+    )
+  })
+
+  it("keeps YouTube embeds but drops ones from other hosts", () => {
+    assert.equal(
+      cleanSubstackBody(
+        '<div class="youtube-wrap"><iframe src="https://www.youtube-nocookie.com/embed/abc"></iframe></div><div class="spotify-wrap"><iframe src="https://open.spotify.com/embed/episode/1" height="152"></iframe></div><p><iframe src="https://player.vimeo.com/video/1"></iframe></p>',
+      ),
+      '<div><iframe src="https://www.youtube-nocookie.com/embed/abc"></iframe></div><div></div>',
+    )
+  })
+
   it("shows a gallery as its single composite image", () => {
     assert.equal(
       cleanSubstackBody(
