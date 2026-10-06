@@ -204,9 +204,10 @@ html[data-loading] .animate-nav-spring-in {
   }
 }
 
-/* Fades text in from the top down: a soft edge sweeps from --reveal-from to
-   the bottom, starting as the fade a collapsed ExpandableDescription shows
-   (opaque to --reveal-from, clear at twice that) */
+/* Fades text in from the top down: a soft edge sweeps from --reveal-from
+   (where a collapsed ExpandableDescription began fading out) to the bottom.
+   The edge is three times as tall as the collapsed fade and eases in and out
+   of clear, so the lines below the fold begin showing at once. */
 @property --reveal {
   syntax: "<length-percentage>";
   inherits: false;
@@ -220,12 +221,16 @@ html[data-loading] .animate-nav-spring-in {
 }
 
 @utility animate-reveal {
+  --reveal-edge: calc(var(--reveal-from) * 3);
   mask-image: linear-gradient(
     to bottom,
     #000 var(--reveal),
-    transparent calc(var(--reveal) + var(--reveal-from))
+    rgb(0 0 0 / 0.84) calc(var(--reveal) + var(--reveal-edge) * 0.25),
+    rgb(0 0 0 / 0.5) calc(var(--reveal) + var(--reveal-edge) * 0.5),
+    rgb(0 0 0 / 0.16) calc(var(--reveal) + var(--reveal-edge) * 0.75),
+    transparent calc(var(--reveal) + var(--reveal-edge))
   );
-  animation: reveal 600ms ease-out;
+  animation: reveal 900ms ease-out;
 }
 
 @utility h-screen-mobile {
