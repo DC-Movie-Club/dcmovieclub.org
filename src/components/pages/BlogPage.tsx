@@ -4,6 +4,7 @@ import { TIME_ZONE } from "@/lib/event-format";
 import type { PageView } from "@/lib/pages";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
 import { CardSurface } from "@/components/CardSurface";
+import { CardEdgeLink, CardLabel } from "@/components/section-cards";
 import { CreamCard } from "@/components/CreamCard";
 import type { SubstackPost } from "@/types/post";
 import { ThumbnailImage } from "@/components/ThumbnailImage";
@@ -74,7 +75,7 @@ function OpensOverlay({
 
 function LatestPostCard({ post }: { post: SubstackPost }) {
   return (
-    <div className="group/card relative">
+    <div className="group/card relative flex flex-col items-start">
       <CardSurface className="card-hover:stroke-page-accent-edge" />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
@@ -88,13 +89,14 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
         className="absolute inset-0 rounded-2xl"
       />
 
-      <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
-        <span className="font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink card-hover:outline-ink-page-accent-edge sm:text-5xl">
-          Latest
-        </span>
-      </div>
+      <CardLabel
+        as="p"
+        className="pointer-events-none card-hover:outline-ink-page-accent-edge"
+      >
+        Latest
+      </CardLabel>
 
-      <div className="pointer-events-none relative flex flex-col gap-5 px-5 pt-12 pb-6 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:pt-14 sm:pb-7">
+      <div className="pointer-events-none relative flex flex-col gap-5 self-stretch px-5 pt-4 pb-6 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:pt-6 sm:pb-7">
         {post.imageUrl ? (
           <div className="relative mt-2 shrink-0 sm:mt-0 sm:w-2/5">
             <ThumbnailImage
@@ -127,26 +129,11 @@ function LatestPostCard({ post }: { post: SubstackPost }) {
         </div>
       </div>
 
-      <a
-        href={post.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform card-hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
-      >
-        <span
-          aria-hidden
-          className="absolute inset-px rounded-full bg-page-accent shadow-lg sketch card-hover:boil"
-        />
-        <span
-          aria-hidden
-          className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink card-hover:boil"
-        />
-        <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
-          <span className="sm:hidden">Read</span>
-          <span className="hidden sm:inline">Read on Substack</span>
-          <ArrowUpRight size={18} className="shrink-0" />
-        </span>
-      </a>
+      <CardEdgeLink href={post.link}>
+        <span className="sm:hidden">Read</span>
+        <span className="hidden sm:inline">Read on Substack</span>
+        <ArrowUpRight size={18} className="shrink-0" />
+      </CardEdgeLink>
     </div>
   );
 }
@@ -234,6 +221,40 @@ function Posts({ posts }: { posts: SubstackPost[] }) {
   );
 }
 
+function BlogHeader({ page }: { page: PageView }) {
+  return (
+    <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4">
+        <PageTitle>{page.title}</PageTitle>
+        {page.subtitle && (
+          <p className="text-xl uppercase tracking-wide text-page-fg">
+            {page.subtitle}
+          </p>
+        )}
+      </div>
+      <a
+        href={SUBSTACK_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group/subscribe relative self-start rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:self-auto"
+      >
+        <span
+          aria-hidden
+          className="absolute inset-px rounded-full transition-colors sketch-subtle group-hover/subscribe:bg-page-fg group-hover/subscribe:boil"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full border-2 border-page-fg ink-subtle group-hover/subscribe:boil"
+        />
+        <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-page-fg transition-colors group-hover/subscribe:text-charcoal">
+          <Mail size={14} />
+          Subscribe
+        </span>
+      </a>
+    </header>
+  );
+}
+
 export function BlogPage({
   page,
   posts,
@@ -242,37 +263,11 @@ export function BlogPage({
   posts: SubstackPost[];
 }) {
   return (
-    <ColorPage colors={page.colors}>
-      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-4">
-          <PageTitle>{page.title}</PageTitle>
-          {page.subtitle && (
-            <p className="text-xl uppercase tracking-wide text-page-fg">
-              {page.subtitle}
-            </p>
-          )}
-        </div>
-        <a
-          href={SUBSTACK_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group/subscribe relative self-start rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:self-auto"
-        >
-          <span
-            aria-hidden
-            className="absolute inset-px rounded-full transition-colors sketch-subtle group-hover/subscribe:bg-page-fg group-hover/subscribe:boil"
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-full border-2 border-page-fg ink-subtle group-hover/subscribe:boil"
-          />
-          <span className="relative flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-widest text-page-fg transition-colors group-hover/subscribe:text-charcoal">
-            <Mail size={14} />
-            Subscribe
-          </span>
-        </a>
-      </header>
-
+    <ColorPage
+      colors={page.colors}
+      header={<BlogHeader page={page} />}
+      contentClassName="mt-14"
+    >
       <Posts posts={posts} />
     </ColorPage>
   );

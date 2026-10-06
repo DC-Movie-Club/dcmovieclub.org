@@ -12,7 +12,7 @@ import {
 import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import { Markdown } from "@/components/Markdown";
-import { SectionCard } from "@/components/section-cards";
+import { CardEdgeLink, SectionCard } from "@/components/section-cards";
 import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
@@ -190,24 +190,11 @@ function AboutSection({
             <SectionCard label={blurb.label}>
               <Markdown>{blurb.content}</Markdown>
             </SectionCard>
-            <NextLink
-              href={pageTemplates.about.href}
-              className="group/more absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
-            >
-              <span
-                aria-hidden
-                className="absolute inset-px rounded-full bg-page-accent shadow-md sketch group-hover/more:boil"
-              />
-              <span
-                aria-hidden
-                className="absolute inset-0 rounded-full border-[2.5px] border-page-accent-edge ink group-hover/more:boil"
-              />
-              <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-page-accent-text">
-                <routes.about.icon size={16} className="shrink-0" />
-                More about us
-                <ArrowRight size={14} className="shrink-0" />
-              </span>
-            </NextLink>
+            <CardEdgeLink href={pageTemplates.about.href}>
+              <routes.about.icon size={18} className="shrink-0" />
+              More about us
+              <ArrowRight size={18} className="shrink-0" />
+            </CardEdgeLink>
           </div>
         )}
 

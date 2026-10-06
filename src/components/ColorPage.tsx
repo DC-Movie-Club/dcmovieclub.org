@@ -4,13 +4,17 @@ import { HomeLink } from "@/components/HomeLink";
 import { SiteFooter } from "@/components/SiteFooter";
 
 // A full-bleed page in its color roles (see colorRoles), from the page's
-// Firestore doc. `contentClassName` sets the spacing between sections.
+// Firestore doc. `contentClassName` sets the spacing between sections. The
+// header sits 32px above the first one; a page whose first card has a sticker
+// or heading overhanging its top edge adds the overhang to that margin.
 export function ColorPage({
   colors,
+  header,
   contentClassName,
   children,
 }: {
   colors: PageColors;
+  header: React.ReactNode;
   contentClassName?: string;
   children: React.ReactNode;
 }) {
@@ -23,10 +27,11 @@ export function ColorPage({
     >
       <div className="mx-auto max-w-3xl">
         <HomeLink />
+        {header}
       </div>
       <div
         className={cn(
-          "mx-auto flex max-w-3xl flex-col gap-14",
+          "mx-auto mt-8 flex max-w-3xl flex-col gap-14",
           contentClassName,
         )}
       >

@@ -4,8 +4,11 @@ import type { PageView } from "@/lib/pages";
 
 export function PartnershipsPage({ page }: { page: PageView }) {
   return (
-    <ColorPage colors={page.colors} contentClassName="gap-16">
-      <PageTitle className="text-4xl">{page.title}</PageTitle>
+    <ColorPage
+      colors={page.colors}
+      header={<PageTitle className="text-4xl">{page.title}</PageTitle>}
+      contentClassName="mt-12 gap-16"
+    >
       <PageSections sections={page.sections} />
     </ColorPage>
   );

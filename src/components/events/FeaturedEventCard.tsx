@@ -7,6 +7,7 @@ import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { CalendarDate } from "@/components/events/CalendarDate";
 import { getEventCta, getMapUrl } from "@/components/events/event-links";
 import { CardSurface } from "@/components/CardSurface";
+import { CardEdgeLink, CardLabel } from "@/components/section-cards";
 import type { CalendarEvent } from "@/types/event";
 
 // TODO: detect if the featured event is sold out via Ticket Tailor API and
@@ -19,7 +20,7 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
   const mapUrl = getMapUrl(event.location);
 
   return (
-    <div className="group/card relative">
+    <div className="group/card relative flex flex-col items-start">
       <CardSurface className={cn(cta && "card-hover:stroke-page-accent-edge")} />
 
       {/* Stretched link makes the whole card clickable; the pill below is the
@@ -35,18 +36,17 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
         />
       )}
 
-      <div className="pointer-events-none absolute -top-5 left-6 z-10 -rotate-4 sm:-top-6 sm:left-8">
-        <span
-          className={cn(
-            "font-dcmc text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-5xl",
-            cta && "card-hover:outline-ink-page-accent-edge",
-          )}
-        >
-          Next Up
-        </span>
-      </div>
+      <CardLabel
+        as="p"
+        className={cn(
+          "pointer-events-none",
+          cta && "card-hover:outline-ink-page-accent-edge",
+        )}
+      >
+        Next Up
+      </CardLabel>
 
-      <div className="pointer-events-none relative flex items-start gap-4 px-5 pt-10 pb-8 sm:gap-5 sm:px-6 sm:pt-12 sm:pb-9">
+      <div className="pointer-events-none relative flex items-start gap-4 self-stretch px-5 pt-4 pb-8 sm:gap-5 sm:px-6 sm:pb-9">
         <CalendarDate month={month} day={day} variant="tall" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -87,25 +87,10 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
       </div>
 
       {cta && (
-        <a
-          href={cta.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform card-hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
-        >
-          <span
-            aria-hidden
-            className="absolute inset-px rounded-full bg-page-accent shadow-lg sketch card-hover:boil"
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink card-hover:boil"
-          />
-          <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
-            <cta.icon size={18} className="shrink-0" />
-            {cta.label}
-          </span>
-        </a>
+        <CardEdgeLink href={cta.href}>
+          <cta.icon size={18} className="shrink-0" />
+          {cta.label}
+        </CardEdgeLink>
       )}
     </div>
   );

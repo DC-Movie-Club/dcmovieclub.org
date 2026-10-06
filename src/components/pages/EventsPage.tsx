@@ -58,16 +58,20 @@ export function EventsPage({
   events: CalendarEvent[];
 }) {
   return (
-    <ColorPage colors={page.colors}>
-      <header className="flex flex-col gap-4">
-        <PageTitle>{page.title}</PageTitle>
-        {page.subtitle && (
-          <p className="text-lg uppercase tracking-wide text-page-fg/80">
-            {page.subtitle}
-          </p>
-        )}
-      </header>
-
+    <ColorPage
+      colors={page.colors}
+      header={
+        <header className="flex flex-col gap-4">
+          <PageTitle>{page.title}</PageTitle>
+          {page.subtitle && (
+            <p className="text-lg uppercase tracking-wide text-page-fg/80">
+              {page.subtitle}
+            </p>
+          )}
+        </header>
+      }
+      contentClassName="mt-14"
+    >
       <UpcomingEvents events={events} />
       <PageSections sections={page.sections} />
     </ColorPage>
