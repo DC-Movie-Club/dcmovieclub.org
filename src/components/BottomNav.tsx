@@ -42,7 +42,7 @@ const HATCH_CLEARANCE = 1.5;
 // `accents` holds each page's accent color by route; an item takes its page's
 // for hover and the active state, and an item without one keeps the defaults
 // in globals.css. `backgrounds` holds each page's background by route, which
-// the fade under the nav takes.
+// the fade under the nav and the corner patch take.
 export function BottomNav({
   accents,
   backgrounds,
@@ -53,13 +53,23 @@ export function BottomNav({
   const pathname = usePathname();
   const onHome = pathname === routes.home.href;
   const activeMenuRoute = menuRoutes.find((route) => route.href === pathname);
+  const pageBackground = colorVars({ background: backgrounds[pathname] });
 
   return (
     <>
       <div
         aria-hidden
         className="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-21 bg-linear-to-b from-transparent via-page-bg/55 via-60% to-page-bg/85 mask-t-from-0% xs:h-28"
-        style={colorVars({ background: backgrounds[pathname] })}
+        style={pageBackground}
+      />
+      {/* Safari paints a small black square at the page's top-left corner for
+          filtered elements outside the area it's repainting (WebKit bug
+          314999, fixed upstream in June 2026). This covers that corner in the
+          page's background, fading in with the page. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-0 z-40 size-5 animate-page-fade-in bg-page-bg"
+        style={pageBackground}
       />
       <nav className="fixed bottom-0 left-0 right-0 z-50 animate-nav-spring-in select-none motion-reduce:animate-none xs:bottom-6 xs:left-1/2 xs:right-auto xs:-translate-x-1/2">
         {/* Grows a touch on hover or keyboard focus, with the same spring as
@@ -382,13 +392,18 @@ function NavItemContent({
 }) {
   return (
     <>
-      <Icon
+      {/* The filter goes on a box around the icon: Safari fits an SVG's
+          filter region to its shapes rather than its box, which cropped
+          small shapes like the More dots flat */}
+      <span
         className={cn(
           LAYOUTS[layout].icon,
           "ink-subtle",
           hoverable && "group-hover/item:boil group-focus-visible/item:boil",
         )}
-      />
+      >
+        <Icon className="size-full" />
+      </span>
       <span
         className={cn(
           LAYOUTS[layout].label,
