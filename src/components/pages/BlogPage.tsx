@@ -1,9 +1,9 @@
-import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PageView } from "@/lib/pages";
 import { latestPost } from "@/lib/posts";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
 import { CreamCard } from "@/components/CreamCard";
+import { OpensOverlay } from "@/components/OpensOverlay";
 import { textStyles } from "@/components/textStyles";
 import { SubscribeCard } from "@/components/SubscribeDialog";
 import { LatestPost } from "@/components/posts/LatestPost";
@@ -13,31 +13,6 @@ import {
   SubscribeButton,
 } from "@/components/posts/PostParts";
 import type { SubstackPost } from "@/types/post";
-
-function OpensOverlay({
-  className,
-  washClassName,
-}: {
-  className: string;
-  washClassName: string;
-}) {
-  return (
-    <div
-      aria-hidden
-      className={cn(
-        "absolute inset-0 flex items-center justify-center opacity-0 transition-opacity",
-        className,
-      )}
-    >
-      <div className={cn("absolute inset-0 bg-page-accent-edge/80", washClassName)} />
-      <ArrowUpRight
-        size={32}
-        strokeWidth={2.5}
-        className="relative text-cream sketch"
-      />
-    </div>
-  );
-}
 
 function PostTile({ post }: { post: SubstackPost }) {
   return (

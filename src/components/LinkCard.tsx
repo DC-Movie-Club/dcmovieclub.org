@@ -5,6 +5,7 @@ import { ArrowUpRight, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CardItem } from "@/lib/pages";
 import { textStyles } from "@/components/textStyles";
+import { OpensOverlay } from "@/components/OpensOverlay";
 
 // A link with its site's preview picture, like a press piece. The picture is
 // loaded from that site, so if it's gone the card shows without it.
@@ -21,7 +22,7 @@ export function LinkCard({ item }: { item: CardItem }) {
       />
       <div
         aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge ink"
+        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge transition-colors ink group-hover/tile:border-page-accent-edge"
       />
       <div className="relative grid grid-cols-[auto_1fr] items-start gap-x-4 p-3 sm:flex sm:h-full sm:flex-col sm:items-stretch sm:gap-3">
         {image ? (
@@ -54,12 +55,7 @@ export function LinkCard({ item }: { item: CardItem }) {
               {item.source}
             </span>
           )}
-          <h3
-            className={cn(
-              textStyles.tileTitle,
-              "line-clamp-3 transition-colors group-hover/tile:text-rust",
-            )}
-          >
+          <h3 className={cn("line-clamp-3", textStyles.tileTitle)}>
             {item.title}
           </h3>
         </div>
@@ -68,11 +64,14 @@ export function LinkCard({ item }: { item: CardItem }) {
         // On wider screens the picture fills the card's top, so the arrow
         // sits on a chip over the picture's corner
         <span className="absolute top-3 right-3 flex rounded-full text-rust sm:top-4.5 sm:right-4.5 sm:bg-cream sm:p-1 sm:shadow-md">
-          <ArrowUpRight
-            size={16}
-            className="sketch-subtle group-hover/tile:sketch-subtle-animated"
-          />
+          <ArrowUpRight size={16} className="sketch-subtle" />
         </span>
+      )}
+      {item.url && (
+        <OpensOverlay
+          className="group-hover/tile:opacity-100"
+          washClassName="inset-px rounded-xl sketch"
+        />
       )}
     </>
   );
