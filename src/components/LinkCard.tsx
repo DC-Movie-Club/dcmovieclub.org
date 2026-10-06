@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowUpRight, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CardItem } from "@/lib/pages";
+import { textStyles } from "@/components/textStyles";
 
 // A link with its site's preview picture, like a press piece. The picture is
 // loaded from that site, so if it's gone the card shows without it.
@@ -38,7 +39,7 @@ export function LinkCard({ item }: { item: CardItem }) {
           />
         ) : (
           // Holds the picture's place so cards in a row stay alike
-          <div className="flex aspect-square w-20 items-center justify-center rounded-md bg-page-ink/10 text-page-ink/40 sm:aspect-wide sm:w-full">
+          <div className="flex aspect-square w-20 items-center justify-center rounded-md bg-page-card-text/10 text-page-card-text/40 sm:aspect-wide sm:w-full">
             <Newspaper size={28} className="sketch-subtle" />
           </div>
         )}
@@ -49,11 +50,16 @@ export function LinkCard({ item }: { item: CardItem }) {
           )}
         >
           {item.source && (
-            <span className="truncate text-xs uppercase tracking-wider text-page-ink/80">
+            <span className={cn("truncate", textStyles.tileMeta)}>
               {item.source}
             </span>
           )}
-          <h3 className="line-clamp-3 text-base uppercase leading-tight tracking-wide text-page-ink transition-colors group-hover/tile:text-rust sm:text-lg">
+          <h3
+            className={cn(
+              textStyles.tileTitle,
+              "line-clamp-3 transition-colors group-hover/tile:text-rust",
+            )}
+          >
             {item.title}
           </h3>
         </div>

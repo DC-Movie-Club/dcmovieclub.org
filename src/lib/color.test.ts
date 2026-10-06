@@ -1,6 +1,7 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
 import {
+  blend,
   contrastRatio,
   hexToOklch,
   hexToRgb,
@@ -148,6 +149,28 @@ describe("contrastRatio", () => {
 
   it("reads short hex forms", () => {
     close(contrastRatio("#000", "#fff"), 21, 0.0001)
+  })
+})
+
+describe("blend", () => {
+  it("lays a color over a ground at an opacity", () => {
+    assert.equal(blend("#000000", "#ffffff", 0.5), "#808080")
+    assert.equal(blend("#a2390a", "#efecdf", 1), "#a2390a")
+    assert.equal(blend("#a2390a", "#efecdf", 0), "#efecdf")
+  })
+
+  it("matches charcoal at 80% on cream", () => {
+    assert.equal(blend("#393a3e", "#efecdf", 0.8), "#5d5e5e")
+  })
+
+  it("lowers contrast with the ground", () => {
+    const full = contrastRatio("#ca6c84", "#efecdf")
+    const faint = contrastRatio(blend("#ca6c84", "#efecdf", 0.8), "#efecdf")
+    assert.ok(faint < full)
+  })
+
+  it("throws on anything that isn't a hex color", () => {
+    assert.throws(() => blend("red", "#ffffff", 0.5))
   })
 })
 

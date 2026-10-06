@@ -13,6 +13,7 @@ import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import { Markdown } from "@/components/Markdown";
 import { CardEdgeLink, SectionCard } from "@/components/section-cards";
+import { textStyles } from "@/components/textStyles";
 import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
@@ -138,9 +139,7 @@ function EventsSection({
         {upcoming.length > 0 && (
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
-                Also coming up
-              </h2>
+              <h2 className={textStyles.pageHeading}>Also coming up</h2>
               <OutlineLink href={pageTemplates.events.href}>View all</OutlineLink>
             </div>
             <ul className="grid gap-4 sm:grid-cols-3">
@@ -200,9 +199,7 @@ function AboutSection({
 
         {partners && partners.items.length > 0 && (
           <div className="flex flex-col gap-5 border-t-2 border-dashed border-page-fg/30 pt-8">
-            <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
-              {partners.label}
-            </h2>
+            <h2 className={textStyles.pageHeading}>{partners.label}</h2>
             <ul className="flex flex-wrap items-center gap-2.5">
               <li className="flex">
                 <NextLink

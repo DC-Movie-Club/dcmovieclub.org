@@ -106,6 +106,20 @@ export function contrastRatio(a: string, b: string): number {
   return (light + 0.05) / (dark + 0.05);
 }
 
+// `color` at `opacity` laid over `ground`, the color the browser paints for
+// translucent text
+export function blend(color: string, ground: string, opacity: number): string {
+  const top = hexToRgb(color)
+  const bottom = hexToRgb(ground)
+  if (!top || !bottom) throw new Error(`Not a hex color: ${top ? ground : color}`)
+  const mix = (a: number, b: number) => a * opacity + b * (1 - opacity)
+  return rgbToHex({
+    r: mix(top.r, bottom.r),
+    g: mix(top.g, bottom.g),
+    b: mix(top.b, bottom.b),
+  })
+}
+
 // OKLab matrices from Björn Ottosson, https://bottosson.github.io/posts/oklab/
 function linearToOklch(r: number, g: number, b: number): Oklch {
   const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);

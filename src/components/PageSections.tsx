@@ -1,8 +1,10 @@
 import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { LinkCard } from "@/components/LinkCard";
 import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { SectionCard } from "@/components/section-cards";
+import { textStyles } from "@/components/textStyles";
 import { Link, ExternalLink } from "@/components/ui/link";
 import type { FaqItem, LinkItem, PageSection } from "@/lib/pages";
 
@@ -11,7 +13,7 @@ function LinkListItem({ item }: { item: LinkItem }) {
   const LinkComponent = item.url.startsWith("/") ? Link : ExternalLink;
   return (
     <li>
-      <LinkComponent href={item.url} className={markdownStyles.link}>
+      <LinkComponent href={item.url} className={textStyles.proseLink}>
         {item.title}
       </LinkComponent>
     </li>
@@ -20,7 +22,7 @@ function LinkListItem({ item }: { item: LinkItem }) {
 
 function TagItem({ item }: { item: LinkItem }) {
   return (
-    <li className="relative px-4 py-2 text-base uppercase leading-none tracking-wide text-charcoal">
+    <li className={cn("relative px-4 py-2", textStyles.stickerText)}>
       <span
         aria-hidden
         className="absolute inset-0 rounded-full border-2 border-page-accent-edge/30 bg-page-accent/20 shadow-sm sketch-subtle"
@@ -40,9 +42,7 @@ function TagItem({ item }: { item: LinkItem }) {
 // page instead of on a card
 function ListHeading({ children }: { children: string }) {
   return (
-    <h2 className="text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-5xl">
-      {children}
-    </h2>
+    <h2 className={textStyles.labelLettering}>{children}</h2>
   );
 }
 
@@ -55,7 +55,7 @@ export function FaqEntry({ item }: { item: FaqItem }) {
     // than <summary> lands in ::details-content, which is hidden while closed.
     <details className="group/faq relative [interpolate-size:allow-keywords] before:absolute before:inset-px before:rounded-xl before:bg-cream before:shadow-lg before:content-[''] before:sketch after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:border-[2.5px] after:border-page-edge after:content-[''] after:ink [&::details-content]:h-0 [&::details-content]:overflow-hidden [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto">
       <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust sm:px-6 [&::-webkit-details-marker]:hidden">
-        <span className="text-xl uppercase leading-snug tracking-wider text-page-ink sm:text-2xl">
+        <span className={textStyles.cardQuestion}>
           {item.question}
         </span>
         <span className="relative flex size-8 shrink-0 items-center justify-center text-page-accent-text">

@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { colorVars, type PageColors } from "@/config/pages";
 import { HomeLink } from "@/components/HomeLink";
 import { SiteFooter } from "@/components/SiteFooter";
+import { textStyles } from "@/components/textStyles";
 
 // A full-bleed page in its color roles (see colorRoles), from the page's
 // Firestore doc. `contentClassName` sets the spacing between sections. The
@@ -51,12 +52,7 @@ export function PageTitle({
   children: React.ReactNode;
 }) {
   return (
-    <h1
-      className={cn(
-        "text-5xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:text-6xl",
-        className,
-      )}
-    >
+    <h1 className={cn(textStyles.titleLettering, className)}>
       {children}
     </h1>
   );

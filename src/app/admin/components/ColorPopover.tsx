@@ -1,7 +1,14 @@
 "use client";
 
 import { Check, TriangleAlert } from "lucide-react";
-import { partnersOf } from "@/config/contrast";
+import {
+  faintestOf,
+  fixedColors,
+  isFixedColorKey,
+  partnersOf,
+  shownColor,
+  type PartnerKey,
+} from "@/config/contrast";
 import { colorRoles, isHexColor, type ColorRoleKey } from "@/config/pages";
 import { BrandSwatches } from "@/app/admin/components/BrandSwatches";
 import { ColorPicker } from "@/app/admin/components/ColorPicker";
@@ -12,7 +19,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { contrastRatio, shades } from "@/lib/color";
+import { blend, contrastRatio, shades } from "@/lib/color";
 import { cn } from "@/lib/utils";
 
 function Shades({
@@ -55,25 +62,50 @@ function ratioText(ratio: number) {
   return `${Math.floor(ratio * 10) / 10}:1`;
 }
 
+function partnerColor(
+  partner: PartnerKey,
+  colors: Record<ColorRoleKey, string>,
+) {
+  if (isFixedColorKey(partner)) {
+    const { label, hex } = fixedColors[partner];
+    return { name: label, hex, preposition: "on" };
+  }
+  return {
+    name: colorRoles[partner].label.toLowerCase(),
+    hex: colors[partner],
+    preposition: "with",
+  };
+}
+
+// Checks the color the role shows in, which for an unset role with a
+// fallback is the fallback's
 export function Contrast({
   role,
-  color,
   colors,
 }: {
   role: ColorRoleKey;
-  color: string;
   colors: Record<ColorRoleKey, string>;
 }) {
   const partners = partnersOf(role);
-  if (partners.length === 0) return null;
+  const shown = shownColor(role, colors);
+  const typing = colors[role] !== "" && !isHexColor(colors[role]);
+  if (partners.length === 0 || !shown || typing) return null;
+  const faintest = faintestOf(role);
+  const source = shown.from
+    ? `the ${colorRoles[shown.from].label.toLowerCase()} color`
+    : "charcoal";
   return (
     <div className="flex flex-col gap-1">
       <span className="text-xs font-medium text-muted-foreground">
         Contrast
       </span>
+      {shown.from !== role && (
+        <p className="text-xs text-muted-foreground">
+          {`Not set, so ${colorRoles[role].label.toLowerCase()} shows in ${source}, ${shown.hex}.`}
+        </p>
+      )}
       {partners.map(([partner, minimum]) => {
-        const name = colorRoles[partner].label.toLowerCase();
-        const other = colors[partner];
+        const { name, hex: other, preposition } = partnerColor(partner, colors);
         if (!isHexColor(other)) {
           return (
             <p key={partner} className="text-xs text-muted-foreground">
@@ -81,6 +113,7 @@ export function Contrast({
             </p>
           );
         }
+        const color = faintest < 1 ? blend(shown.hex, other, faintest) : shown.hex;
         const ratio = contrastRatio(color, other);
         const passes = ratio >= minimum;
         const Icon = passes ? Check : TriangleAlert;
@@ -93,7 +126,8 @@ export function Contrast({
               )}
             />
             <span>
-              {ratioText(ratio)} with {name}
+              {`${ratioText(ratio)} ${preposition} ${name}`}
+              {faintest < 1 && ` at ${Math.round(faintest * 100)}%, its faintest`}
               <span className="text-muted-foreground">
                 {passes
                   ? " · passes AA"

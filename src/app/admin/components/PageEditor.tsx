@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowUpRight, Maximize2, Minimize2, Undo2 } from "lucide-react";
 import {
   colorRoles,
+  colorVars,
   isHexColor,
   navPages,
   pageTemplates,
@@ -12,6 +13,7 @@ import {
   type ColorRoleKey,
   type NavColors,
   type PageColors,
+  type PageKey,
 } from "@/config/pages";
 import { savePage } from "@/app/admin/actions/pages";
 import {
@@ -78,6 +80,22 @@ function colorsOf(draft: Draft): PageColors {
   return Object.fromEntries(
     Object.entries(draft.colors).filter(([, hex]) => isHexColor(hex)),
   );
+}
+
+// The colors a section's text sits in on the page, so its rich text fields can
+// show it that way: the page's own, but Home's About text is in the About
+// page's band (see HomePage)
+function textColorsOf(
+  page: PageKey,
+  section: string,
+  draft: Draft,
+  data: PageData,
+): PageColors {
+  const home = pageTemplates.home;
+  if (page === home.key && section === home.sections.about.key) {
+    return data.aboutPage?.colors ?? {};
+  }
+  return colorsOf(draft);
 }
 
 function navColorsOf(draft: Draft): NavColors {
@@ -424,7 +442,12 @@ export function PageEditor({
                   </Button>
                 )}
               </div>
-              <div key={`${current.key}:${revision}`}>{form}</div>
+              <div
+                key={`${current.key}:${revision}`}
+                style={colorVars(textColorsOf(pageKey, current.key, draft, data))}
+              >
+                {form}
+              </div>
             </div>
           </section>
 

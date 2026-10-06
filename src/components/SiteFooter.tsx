@@ -2,6 +2,7 @@ import NextLink from "next/link";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { textStyles } from "@/components/textStyles";
 import { routes, socials } from "@/config/navigation";
 
 const EMAIL = "hello@dcmovieclub.org";
@@ -50,7 +51,12 @@ export function SiteFooter({ className }: { className?: string }) {
           aria-hidden
           className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/subscribe:boil"
         />
-        <span className="relative flex items-center gap-2 px-5 py-2.5 uppercase tracking-wider whitespace-nowrap text-page-accent-text">
+        <span
+          className={cn(
+            "relative flex items-center gap-2 px-5 py-2.5 whitespace-nowrap",
+            textStyles.accentPillSmall,
+          )}
+        >
           <Mail size={18} className="shrink-0" />
           Subscribe to our newsletter
         </span>

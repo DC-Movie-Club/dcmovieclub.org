@@ -106,9 +106,12 @@
   /* --- Page colors: pages set them from their Firestore doc (see colorRoles).
      The fallbacks are neutral, for a color that isn't set. --- */
   --color-page-bg: var(--page-bg, var(--color-background));
-  /* Text: copy sitting directly on the page background */
+  /* Page text: text sitting directly on the page background */
   --color-page-fg: var(--page-fg, var(--color-charcoal));
-  /* Ink: outlines on lettering labels */
+  /* Card text: all text on the cream cards. Unset, it takes the lettering
+     outline's color (see colorRoles' fallback). */
+  --color-page-card-text: var(--page-card-text, var(--page-ink, var(--color-charcoal)));
+  /* Ink: the outline on cream lettering like page titles and card labels */
   --color-page-ink: var(--page-ink, var(--color-charcoal));
   /* Edge: card and tile borders */
   --color-page-edge: var(--page-edge, var(--color-charcoal));

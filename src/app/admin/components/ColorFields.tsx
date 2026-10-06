@@ -4,6 +4,7 @@ import {
   colorRoles,
   isHexColor,
   navPages,
+  placeholderOf,
   type ColorRoleKey,
   type PageKey,
 } from "@/config/pages";
@@ -66,22 +67,18 @@ export function ColorFields({
         Pick a swatch to try a color. The preview updates right away, and the
         site changes when you save.
       </FieldDescription>
-      {Object.values(colorRoles).map((role) => {
-        const value = colors[role.key];
-        return (
-          <ColorField
-            key={role.key}
-            id={`color-${role.key}`}
-            label={role.label}
-            value={value}
-            onChange={(next) => onChange(role.key, next)}
-          >
-            {isHexColor(value) && (
-              <Contrast role={role.key} color={value} colors={colors} />
-            )}
-          </ColorField>
-        );
-      })}
+      {Object.values(colorRoles).map((role) => (
+        <ColorField
+          key={role.key}
+          id={`color-${role.key}`}
+          label={role.label}
+          value={colors[role.key]}
+          placeholder={placeholderOf(role.key)}
+          onChange={(next) => onChange(role.key, next)}
+        >
+          <Contrast role={role.key} colors={colors} />
+        </ColorField>
+      ))}
     </FieldGroup>
   );
 }

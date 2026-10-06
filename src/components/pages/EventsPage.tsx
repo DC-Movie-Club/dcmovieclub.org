@@ -5,6 +5,7 @@ import { EventTile } from "@/components/events/EventTile";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
 import { CreamCard } from "@/components/CreamCard";
 import { PageSections } from "@/components/PageSections";
+import { textStyles } from "@/components/textStyles";
 import type { CalendarEvent } from "@/types/event";
 
 function groupByMonth(events: CalendarEvent[]) {
@@ -26,7 +27,7 @@ function UpcomingEvents({ events }: { events: CalendarEvent[] }) {
         <FeaturedEventCard event={featured} />
       ) : (
         <CreamCard>
-          <p className="text-center text-lg uppercase tracking-wide text-charcoal/80">
+          <p className={textStyles.cardEmpty}>
             No upcoming events right now. Check back soon!
           </p>
         </CreamCard>
@@ -34,9 +35,7 @@ function UpcomingEvents({ events }: { events: CalendarEvent[] }) {
 
       {months.map((month) => (
         <section key={month.label} className="flex flex-col gap-4">
-          <h2 className="text-xl uppercase tracking-wide text-page-fg sm:text-2xl">
-            {month.label}
-          </h2>
+          <h2 className={textStyles.pageHeading}>{month.label}</h2>
           <ul className="grid gap-4 sm:grid-cols-3">
             {month.events.map((event) => (
               <li key={event.id}>
@@ -64,9 +63,7 @@ export function EventsPage({
         <header className="flex flex-col gap-4">
           <PageTitle>{page.title}</PageTitle>
           {page.subtitle && (
-            <p className="text-lg uppercase tracking-wide text-page-fg/80">
-              {page.subtitle}
-            </p>
+            <p className={textStyles.pageSubtitle}>{page.subtitle}</p>
           )}
         </header>
       }

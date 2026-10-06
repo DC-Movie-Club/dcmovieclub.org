@@ -50,7 +50,9 @@ function MarkdownChangePlugin({
 }
 
 // A rich text editor for one markdown field. It reads `value` once when it
-// mounts; remount it (with a new `key`) to load a different value.
+// mounts; remount it (with a new `key`) to load a different value. The text
+// is on cream in the page's card text, as on the page, from the page color
+// variables the form sets around it (see PageEditor).
 export function RichTextField({
   value,
   onChange,
@@ -81,7 +83,7 @@ export function RichTextField({
           setIsLinkEditMode={setIsLinkEditMode}
           className="rounded-t-lg"
         />
-        <div ref={setAnchorElem} className="relative px-4 py-3">
+        <div ref={setAnchorElem} className="relative rounded-b-lg bg-cream px-4 py-3">
           <RichTextPlugin
             contentEditable={
               <ContentEditable
@@ -92,7 +94,7 @@ export function RichTextField({
                     Start writing...
                   </div>
                 }
-                className="min-h-16 font-dcmc text-charcoal outline-none"
+                className="min-h-16 font-dcmc text-page-card-text outline-none"
               />
             }
             ErrorBoundary={LexicalErrorBoundary}

@@ -1,6 +1,7 @@
 import NextLink from "next/link";
 import { cn } from "@/lib/utils";
 import { CardSurface } from "@/components/CardSurface";
+import { textStyles } from "@/components/textStyles";
 
 // A fixed angle lifts the far end of a long heading well above the card, so the
 // tilt shrinks with length to keep that rise roughly constant (capped at 2deg).
@@ -24,7 +25,8 @@ export function CardLabel({
   return (
     <Tag
       className={cn(
-        "relative -mt-2 ml-4 mr-4 origin-bottom-left text-4xl uppercase leading-none tracking-wide text-cream outlined-lettering outline-ink-page-ink sm:-mt-3 sm:ml-6 sm:text-5xl",
+        "relative -mt-2 ml-4 mr-4 origin-bottom-left sm:-mt-3 sm:ml-6",
+        textStyles.labelLettering,
         className,
       )}
       style={{ rotate: `${headingTilt(children)}deg` }}
@@ -51,7 +53,12 @@ export function CardEdgeFace({ children }: { children: React.ReactNode }) {
         aria-hidden
         className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/edge:boil card-hover:boil"
       />
-      <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
+      <span
+        className={cn(
+          "relative flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3",
+          textStyles.accentPill,
+        )}
+      >
         {children}
       </span>
     </>

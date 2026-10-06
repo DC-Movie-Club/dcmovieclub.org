@@ -81,7 +81,7 @@ export function Markdown({
   overrides?: Components;
 }) {
   return (
-    <div className={cn("text-charcoal", className)}>
+    <div className={cn("text-page-card-text", className)}>
       <ReactMarkdown
         components={{ ...components, ...overrides }}
         remarkPlugins={[remarkDirective, remarkDetails]}

@@ -8,6 +8,7 @@ import { CalendarDate } from "@/components/events/CalendarDate";
 import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta, getMapUrl } from "@/components/events/event-links";
 import { CardSurface } from "@/components/CardSurface";
+import { textStyles } from "@/components/textStyles";
 import {
   CardEdgeFace,
   CardLabel,
@@ -54,11 +55,16 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
         <CalendarDate month={month} day={day} variant="tall" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <h2 className="text-2xl uppercase leading-tight tracking-wide text-page-ink sm:text-3xl">
+          <h2 className={textStyles.cardTitle}>
             {event.title}
           </h2>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm uppercase tracking-wider text-page-ink/80">
+          <div
+            className={cn(
+              "flex flex-wrap items-center gap-x-4 gap-y-1",
+              textStyles.cardMeta,
+            )}
+          >
             <span className="flex items-center gap-1.5">
               <CalendarDays size={14} className="shrink-0" />
               {weekday}
@@ -72,7 +78,7 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
             {event.location && mapUrl && (
               <ExternalLink
                 href={mapUrl}
-                className="pointer-events-auto flex items-center gap-1.5 underline decoration-page-ink/30 underline-offset-4 hover:decoration-rust"
+                className="pointer-events-auto flex items-center gap-1.5 underline decoration-page-card-text/30 underline-offset-4 hover:decoration-rust"
               >
                 <MapPin size={14} className="shrink-0" />
                 {event.location}
@@ -83,7 +89,11 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
           {event.description && (
             <ExpandableDescription
               html={event.description}
-              className="mt-2 border-t border-dashed border-charcoal/20 pt-3 text-sm text-page-ink/90 [&_a]:pointer-events-auto [&_a]:text-rust [&_a]:underline [&_a]:decoration-rust/40 [&_a]:underline-offset-4 [&_a:hover]:decoration-rust"
+              className={cn(
+                "mt-2 border-t border-dashed border-charcoal/20 pt-3 [&_a]:pointer-events-auto",
+                textStyles.cardNote,
+                textStyles.htmlLinks,
+              )}
               actionClassName="pointer-events-auto absolute bottom-0 left-1/2 mt-0 -translate-x-1/2 translate-y-1/2"
             />
           )}

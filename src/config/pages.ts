@@ -2,10 +2,19 @@ import type { CSSProperties } from "react";
 
 // Each role is a CSS variable that page components color with (bg-page-bg,
 // border-page-accent-edge, …); a role a page doesn't set falls back to a
-// neutral color in globals.css.
+// neutral color in globals.css, or to the role named as its `fallback`. Keys
+// are field names in Firestore, so they stay put even when labels change.
 export const colorRoles = {
   background: { key: "background", label: "Background", cssVar: "--page-bg" },
-  foreground: { key: "foreground", label: "Text", cssVar: "--page-fg" },
+  foreground: { key: "foreground", label: "Page text", cssVar: "--page-fg" },
+  cardText: {
+    key: "cardText",
+    label: "Card text",
+    cssVar: "--page-card-text",
+    fallback: "ink",
+    // Its field's placeholder while unset, short enough to fit
+    placeholder: "Outline",
+  },
   ink: { key: "ink", label: "Lettering outline", cssVar: "--page-ink" },
   edge: { key: "edge", label: "Card border", cssVar: "--page-edge" },
   accent: { key: "accent", label: "Accent", cssVar: "--page-accent" },
@@ -26,11 +35,32 @@ export function isHexColor(value: unknown): value is string {
   return typeof value === "string" && HEX_COLOR.test(value);
 }
 
+type ColorRole = {
+  key: ColorRoleKey;
+  label: string;
+  fallback?: ColorRoleKey;
+  placeholder?: string;
+};
+
+// The role an unset role shows instead, if it has one
+export function fallbackOf(role: ColorRoleKey): ColorRoleKey | null {
+  const entry: ColorRole = colorRoles[role];
+  return entry.fallback ?? null;
+}
+
+export function placeholderOf(role: ColorRoleKey): string | undefined {
+  const entry: ColorRole = colorRoles[role];
+  return entry.placeholder;
+}
+
+// Every role is written, an unset one as `initial` (which makes var() take its
+// fallback), so a scope nested in another page's, like Home's bands, never
+// shows a color the outer page set
 export function colorVars(colors: PageColors): CSSProperties {
   return Object.fromEntries(
-    Object.entries(colors).map(([role, hex]) => [
-      colorRoles[role as ColorRoleKey].cssVar,
-      hex,
+    Object.values(colorRoles).map((role) => [
+      role.cssVar,
+      colors[role.key] ?? "initial",
     ]),
   );
 }
