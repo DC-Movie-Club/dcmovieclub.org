@@ -1,3 +1,6 @@
+import type { EventTicket } from "@/types/event"
+import { decodeEntities } from "./link-preview.ts"
+
 // TODO: use Ticket Tailor API (TICKET_TAILOR_API_KEY) to fetch event images (images.header / images.thumbnail) for events with a TT link
 const TICKET_TAILOR_RE = /https?:\/\/(?:(?:www\.|app\.)?tickettailor\.com|buytickets\.at)\/[^\s<"']*/i
 
@@ -13,29 +16,36 @@ export function isHoldEvent(title?: string) {
 
 // Organizers link tickets from many hosts (Ticket Tailor, Google Forms, venue
 // sites), so the anchor text is a more reliable signal than the URL itself.
-// The matched link is removed from the description since it's surfaced as the CTA.
-export function extractTicket(description?: string): {
-  ticketUrl: string | null
+// An event can link several, e.g. one per film when there's a choice.
+export function extractTickets(description?: string): {
+  tickets: EventTicket[]
   description: string | null
 } {
-  if (!description) return { ticketUrl: null, description: null }
-  for (const match of description.matchAll(ANCHOR_RE)) {
-    const [anchor, href, text] = match
-    if (CTA_TEXT_RE.test(text.replace(/<[^>]*>/g, ""))) {
-      return {
-        ticketUrl: href.replace(/&amp;/g, "&"),
-        description: tidyDescription(description.replace(anchor, "")),
-      }
+  if (!description) return { tickets: [], description: null }
+  const tickets: EventTicket[] = []
+  for (const [, href, html] of description.matchAll(ANCHOR_RE)) {
+    const text = decodeEntities(html.replace(/<[^>]*>/g, "")).trim()
+    const url = href.replace(/&amp;/g, "&")
+    if (CTA_TEXT_RE.test(text) && !tickets.some((t) => t.url === url)) {
+      tickets.push({ label: ticketLabel(text), url })
     }
   }
-  const match = description.match(TICKET_TAILOR_RE)
-  return {
-    ticketUrl: match ? match[0] : null,
-    description: tidyDescription(description),
-  }
+  const match = !tickets.length && description.match(TICKET_TAILOR_RE)
+  if (match) tickets.push({ label: "Tickets", url: match[0] })
+  return { tickets, description: tidyDescription(description) }
 }
 
-const EMPTY_INLINE_RE = /<(b|strong|u|em|i)>\s*<\/\1>/gi
+const TICKET_WORD_RE = /^tickets?\b[\s:!.-]*|[\s:!.-]*\btickets?[\s:!.]*$/gi
+const BARE_VERB_RE = /^(?:get|buy|book|reserve)?$/i
+
+// "VERITY TICKETS" reads "VERITY" next to its siblings; text with nothing
+// else to it ("Buy tickets!") stays whole.
+function ticketLabel(text: string) {
+  const label = text.replace(TICKET_WORD_RE, "")
+  return BARE_VERB_RE.test(label) ? text : label
+}
+
+const EMPTY_INLINE_RE = /<(b|strong|u|em|i)>((?:\s|<br\s*\/?>)*)<\/\1>/gi
 const EDGE_BREAKS_RE = /^(?:\s|<br\s*\/?>|<p>\s*<\/p>)+|(?:\s|<br\s*\/?>|<p>\s*<\/p>)+$/gi
 const REPEATED_BREAKS_RE = /(?:<br\s*\/?>\s*){3,}/gi
 
@@ -44,7 +54,7 @@ export function tidyDescription(html: string): string | null {
   let previous
   do {
     previous = out
-    out = out.replace(EMPTY_INLINE_RE, "")
+    out = out.replace(EMPTY_INLINE_RE, "$2")
   } while (out !== previous)
   out = out.replace(EDGE_BREAKS_RE, "").replace(REPEATED_BREAKS_RE, "<br><br>")
   return out || null

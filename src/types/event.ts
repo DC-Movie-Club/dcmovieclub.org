@@ -7,5 +7,10 @@ export type CalendarEvent = {
   end: string
   allDay: boolean
   link: string | null
-  ticketUrl: string | null
+  tickets: EventTicket[]
+}
+
+export type EventTicket = {
+  label: string
+  url: string
 }

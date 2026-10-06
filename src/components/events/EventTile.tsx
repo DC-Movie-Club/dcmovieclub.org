@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { formatEventDate } from "@/lib/event-format";
 import { EventTime } from "@/components/EventTime";
 import { CalendarDate } from "@/components/events/CalendarDate";
+import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta } from "@/components/events/event-links";
 import type { CalendarEvent } from "@/types/event";
 
@@ -64,14 +65,13 @@ export function EventTile({ event }: { event: CalendarEvent }) {
     "group/tile relative block h-full rounded-xl transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
   return cta ? (
-    <a
-      href={cta.href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <EventCtaLink
+      cta={cta}
+      title={event.title}
       className={cn(className, "hover:-rotate-1 hover:scale-102")}
     >
       {content}
-    </a>
+    </EventCtaLink>
   ) : (
     <div className={className}>{content}</div>
   );

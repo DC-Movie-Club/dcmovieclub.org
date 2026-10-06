@@ -1,7 +1,7 @@
 import type { CalendarEvent } from "@/types/event"
 import type { LetterboxdReview } from "@/types/letterboxd"
 import type { SubstackPost } from "@/types/post"
-import { extractTicket, isHoldEvent } from "@/lib/event-description"
+import { extractTickets, isHoldEvent } from "@/lib/event-description"
 import { splitReview } from "@/lib/letterboxd-review"
 
 const CALENDAR_ID =
@@ -52,7 +52,7 @@ export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
         end: item.end.dateTime ?? item.end.date ?? "",
         allDay: !item.start.dateTime,
         link: item.htmlLink ?? null,
-        ...extractTicket(item.description),
+        ...extractTickets(item.description),
       }))
   } catch {
     return []

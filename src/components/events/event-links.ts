@@ -1,5 +1,5 @@
 import { ArrowUpRight, Ticket, type LucideIcon } from "lucide-react";
-import type { CalendarEvent } from "@/types/event";
+import type { CalendarEvent, EventTicket } from "@/types/event";
 
 export function getMapUrl(location: string | null) {
   return location
@@ -7,11 +7,18 @@ export function getMapUrl(location: string | null) {
     : null;
 }
 
-export function getEventCta(
-  event: CalendarEvent,
-): { href: string; label: string; icon: LucideIcon } | null {
-  if (event.ticketUrl) {
-    return { href: event.ticketUrl, label: "Get Tickets", icon: Ticket };
+// An event with several ticket links (e.g. a choice of films) gets a picker
+// instead of a single href.
+export type EventCta = { label: string; icon: LucideIcon } & (
+  { href: string } | { tickets: EventTicket[] }
+);
+
+export function getEventCta(event: CalendarEvent): EventCta | null {
+  if (event.tickets.length > 1) {
+    return { tickets: event.tickets, label: "Get Tickets", icon: Ticket };
+  }
+  if (event.tickets.length === 1) {
+    return { href: event.tickets[0].url, label: "Get Tickets", icon: Ticket };
   }
   if (event.link) {
     return { href: event.link, label: "View on Calendar", icon: ArrowUpRight };

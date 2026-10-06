@@ -1,82 +1,101 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
 import {
-  extractTicket,
+  extractTickets,
   isHoldEvent,
   tidyDescription,
 } from "./event-description.ts"
 
-describe("extractTicket", () => {
-  it("returns nulls for a missing description", () => {
-    assert.deepEqual(extractTicket(undefined), {
-      ticketUrl: null,
+describe("extractTickets", () => {
+  it("returns no tickets for a missing description", () => {
+    assert.deepEqual(extractTickets(undefined), {
+      tickets: [],
       description: null,
     })
   })
 
-  it("picks a non-Ticket Tailor link by its anchor text and removes it", () => {
-    const result = extractTicket(
-      '<a href="https://forms.gle/abc">Reserve tickets here before 8/24</a><br><br>Thank you for your interest in <a href="https://sigtheatre.org/show"><u>Merrily</u></a>!',
-    )
-    assert.equal(result.ticketUrl, "https://forms.gle/abc")
-    assert.equal(
-      result.description,
-      'Thank you for your interest in <a href="https://sigtheatre.org/show"><u>Merrily</u></a>!',
-    )
+  it("picks a non-Ticket Tailor link by its anchor text and keeps it in the description", () => {
+    const description =
+      '<a href="https://forms.gle/abc">Reserve tickets here before 8/24</a><br><br>Thank you for your interest in <a href="https://sigtheatre.org/show"><u>Merrily</u></a>!'
+    const result = extractTickets(description)
+    assert.deepEqual(result.tickets, [
+      { label: "Reserve tickets here before 8/24", url: "https://forms.gle/abc" },
+    ])
+    assert.equal(result.description, description)
   })
 
   it("matches anchor text wrapped in formatting tags", () => {
-    const result = extractTicket(
+    const result = extractTickets(
       '<a href="https://buytickets.at/dcmovieclub/1"><b>Register here!</b></a><br>Monthly happy hour',
     )
-    assert.equal(result.ticketUrl, "https://buytickets.at/dcmovieclub/1")
-    assert.equal(result.description, "Monthly happy hour")
+    assert.deepEqual(result.tickets, [
+      { label: "Register here!", url: "https://buytickets.at/dcmovieclub/1" },
+    ])
   })
 
   it("decodes &amp; in the ticket URL", () => {
-    const result = extractTicket(
+    const result = extractTickets(
       'Screening at 6:45<br><br><a href="https://drafthouse.com/show?a=1&amp;b=2"><b>TICKETS</b></a>',
     )
-    assert.equal(result.ticketUrl, "https://drafthouse.com/show?a=1&b=2")
-    assert.equal(result.description, "Screening at 6:45")
+    assert.deepEqual(result.tickets, [
+      { label: "TICKETS", url: "https://drafthouse.com/show?a=1&b=2" },
+    ])
   })
 
-  it("uses the first link whose text looks like a CTA", () => {
-    const result = extractTicket(
+  it("skips links whose text doesn't look like a CTA", () => {
+    const result = extractTickets(
       '<a href="https://example.com/info">More info</a> and <a href="https://example.com/buy">Buy tickets</a>',
     )
-    assert.equal(result.ticketUrl, "https://example.com/buy")
-    assert.equal(
-      result.description,
-      '<a href="https://example.com/info">More info</a> and',
-    )
+    assert.deepEqual(result.tickets, [
+      { label: "Buy tickets", url: "https://example.com/buy" },
+    ])
   })
 
-  it("falls back to a bare Ticket Tailor URL and leaves the text alone", () => {
-    const result = extractTicket(
-      "Get tickets at https://www.tickettailor.com/events/dcmovieclub/42 today",
+  it("collects every ticket link, labeled without the word tickets", () => {
+    const result = extractTickets(
+      '<a href="https://drafthouse.com/verity"><b>VERITY TICKETS</b></a><br><b><br></b><br><a href="https://drafthouse.com/your-mother"><b>YOUR MOTHERx3 TICKETS</b></a><br><br><strong>Choice of either</strong>',
     )
-    assert.equal(
-      result.ticketUrl,
-      "https://www.tickettailor.com/events/dcmovieclub/42",
+    assert.deepEqual(result.tickets, [
+      { label: "VERITY", url: "https://drafthouse.com/verity" },
+      { label: "YOUR MOTHERx3", url: "https://drafthouse.com/your-mother" },
+    ])
+  })
+
+  it("keeps one ticket per URL and decodes entities in labels", () => {
+    const result = extractTickets(
+      '<a href="https://example.com/t">Q&amp;A tickets</a> Doors at 7. <a href="https://example.com/t">Tickets</a>',
     )
-    assert.equal(
-      result.description,
-      "Get tickets at https://www.tickettailor.com/events/dcmovieclub/42 today",
-    )
+    assert.deepEqual(result.tickets, [
+      { label: "Q&A", url: "https://example.com/t" },
+    ])
+  })
+
+  it("falls back to a bare Ticket Tailor URL", () => {
+    const description =
+      "Get tickets at https://www.tickettailor.com/events/dcmovieclub/42 today"
+    assert.deepEqual(extractTickets(description), {
+      tickets: [
+        {
+          label: "Tickets",
+          url: "https://www.tickettailor.com/events/dcmovieclub/42",
+        },
+      ],
+      description,
+    })
   })
 
   it("returns no ticket when nothing matches", () => {
-    assert.deepEqual(extractTicket("Tickets/details coming soon!"), {
-      ticketUrl: null,
+    assert.deepEqual(extractTickets("Tickets/details coming soon!"), {
+      tickets: [],
       description: "Tickets/details coming soon!",
     })
   })
 
-  it("returns a null description when only the CTA link was present", () => {
-    assert.deepEqual(
-      extractTicket('<p><a href="https://example.com/t">TICKETS</a></p>'),
-      { ticketUrl: "https://example.com/t", description: null },
+  it("tidies the description it returns", () => {
+    assert.equal(
+      extractTickets('<br><a href="https://example.com/t">TICKETS</a><br><br>')
+        .description,
+      '<a href="https://example.com/t">TICKETS</a>',
     )
   })
 })
@@ -99,6 +118,13 @@ describe("tidyDescription", () => {
 
   it("removes nested empty formatting tags", () => {
     assert.equal(tidyDescription("<b><u></u></b>Hello"), "Hello")
+  })
+
+  it("unwraps formatting tags that only hold breaks", () => {
+    assert.equal(
+      tidyDescription("<br><b><br></b><br>Hello<b><br></b>World"),
+      "Hello<br>World",
+    )
   })
 
   it("returns null when nothing is left", () => {

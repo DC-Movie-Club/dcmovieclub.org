@@ -5,9 +5,14 @@ import { ExternalLink } from "@/components/ui/link";
 import { EventTime } from "@/components/EventTime";
 import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { CalendarDate } from "@/components/events/CalendarDate";
+import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta, getMapUrl } from "@/components/events/event-links";
 import { CardSurface } from "@/components/CardSurface";
-import { CardEdgeLink, CardLabel } from "@/components/section-cards";
+import {
+  CardEdgeFace,
+  CardLabel,
+  cardEdgeClassName,
+} from "@/components/section-cards";
 import type { CalendarEvent } from "@/types/event";
 
 // TODO: detect if the featured event is sold out via Ticket Tailor API and
@@ -26,10 +31,9 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
       {/* Stretched link makes the whole card clickable; the pill below is the
           focusable CTA, so this one stays out of the tab order. */}
       {cta && (
-        <a
-          href={cta.href}
-          target="_blank"
-          rel="noopener noreferrer"
+        <EventCtaLink
+          cta={cta}
+          title={event.title}
           tabIndex={-1}
           aria-hidden
           className="absolute inset-0 rounded-2xl"
@@ -87,10 +91,16 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
       </div>
 
       {cta && (
-        <CardEdgeLink href={cta.href}>
-          <cta.icon size={18} className="shrink-0" />
-          {cta.label}
-        </CardEdgeLink>
+        <EventCtaLink
+          cta={cta}
+          title={event.title}
+          className={cardEdgeClassName}
+        >
+          <CardEdgeFace>
+            <cta.icon size={18} className="shrink-0" />
+            {cta.label}
+          </CardEdgeFace>
+        </EventCtaLink>
       )}
     </div>
   );

@@ -34,8 +34,30 @@ export function CardLabel({
   );
 }
 
-// An accent pill straddling a card's top-right corner. Inside a clickable
-// card (group/card) it also reacts while the card is hovered.
+// An accent pill straddling a card's top-right corner, as the class for the
+// element and its face to put inside. Inside a clickable card (group/card) it
+// also reacts while the card is hovered.
+export const cardEdgeClassName =
+  "group/edge absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 card-hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6";
+
+export function CardEdgeFace({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <span
+        aria-hidden
+        className="absolute inset-px rounded-full bg-page-accent shadow-lg sketch group-hover/edge:boil card-hover:boil"
+      />
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/edge:boil card-hover:boil"
+      />
+      <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
+        {children}
+      </span>
+    </>
+  );
+}
+
 export function CardEdgeLink({
   href,
   children,
@@ -48,19 +70,9 @@ export function CardEdgeLink({
     <NextLink
       href={href}
       {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-      className="group/edge absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 card-hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6"
+      className={cardEdgeClassName}
     >
-      <span
-        aria-hidden
-        className="absolute inset-px rounded-full bg-page-accent shadow-lg sketch group-hover/edge:boil card-hover:boil"
-      />
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/edge:boil card-hover:boil"
-      />
-      <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-page-accent-text sm:px-6 sm:py-3 sm:text-base">
-        {children}
-      </span>
+      <CardEdgeFace>{children}</CardEdgeFace>
     </NextLink>
   );
 }
