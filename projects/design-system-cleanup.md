@@ -113,10 +113,16 @@ hand in about 18 places across 14 files.
 Each phase is a commit (or several), checked against the `/kit` screenshots
 before moving on.
 
-- [ ] **0. Safety net.** Fixture data; dev-only `/kit` pages rendering every
-  page from fixtures under the real chrome; a Playwright spec screenshotting
-  them at phone and desktop sizes, with hover and open states and animations
-  paused; baseline taken before any change.
+To check a change: on the commit before it, `pnpm kit:baseline`; after it,
+`pnpm kit:check`. Differences land in `test-results/` as expected, actual and
+diff images. `pnpm dev` and `/kit` show the pages by eye. Locally, Playwright
+needs its browser once: `pnpm exec playwright install chromium`.
+
+- [x] **0. Safety net.** Fixture data (`src/app/kit/fixtures.ts`); dev-only
+  `/kit` pages rendering every page from fixtures under the real chrome;
+  `tests/kit.spec.ts` screenshotting each page (top of page and whole) at
+  phone and desktop sizes, plus open states (dialogs, Read more, FAQ) and 23
+  desktop hovers, with animations held still.
 - [ ] **1. Foundations, no visual change.** `filters.ts`, PublicChrome,
   `focus-ring`, SmartLink, site constants, deletions (WatercolorFilter, unused
   icons, Contact, Instagram).

@@ -42,3 +42,8 @@ service-account-key.json
 service-account.json
 *-firebase-adminsdk-*.json
 credentials.json
+
+# kit screenshots (see playwright.config.ts)
+/tests/kit-screenshots/
+/test-results/
+/playwright-report/
