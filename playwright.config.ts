@@ -17,7 +17,8 @@ export default defineConfig({
   reporter: [["list"]],
   expect: {
     toHaveScreenshot: {
-      // Finishes transitions and holds CSS animations (the marquee) still
+      // Finishes transitions and cancels endless animations, for any shot
+      // that doesn't freeze the page itself first (see freeze in the spec)
       animations: "disabled",
       caret: "hide",
       // Exact: runs on one machine draw the same, and a faint color change is

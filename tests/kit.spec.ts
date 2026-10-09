@@ -16,12 +16,23 @@ async function open(page: Page, key: string) {
   await page.waitForSelector("html:not([data-loading])");
 }
 
-// Holds SVG animations (the boils and redraws) on their first frame
+// Holds everything still: transitions and other animations that end jump to
+// their end, and endless ones (the boils and redraws, the marquee) stop on
+// their first frame, so a hover shot shows the boil's first frame. SVG
+// animations stop on their first frame too.
 async function freeze(page: Page) {
   await page.evaluate(() => {
     for (const svg of document.querySelectorAll("svg")) {
       svg.pauseAnimations();
       svg.setCurrentTime(0);
+    }
+    for (const animation of document.getAnimations()) {
+      if (Number.isFinite(animation.effect?.getComputedTiming().endTime)) {
+        animation.finish();
+      } else {
+        animation.pause();
+        animation.currentTime = 0;
+      }
     }
   });
 }
@@ -54,6 +65,9 @@ async function shot(page: Page, name: string, fullPage = false) {
   }
   // Soft, so a test's later shots are still compared after one differs
   await expect.soft(page).toHaveScreenshot(`${name}.png`, {
+    // freeze() has already stilled the animations; Playwright's own
+    // stilling would cancel the endless ones, boils included
+    animations: "allow",
     fullPage,
     mask: [page.locator("iframe")],
   });
