@@ -92,7 +92,8 @@ hand in about 18 places across 14 files.
 - **PublicChrome**: filters, main, nav, PageReveal; shared by the public
   layout, the 404 page and `/kit`.
 - **PageShell**: color roles, background to the bottom edge, nav clearance,
-  optional HomeLink, footer. Replaces ColorPage and Home's wrapper.
+  footer. Replaces ColorPage and Home's wrapper. PageHeader carries the
+  HomeLink.
 - **ColorBand, Container, PageHeader, SectionHeader, TileGrid, EmptyState.**
 - BottomNav keeps its own item system and hatched shadow; its bar, menu and
   socials move onto the primitives.
@@ -146,7 +147,15 @@ needs its browser once: `pnpm exec playwright install chromium`.
   FAQ's corners and line, one dialog cream, the posters' focus ring. The
   latest post keeps its tighter padding (its title needs the room beside the
   cover). ui/dialog is plain again for the admin.
-- [ ] **4. Layout components**; the 404 page onto PageShell.
+- [x] **4. Layout components** (`components/layout/`): PageShell (color
+  roles, background to the bottom edge, footer, nav clearance; the
+  `-mb-24` that cancelled `main`'s padding is gone), Container, PageHeader
+  (a title with a word too long for a 320px phone steps down a size),
+  PageContent, ColorBand, SectionHeader, TileGrid, EmptyState. The 404 page
+  is a PageShell page with a PageHeader, at `/kit/404` and in the
+  screenshots. Converged on the home page: the About band's padding, the
+  rail heading in the page's text color, the footer spacing and bottom
+  clearance. The other pages are pixel-identical.
 - [ ] **5. Text and tokens.**
 - [ ] **6. File moves and docs.** Rename-only commit; rewrite
   `docs/design-guide.md` as the component reference; a CLAUDE.md with the
@@ -163,14 +172,14 @@ needs its browser once: `pnpm exec playwright install chromium`.
   entrance waited for the 3 s fallback. Now in PublicChrome.
 - Fixed: the hero's and the More menu's social icons were links with no
   accessible name. SocialLinks names them.
-- Admin dialogs use the sketched surface from `ui/dialog.tsx`, but the filters
-  only exist in admin while a page preview is mounted, so the same dialog is
-  sketched in the page editor and flat elsewhere. Fixed by moving the sketched
-  surface to SketchDialog.
 - Fixed: the cover snapshot's frame used `sketch-subtle` where its
   single-color line should use `ink-subtle`.
-- Fixed: admin dialogs used the sketched surface, which only rendered while
-  a page preview was mounted.
+- Fixed: admin dialogs used the sketched surface from `ui/dialog.tsx`, but
+  the filters only exist in admin while a page preview is mounted, so the
+  same dialog was sketched in the page editor and flat elsewhere. The
+  sketched surface moved to SketchDialogContent.
+- The 404 page can't render in local dev without Firestore credentials
+  (it fetches the nav's colors); `/kit/404` draws it from fixtures.
 
 ## Afterwards: performance
 
