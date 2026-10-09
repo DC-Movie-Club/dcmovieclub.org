@@ -1,9 +1,15 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { createElement, useId, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
-import { INK, SKETCH_NOISE, SKETCH_SCALE } from "@/components/SketchFilter";
+import {
+  INK_BLUR,
+  WOBBLE,
+  inkSteps,
+  wobbleSteps,
+  type FilterStep,
+} from "@/components/system/filters";
 
 const STROKE = 3;
 // rounded-2xl
@@ -145,25 +151,19 @@ function SketchedBox({ id, width, height }: { id: string; width: number; height:
   );
 }
 
-function Wobble({ area, result }: { area: Rect; result?: string }) {
-  return (
-    <>
-      <feTurbulence {...area} type="turbulence" {...SKETCH_NOISE} result="noise" />
-      <feDisplacementMap
-        {...area}
-        in="SourceGraphic"
-        in2="noise"
-        scale={SKETCH_SCALE}
-        xChannelSelector="R"
-        yChannelSelector="G"
-        result={result}
-      />
-    </>
+// The fill takes the plain wobble and the line the bold ink line, as the
+// sketch and ink utilities draw them
+const FILL_STEPS = wobbleSteps(WOBBLE.bold);
+const LINE_STEPS = inkSteps(WOBBLE.bold, INK_BLUR);
+
+// Filter steps over `area`, except the padded ones, over `padded`
+function Steps({ steps, area, padded }: { steps: FilterStep[]; area: Rect; padded: Rect }) {
+  return steps.map((step, i) =>
+    createElement(step.tag, { key: i, ...(step.padded ? padded : area), ...step.attrs }),
   );
 }
 
-// A strip's fill filter (the sketch wobble) and line filter (the ink filter's
-// steps, as in SketchFilter)
+// A strip's fill filter and line filter
 function StripFilters({ id, strip }: { id: string; strip: Rect }) {
   const wide = grow(strip, INK_PAD);
 
@@ -175,7 +175,7 @@ function StripFilters({ id, strip }: { id: string; strip: Rect }) {
         primitiveUnits="userSpaceOnUse"
         {...grow(strip, MARGIN)}
       >
-        <Wobble area={strip} />
+        <Steps steps={FILL_STEPS} area={strip} padded={strip} />
       </filter>
       <filter
         id={`${id}-line`}
@@ -183,19 +183,7 @@ function StripFilters({ id, strip }: { id: string; strip: Rect }) {
         primitiveUnits="userSpaceOnUse"
         {...grow(wide, MARGIN)}
       >
-        <Wobble area={wide} result="wobbled" />
-        <feGaussianBlur {...wide} in="wobbled" stdDeviation={INK.blur} result="blurred" />
-        <feTurbulence {...strip} type="fractalNoise" {...INK.pressure} result="pressure" />
-        <feComposite
-          {...strip}
-          in="blurred"
-          in2="pressure"
-          operator="arithmetic"
-          {...INK.cut}
-          result="stroke"
-        />
-        <feMorphology {...wide} in="wobbled" operator="dilate" radius={INK.spread} result="ink" />
-        <feComposite {...strip} in="ink" in2="stroke" operator="in" />
+        <Steps steps={LINE_STEPS} area={strip} padded={wide} />
       </filter>
     </>
   );
