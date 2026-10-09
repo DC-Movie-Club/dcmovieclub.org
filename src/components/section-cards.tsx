@@ -40,7 +40,7 @@ export function CardLabel({
 // element and its face to put inside. Inside a clickable card (group/card) it
 // also reacts while the card is hovered.
 export const cardEdgeClassName =
-  "group/edge absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 card-hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream sm:right-6";
+  "group/edge absolute top-0 right-4 z-10 block -translate-y-1/2 rounded-full transition-transform hover:scale-105 card-hover:scale-105 focus-ring sm:right-6";
 
 export function CardEdgeFace({ children }: { children: React.ReactNode }) {
   return (

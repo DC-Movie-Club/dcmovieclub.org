@@ -95,7 +95,7 @@ export function SubscribeButton({ className }: { className?: string }) {
         <button
           type="button"
           className={cn(
-            "group/subscribe relative rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream",
+            "group/subscribe relative rounded-full transition-transform hover:scale-105 focus-ring",
             className,
           )}
         />

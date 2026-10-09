@@ -60,7 +60,7 @@ function TileLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group/card relative block w-full rounded-lg transition-transform hover:-rotate-1 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rust"
+      className="group/card relative block w-full rounded-lg transition-transform hover:-rotate-1 hover:scale-105 focus-ring focus-ring-rust [--focus-offset:4px]"
     >
       {/* A filled twin of the outline, wobbling identically, so the ink
           filter never opens a gap to the page between poster and border. It's
@@ -285,7 +285,7 @@ function FollowButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Follow us on Letterboxd"
-      className="group/follow relative block w-fit shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+      className="group/follow relative block w-fit shrink-0 rounded-full transition-transform hover:scale-105 focus-ring focus-ring-rust"
     >
       <span
         aria-hidden

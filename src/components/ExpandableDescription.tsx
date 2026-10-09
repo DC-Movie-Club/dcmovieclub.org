@@ -106,7 +106,7 @@ export function ExpandableDescription({
           onClick={toggle}
           aria-expanded={expanded}
           className={cn(
-            "group/toggle relative mx-auto mt-2 flex rounded-full text-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust",
+            "group/toggle relative mx-auto mt-2 flex rounded-full text-charcoal focus-ring focus-ring-rust",
             actionClassName,
           )}
         >

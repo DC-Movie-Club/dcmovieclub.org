@@ -9,7 +9,7 @@ export function CornerCloseButton() {
         <button
           type="button"
           aria-label="Close"
-          className="group/close absolute -top-7 -right-7 flex size-10 items-center justify-center rounded-full text-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+          className="group/close absolute -top-7 -right-7 flex size-10 items-center justify-center rounded-full text-charcoal focus-ring focus-ring-rust"
         />
       }
     >

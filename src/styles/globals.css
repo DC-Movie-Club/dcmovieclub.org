@@ -264,6 +264,20 @@ html[data-loading] .animate-nav-spring-in {
   --outline-ink: --value(--color-*);
 }
 
+/* Keyboard focus: a 2px ring, cream for controls on the page's colors.
+   focus-ring-* recolors it (focus-ring-rust on cream), and --focus-offset
+   spaces it further out. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring, var(--color-cream));
+    outline-offset: var(--focus-offset, 2px);
+  }
+}
+
+@utility focus-ring-* {
+  --focus-ring: --value(--color-*);
+}
+
 /* A sketch or ink class sets an element's resting wobble; a boil class adds
    a shudder on top (see SketchFilter). Each names its filter in its own
    variable and sets the same composed filter, so they combine in any order:

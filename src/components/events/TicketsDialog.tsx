@@ -83,7 +83,7 @@ export function TicketsDialog({
                     href={ticket.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group/edge relative block rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+                    className="group/edge relative block rounded-full transition-transform hover:scale-105 focus-ring focus-ring-rust"
                   />
                 }
               >

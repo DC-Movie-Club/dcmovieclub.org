@@ -20,7 +20,7 @@ function PostTile({ post }: { post: SubstackPost }) {
       href={post.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group/tile relative flex h-full flex-col rounded-xl transition-transform hover:-rotate-1 hover:scale-102 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+      className="group/tile relative flex h-full flex-col rounded-xl transition-transform hover:-rotate-1 hover:scale-102 focus-ring"
     >
       <div
         aria-hidden

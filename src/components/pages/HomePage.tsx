@@ -103,7 +103,7 @@ function OutlineLink({
   return (
     <NextLink
       href={href}
-      className="group/outline relative shrink-0 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+      className="group/outline relative shrink-0 rounded-full focus-ring"
     >
       <span
         aria-hidden
@@ -231,7 +231,7 @@ function AboutSection({
               <li className="flex">
                 <NextLink
                   href={pageTemplates.partnerships.href}
-                  className="group/partner relative rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+                  className="group/partner relative rounded-full transition-transform hover:scale-105 focus-ring"
                 >
                   <span
                     aria-hidden

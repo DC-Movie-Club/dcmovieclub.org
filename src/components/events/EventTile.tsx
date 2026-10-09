@@ -73,7 +73,7 @@ export function EventTile({ event }: { event: CalendarEvent }) {
   );
 
   const className =
-    "group/tile relative block h-full rounded-xl transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
+    "group/tile relative block h-full rounded-xl transition-transform focus-ring";
 
   return cta ? (
     <EventCtaLink
