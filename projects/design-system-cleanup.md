@@ -114,7 +114,10 @@ Each phase is a commit (or several), checked against the `/kit` screenshots
 before moving on.
 
 To check a change: on the commit before it, `pnpm kit:baseline`; after it,
-`pnpm kit:check`. Differences land in `test-results/` as expected, actual and
+`pnpm kit:check`. Comparisons are exact. To compare two commits side by side,
+serve the older one from a second checkout and point the spec at it with
+`KIT_URL` (and `KIT_SHOTS` for a separate folder); restart that server after
+each checkout, since Turbopack doesn't always rebuild the CSS. Differences land in `test-results/` as expected, actual and
 diff images. `pnpm dev` and `/kit` show the pages by eye. Locally, Playwright
 needs its browser once: `pnpm exec playwright install chromium`.
 
@@ -137,7 +140,12 @@ needs its browser once: `pnpm exec playwright install chromium`.
   page's text color whose hover text takes the page's background, the Home
   link as a ghost button, one cream sticker, the poster overlay in the
   page's accent edge, and the focus ring in the page's text color.
-- [ ] **3. Tile, Card, SketchDialog**; the FAQ onto Card.
+- [x] **3. Tile, Card, SketchDialogContent**, plus SketchImage (post
+  covers), PosterFrame/PosterCard and SketchIcon; the FAQ onto Card, opening
+  in one step with a fade. Converged: the featured event card's padding, the
+  FAQ's corners and line, one dialog cream, the posters' focus ring. The
+  latest post keeps its tighter padding (its title needs the room beside the
+  cover). ui/dialog is plain again for the admin.
 - [ ] **4. Layout components**; the 404 page onto PageShell.
 - [ ] **5. Text and tokens.**
 - [ ] **6. File moves and docs.** Rename-only commit; rewrite
@@ -159,8 +167,10 @@ needs its browser once: `pnpm exec playwright install chromium`.
   only exist in admin while a page preview is mounted, so the same dialog is
   sketched in the page editor and flat elsewhere. Fixed by moving the sketched
   surface to SketchDialog.
-- The cover snapshot's frame uses `sketch-subtle` where its single-color line
-  should use `ink-subtle`.
+- Fixed: the cover snapshot's frame used `sketch-subtle` where its
+  single-color line should use `ink-subtle`.
+- Fixed: admin dialogs used the sketched surface, which only rendered while
+  a page preview was mounted.
 
 ## Afterwards: performance
 
