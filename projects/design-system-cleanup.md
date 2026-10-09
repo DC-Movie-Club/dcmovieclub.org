@@ -156,7 +156,15 @@ needs its browser once: `pnpm exec playwright install chromium`.
   screenshots. Converged on the home page: the About band's padding, the
   rail heading in the page's text color, the footer spacing and bottom
   clearance. The other pages are pixel-identical.
-- [ ] **5. Text and tokens.**
+- [x] **5. Text and tokens.** The last inline type in feature code is in
+  textStyles (dialog title, quotes, overlay caption, footer); the bottom nav,
+  calendar date and hero tagline keep their own. Semantic and shadcn colors
+  alias the brand's (pixels identical); the heart sticker's flap has tokens
+  (through a `stop-*` utility, since Tailwind doesn't emit a theme variable
+  only an arbitrary value uses); unused shades and roles are gone, while the
+  brand's named colors stay. Converged: the featured review in card text with
+  its reviewer at 80%, the missing-poster card on cream, the tickets
+  dialog's title in card text.
 - [ ] **6. File moves and docs.** Rename-only commit; rewrite
   `docs/design-guide.md` as the component reference; a CLAUDE.md with the
   rules; a node test that fails when effect, focus or new-tab classes appear
