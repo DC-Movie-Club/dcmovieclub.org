@@ -52,7 +52,8 @@ async function shot(page: Page, name: string, fullPage = false) {
       }
     });
   }
-  await expect(page).toHaveScreenshot(`${name}.png`, {
+  // Soft, so a test's later shots are still compared after one differs
+  await expect.soft(page).toHaveScreenshot(`${name}.png`, {
     fullPage,
     mask: [page.locator("iframe")],
   });
