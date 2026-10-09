@@ -126,6 +126,53 @@ test.describe("open states", () => {
   });
 });
 
+// Keyboard focus rings: cream on page colors, rust on cream, wider round
+// posters. Focused from script with no pointer used, which Chromium treats
+// as keyboard focus.
+test.describe("focus", () => {
+  test.skip(({ isMobile }) => isMobile, "The same rings as on desktop");
+
+  const focuses: {
+    key: (typeof PAGES)[number];
+    name: string;
+    target: (page: Page) => Locator;
+  }[] = [
+    { key: "events", name: "corner-action", target: (p) => p.getByRole("button", { name: "Get Tickets" }) },
+    { key: "events", name: "event-tile", target: (p) => p.getByRole("link", { name: /Paris, Texas/ }) },
+    { key: "events", name: "read-more", target: (p) => p.getByRole("button", { name: "Read more" }) },
+    { key: "events", name: "faq-question", target: (p) => p.locator("summary").first() },
+    { key: "blog", name: "subscribe", target: (p) => p.getByRole("button", { name: "Subscribe", exact: true }) },
+    { key: "blog", name: "post-tile", target: (p) => p.getByRole("link", { name: /keep going back/ }) },
+    { key: "about", name: "link-card", target: (p) => p.getByRole("link", { name: /strangers together/ }) },
+    { key: "home", name: "outline-link", target: (p) => p.getByRole("link", { name: "View all" }) },
+    { key: "home", name: "card-corner-link", target: (p) => p.getByRole("link", { name: "More about us" }) },
+    { key: "home", name: "partner-button", target: (p) => p.getByRole("link", { name: "Partner with us" }) },
+    { key: "home", name: "follow-button", target: (p) => p.getByRole("link", { name: "Follow us on Letterboxd" }) },
+    { key: "home", name: "poster", target: (p) => p.getByRole("img", { name: "Past Lives" }).locator("xpath=ancestor::a[1]") },
+    { key: "home", name: "footer-subscribe", target: (p) => p.getByRole("button", { name: "Subscribe to our newsletter" }) },
+  ];
+
+  for (const { key, name, target } of focuses) {
+    test(`${key}: ${name}`, async ({ page }) => {
+      await open(page, key);
+      const element = target(page);
+      await center(element);
+      await element.focus();
+      await shot(page, `${key}-focus-${name}`);
+    });
+  }
+
+  test("events: dialog close", async ({ page }) => {
+    await open(page, "events");
+    // Opened from the keyboard, so the close button's focus shows
+    await page.getByRole("button", { name: "Get Tickets" }).focus();
+    await page.keyboard.press("Enter");
+    await page.getByRole("dialog").waitFor();
+    await page.getByRole("button", { name: "Close" }).focus();
+    await shot(page, "events-focus-dialog-close");
+  });
+});
+
 // Only where a pointer can hover
 test.describe("hovers", () => {
   test.skip(({ isMobile }) => isMobile, "Phones don't hover");
