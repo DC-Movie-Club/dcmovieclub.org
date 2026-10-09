@@ -338,22 +338,6 @@ html[data-loading] .animate-nav-spring-in {
   filter: var(--boil, var(--wobble));
 }
 
-@utility watercolor-0 {
-  filter: url(#watercolor-0);
-}
-
-@utility watercolor-1 {
-  filter: url(#watercolor-1);
-}
-
-@utility watercolor-2 {
-  filter: url(#watercolor-2);
-}
-
-@utility watercolor-3 {
-  filter: url(#watercolor-3);
-}
-
 :root {
   --radius: 0.625rem;
 }
