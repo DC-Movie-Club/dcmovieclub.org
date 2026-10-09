@@ -17,6 +17,7 @@ const VARIANTS = {
     line: "border-page-accent-edge",
     text: "text-page-accent-text",
     focus: null,
+    pad: null,
   },
   // Fills in with the text color on hover, the text taking the background's
   outline: {
@@ -27,8 +28,10 @@ const VARIANTS = {
     line: "border-page-fg opacity-70 transition-opacity parent-hover:opacity-100",
     text: "text-page-fg transition-colors parent-hover:text-page-bg",
     focus: null,
+    pad: null,
   },
-  // No line, only a tint on hover
+  // No line, only a tint on hover. With nothing drawn around the label, the
+  // padding only shows as that tint, so it hugs the label at any size.
   ghost: {
     key: "ghost",
     weight: "fine",
@@ -37,6 +40,7 @@ const VARIANTS = {
     line: null,
     text: "text-page-fg",
     focus: null,
+    pad: "px-2.5 py-2",
   },
   cream: {
     key: "cream",
@@ -46,6 +50,7 @@ const VARIANTS = {
     line: "border-charcoal opacity-25 transition-opacity parent-hover:opacity-40",
     text: "text-charcoal",
     focus: "focus-ring-rust",
+    pad: null,
   },
 } as const satisfies Record<
   string,
@@ -57,6 +62,8 @@ const VARIANTS = {
     line: string | null;
     text: string;
     focus: string | null;
+    // Padding in place of the size's
+    pad: string | null;
   }
 >;
 
@@ -65,21 +72,24 @@ const LINE_WIDTHS = { bold: "border-[3px]", fine: "border-2" } as const;
 const SIZES = {
   sm: {
     key: "sm",
-    label: cn("gap-1 px-4 py-1.5", textStyles.buttonSmall),
+    pad: "px-4 py-1.5",
+    label: cn("gap-1", textStyles.buttonSmall),
     icon: 14,
     round: "size-8",
     roundIcon: 16,
   },
   md: {
     key: "md",
-    label: cn("gap-1.5 px-4 py-2", textStyles.button),
+    pad: "px-4 py-2",
+    label: cn("gap-1.5", textStyles.button),
     icon: 16,
     round: "size-10",
     roundIcon: 18,
   },
   lg: {
     key: "lg",
-    label: cn("gap-2 px-5 py-2.5 sm:px-6 sm:py-3", textStyles.buttonLarge),
+    pad: "px-5 py-2.5 sm:px-6 sm:py-3",
+    label: cn("gap-2", textStyles.buttonLarge),
     icon: 18,
     round: "size-12",
     roundIcon: 20,
@@ -153,7 +163,14 @@ export function Pill({
           />
         )
       ) : (
-        <span className={cn("relative flex items-center", size.label, variant.text)}>
+        <span
+          className={cn(
+            "relative flex items-center",
+            variant.pad ?? size.pad,
+            size.label,
+            variant.text,
+          )}
+        >
           {Icon && <Icon size={size.icon} className={cn("shrink-0", iconClassName)} />}
           {children}
           {IconEnd && <IconEnd size={size.icon} className="shrink-0" />}

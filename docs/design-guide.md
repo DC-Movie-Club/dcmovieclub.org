@@ -222,7 +222,8 @@ All in `src/components/system/`.
     main action.
   - `outline`: the page's text color; fills with it on hover, the text
     taking the background's.
-  - `ghost`: no line, a tint on hover. The "← Home" link.
+  - `ghost`: no line, a tint on hover that hugs the label. The "← Home"
+    link.
   - `cream`: cream on any page, for small controls on cream (a dialog's
     close, Read more).
 
