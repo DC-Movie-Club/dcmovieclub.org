@@ -1,14 +1,13 @@
-import { Plus } from "lucide-react";
 import { LinkCard } from "@/components/LinkCard";
 import { TileGrid } from "@/components/layout/TileGrid";
 import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { textStyles } from "@/components/textStyles";
 import { Card } from "@/components/system/Card";
-import { Pill } from "@/components/system/Pill";
+import { DisclosureCard } from "@/components/system/DisclosureCard";
 import { TextLink } from "@/components/system/SmartLink";
 import { Sticker } from "@/components/system/Sticker";
-import type { FaqItem, LinkItem, PageSection } from "@/lib/pages";
+import type { LinkItem, PageSection } from "@/lib/pages";
 
 function LinkListItem({ item }: { item: LinkItem }) {
   if (!item.url) return <li>{item.title}</li>;
@@ -46,34 +45,6 @@ export function TagList({
 function ListHeading({ children }: { children: string }) {
   return (
     <h2 className={textStyles.labelLettering}>{children}</h2>
-  );
-}
-
-// A question on a card that opens to its answer. It opens in one step and
-// the answer fades in: growing it over time would redraw the card's edges
-// every frame, as with ExpandableDescription. The badge boils while the card
-// is hovered.
-export function FaqEntry({ item }: { item: FaqItem }) {
-  return (
-    <Card padded={false} className="group/card">
-      <details className="group/faq relative self-stretch">
-        <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-2xl px-6 py-4 focus-ring focus-ring-rust sm:px-8 [&::-webkit-details-marker]:hidden">
-          <span className={textStyles.cardQuestion}>{item.question}</span>
-          <Pill
-            decorative
-            variant="accent"
-            round
-            size="sm"
-            withCard
-            icon={Plus}
-            iconClassName="transition-transform duration-300 group-open/faq:rotate-45"
-          />
-        </summary>
-        <div className="relative mx-6 border-t border-dashed border-charcoal/20 pt-4 pb-6 group-open/faq:duration-300 motion-safe:group-open/faq:animate-in motion-safe:group-open/faq:fade-in sm:mx-8">
-          <Markdown>{item.answer}</Markdown>
-        </div>
-      </details>
-    </Card>
   );
 }
 
@@ -126,7 +97,9 @@ function Section({ section }: { section: PageSection }) {
           {section.label && <ListHeading>{section.label}</ListHeading>}
           <div className="flex flex-col gap-4">
             {section.items.map((item) => (
-              <FaqEntry key={item.key} item={item} />
+              <DisclosureCard key={item.key} summary={item.question}>
+                <Markdown>{item.answer}</Markdown>
+              </DisclosureCard>
             ))}
           </div>
         </section>

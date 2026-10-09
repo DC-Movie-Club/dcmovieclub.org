@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { routes } from "@/config/navigation";
 import { Pill } from "@/components/system/Pill";
+import { SketchShape } from "@/components/system/SketchShape";
 import { TextLink } from "@/components/system/SmartLink";
 import { SocialLinks } from "@/components/system/SocialLinks";
 import { textStyles } from "@/components/textStyles";
@@ -29,10 +30,7 @@ const LINK = "hover:text-page-fg";
 export function SiteFooter() {
   return (
     <footer className="relative">
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-2xl bg-black/10 sketch"
-      />
+      <SketchShape radius="rounded-2xl" fill="bg-black/10" />
       <SubscribeDialog
         trigger={
           <Pill

@@ -66,7 +66,6 @@ export function TicketsDialog({
         <ul className="mt-5 flex flex-col items-center gap-4 pb-2">
           {tickets.map((ticket) => (
             <li key={ticket.url}>
-              {/* On the dialog's cream, so the focus ring is rust */}
               <DialogClose
                 nativeButton={false}
                 render={
@@ -75,7 +74,6 @@ export function TicketsDialog({
                     size="lg"
                     href={ticket.url}
                     icon={Ticket}
-                    className="focus-ring-rust"
                   >
                     {ticket.label}
                   </Pill>

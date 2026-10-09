@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { DialogClose, DialogContent } from "@/components/ui/dialog";
 import { Pill } from "@/components/system/Pill";
 import { SketchShape } from "@/components/system/SketchShape";
@@ -21,9 +22,11 @@ function CornerCloseButton() {
 }
 
 // A dialog's popup on the public site: hand-drawn cream with a faint edge,
-// and a round close button on its corner unless `closeButton` is false
+// and a round close button on its corner unless `closeButton` is false. On
+// its cream, keyboard focus rings in rust.
 export function SketchDialogContent({
   closeButton = true,
+  className,
   children,
   ...props
 }: Omit<React.ComponentProps<typeof DialogContent>, "surface" | "showCloseButton"> & {
@@ -39,6 +42,7 @@ export function SketchDialogContent({
           line="border-2 border-charcoal opacity-20"
         />
       }
+      className={cn("focus-ring-rust", className)}
       {...props}
     >
       {children}
