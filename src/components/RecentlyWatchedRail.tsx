@@ -71,8 +71,8 @@ function HeartSticker({ className }: { className?: string }) {
           x1={foldX}
           x2={flapCenter - radius}
         >
-          <stop offset="0" stopColor="#d6cfb9" />
-          <stop offset="1" stopColor="#fbf9f1" />
+          <stop offset="0" className="stop-sticker-back-shade" />
+          <stop offset="1" className="stop-sticker-back" />
         </linearGradient>
       </defs>
       <g transform={peelTransform}>
@@ -152,7 +152,7 @@ function FilmPoster({
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-muted p-2 text-center text-xs text-muted-foreground">
+        <div className={cn("flex h-full w-full items-center justify-center bg-cream p-2 text-center", textStyles.tileMeta)}>
           {review.filmTitle}
         </div>
       )}
@@ -183,7 +183,7 @@ function FeaturedReviewCard({ review }: { review: LetterboxdReview }) {
 
   return (
     <div className="relative xs:col-span-2">
-      <PosterCard className="flex flex-col gap-3 p-4 text-charcoal">
+      <PosterCard className="flex flex-col gap-3 p-4">
         {review.rating !== null && (
           <div className="shrink-0 text-rust">
             <StarRating rating={review.rating} size={14} />
@@ -193,14 +193,14 @@ function FeaturedReviewCard({ review }: { review: LetterboxdReview }) {
           ref={clipRef}
           className={cn(
             "min-h-0 flex-1 overflow-hidden",
-            isShort ? "text-2xl leading-tight" : "text-sm leading-normal",
+            isShort ? textStyles.quote : textStyles.quoteLong,
             isClipped && "mask-b-from-[calc(100%-2rem)]",
           )}
         >
           {text}
         </p>
         {review.reviewer && (
-          <p className="shrink-0 text-xs tracking-wide text-charcoal/55">
+          <p className={cn("shrink-0", textStyles.tileMeta)}>
             — {review.reviewer}
           </p>
         )}

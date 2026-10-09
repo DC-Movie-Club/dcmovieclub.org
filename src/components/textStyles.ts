@@ -19,6 +19,8 @@ const buttonLabel = "uppercase tracking-wider whitespace-nowrap";
 
 const stickerText = "text-sm uppercase leading-none tracking-wider";
 
+const footerText = "text-sm uppercase tracking-widest";
+
 export const textStyles = {
   pageHeading: "text-xl uppercase tracking-wide text-page-fg sm:text-2xl",
   pageSubtitle: "text-lg uppercase tracking-wide text-page-fg/80",
@@ -39,8 +41,14 @@ export const textStyles = {
   tileDek: "text-sm text-page-card-text/80",
   // Short HTML, like an event's description
   cardNote: "text-sm text-page-card-text/90",
+  // A quote on a card: a short one large, a longer one at reading size
+  quote: "text-2xl leading-tight text-page-card-text",
+  quoteLong: "text-sm leading-normal text-page-card-text",
   cardEmpty:
     "text-center text-lg uppercase tracking-wide text-page-card-text/80",
+  // A dialog's heading, on its cream
+  dialogTitle:
+    "text-lg uppercase leading-tight tracking-wide text-page-card-text",
 
   proseBody: "text-base leading-[1.6] tracking-[0.04em] text-page-card-text/90",
   proseLink,
@@ -56,6 +64,13 @@ export const textStyles = {
   // Charcoal whatever the page, since stickers are cream on any card or page
   stickerText: cn(stickerText, "text-charcoal"),
   stickerDate: cn(stickerText, "text-charcoal/80"),
+
+  // A caption on the hover wash over a picture or tile (see LinkOverlay)
+  overlayCaption: "text-sm uppercase leading-tight tracking-wide text-cream",
+
+  // The footer's links, and its small print, on its darkened panel
+  footerLinks: cn(footerText, "text-page-fg/80"),
+  footerNote: cn(footerText, "text-page-fg/60"),
 } as const;
 
 // Each level's size and the space above it, the same in Markdown and in HTML

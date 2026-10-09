@@ -5,6 +5,7 @@ import { routes } from "@/config/navigation";
 import { Pill } from "@/components/system/Pill";
 import { TextLink } from "@/components/system/SmartLink";
 import { SocialLinks } from "@/components/system/SocialLinks";
+import { textStyles } from "@/components/textStyles";
 
 const FOUNDED = 2023;
 
@@ -27,7 +28,7 @@ const LINK = "hover:text-page-fg";
 // background darkened.
 export function SiteFooter() {
   return (
-    <footer className="relative text-sm uppercase tracking-widest">
+    <footer className="relative">
       <div
         aria-hidden
         className="absolute inset-0 rounded-2xl bg-black/10 sketch"
@@ -44,7 +45,12 @@ export function SiteFooter() {
         }
       />
       <div className="relative flex flex-col gap-4 px-7 pt-8 pb-5">
-        <div className="flex flex-col gap-4 text-page-fg/80 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className={cn(
+            "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",
+            textStyles.footerLinks,
+          )}
+        >
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {footerLinks.map((link) => (
@@ -69,7 +75,12 @@ export function SiteFooter() {
           <SocialLinks size={20} linkClassName="hover:text-page-fg" />
         </div>
 
-        <div className="flex flex-col gap-2 text-page-fg/60 sm:flex-row sm:justify-between">
+        <div
+          className={cn(
+            "flex flex-col gap-2 sm:flex-row sm:justify-between",
+            textStyles.footerNote,
+          )}
+        >
           <p>
             © {new Date().getFullYear()} DC Movie Club · Est. {FOUNDED}
           </p>

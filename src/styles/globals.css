@@ -89,33 +89,23 @@
 @theme inline {
   --breakpoint-xs: 500px;
 
-  /* --- Brand: Main --- */
+  /* --- Brand: the palette's named colors. Pages pick theirs from the
+     swatches admins edit in Firestore, not from these. --- */
   --color-rust: #a2390a;
   --color-rust-dark: #551e05;
   --color-sienna: #b24d2a;
   --color-cream: #efecdf;
   --color-teal: #375b6d;
-  --color-teal-dark: #1c303a;
-  --color-teal-light: #c1c8c2;
   --color-charcoal: #393a3e;
-  --color-charcoal-light: #c2c0b7;
-  --color-charcoal-detail: #4e505a;
-  --color-rust-wash: #e8cfc5;
   --color-logo-red: #9e2726;
-
-  /* --- Brand: Secondary --- */
   --color-rose: #ca6c84;
-  --color-rose-dark: #431823;
   --color-orange: #eca344;
-  --color-orange-dark: #6e430b;
   --color-olive: #b1ad26;
-  --color-olive-dark: #43420e;
   --color-sky: #57a7cc;
-  --color-sky-dark: #183d4e;
-  --color-sky-light: #c9dbda;
   --color-purple: #6372af;
-  --color-purple-dark: #313a5f;
-  --color-purple-light: #ccced3;
+  /* The paper back of a peeled sticker, shading toward the fold */
+  --color-sticker-back: #fbf9f1;
+  --color-sticker-back-shade: #d6cfb9;
 
   /* --- Page colors: pages set them from their Firestore doc (see colorRoles).
      The fallbacks are neutral, for a color that isn't set. --- */
@@ -139,24 +129,21 @@
   --color-nav-hover: var(--nav-hover-accent, var(--nav-accent, var(--color-rust)));
   --color-nav-active: var(--nav-accent, var(--color-logo-red));
 
-  /* --- Semantic --- */
+  /* --- Semantic: the defaults under the page colors, and the admin's (and
+     shadcn's) roles, in the brand's colors --- */
   --color-background: #f5f3e8;
-  --color-foreground: #393a3e;
-  --color-primary: #a2390a;
-  --color-primary-foreground: #efecdf;
-  --color-secondary: #375b6d;
-  --color-secondary-foreground: #efecdf;
+  --color-foreground: var(--color-charcoal);
+  --color-primary: var(--color-rust);
+  --color-primary-foreground: var(--color-cream);
+  --color-secondary: var(--color-teal);
+  --color-secondary-foreground: var(--color-cream);
   --color-muted: #e2dfd2;
   --color-muted-foreground: #6b6b70;
-  --color-accent: #b24d2a;
-  --color-accent-foreground: #efecdf;
-  --color-border: #b24d2a33;
-  --color-destructive: #ca6c84;
-  --color-success: #b1ad26;
-  --color-info: #57a7cc;
-  --color-surface: #f5f3e8;
-  --color-inverted: #393a3e;
-  --color-inverted-foreground: #efecdf;
+  --color-accent: var(--color-sienna);
+  --color-accent-foreground: var(--color-cream);
+  --color-border: color-mix(in srgb, var(--color-sienna) 20%, transparent);
+  --color-destructive: var(--color-rose);
+  --color-surface: var(--color-background);
 
   /* --- Typography --- */
   --font-dcmc: "DCMC", Georgia, serif;
@@ -168,12 +155,12 @@
   --aspect-wide: 16/9;
 
   /* --- Shadcn plumbing (mapped to brand) --- */
-  --color-ring: #b24d2a;
-  --color-input: #b24d2a33;
-  --color-popover: #f5f3e8;
-  --color-popover-foreground: #393a3e;
-  --color-card: #f5f3e8;
-  --color-card-foreground: #393a3e;
+  --color-ring: var(--color-sienna);
+  --color-input: var(--color-border);
+  --color-popover: var(--color-background);
+  --color-popover-foreground: var(--color-foreground);
+  --color-card: var(--color-background);
+  --color-card-foreground: var(--color-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -276,6 +263,11 @@ html[data-loading] .animate-nav-spring-in {
 /* Sets the ink for outlined-lettering */
 @utility outline-ink-* {
   --outline-ink: --value(--color-*);
+}
+
+/* A gradient stop's color, from the theme's colors */
+@utility stop-* {
+  stop-color: --value(--color-*);
 }
 
 /* Keyboard focus: a 2px ring in the page's text color, which stands out on

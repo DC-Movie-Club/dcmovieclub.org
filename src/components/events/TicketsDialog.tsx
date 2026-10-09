@@ -7,10 +7,11 @@ import { Dialog, DialogClose, DialogTitle, DialogTrigger } from "@/components/ui
 import { colorRoles } from "@/config/pages";
 import { Pill } from "@/components/system/Pill";
 import { SketchDialogContent } from "@/components/system/SketchDialogContent";
+import { textStyles } from "@/components/textStyles";
 import type { EventTicket } from "@/types/event";
 
 // The dialog portals out of the page, so it copies the colors the page sets
-// around the trigger onto its own ticket pills
+// around the trigger onto itself, for its title and ticket pills
 function pageColorVars(element: HTMLElement | null) {
   if (!element) return undefined;
   const style = getComputedStyle(element);
@@ -59,7 +60,7 @@ export function TicketsDialog({
         {children}
       </DialogTrigger>
       <SketchDialogContent style={colors}>
-        <DialogTitle className="px-4 pt-2 text-center text-lg uppercase leading-tight tracking-wide text-balance text-foreground">
+        <DialogTitle className={cn("px-4 pt-2 text-center text-balance", textStyles.dialogTitle)}>
           {title}
         </DialogTitle>
         <ul className="mt-5 flex flex-col items-center gap-4 pb-2">
