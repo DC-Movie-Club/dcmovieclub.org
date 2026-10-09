@@ -59,7 +59,9 @@ export function TicketsDialog({
     >
       <DialogTrigger
         nativeButton={false}
-        tabIndex={tabIndex}
+        // Base UI's default for a trigger that isn't a <button>; passing
+        // undefined would drop it and take the trigger out of the tab order
+        tabIndex={tabIndex ?? 0}
         aria-hidden={ariaHidden}
         render={
           <div ref={triggerRef} className={cn("cursor-pointer", className)} />
