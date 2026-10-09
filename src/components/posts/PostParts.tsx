@@ -1,11 +1,11 @@
 import { Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TIME_ZONE } from "@/lib/event-format";
-import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { SubscribeDialog } from "@/components/posts/SubscribeDialog";
 import { Pill } from "@/components/system/Pill";
 import { Sticker } from "@/components/system/Sticker";
 import { SketchImage } from "@/components/system/SketchImage";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 import type { SubstackPost } from "@/types/post";
 
 // "Sep 14", or "Sep 14, 2025" for posts from a previous year.

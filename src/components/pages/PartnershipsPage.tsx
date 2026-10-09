@@ -1,5 +1,5 @@
 import { PageContent, PageHeader, PageShell } from "@/components/layout/PageShell";
-import { PageSections } from "@/components/PageSections";
+import { PageSections } from "@/components/sections/PageSections";
 import type { PageView } from "@/lib/pages";
 
 export function PartnershipsPage({ page }: { page: PageView }) {

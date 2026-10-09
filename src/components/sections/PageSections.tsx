@@ -1,8 +1,8 @@
-import { LinkCard } from "@/components/LinkCard";
+import { LinkCard } from "@/components/sections/LinkCard";
 import { TileGrid } from "@/components/layout/TileGrid";
-import { Markdown } from "@/components/Markdown";
-import { markdownStyles } from "@/components/markdownStyles";
-import { textStyles } from "@/components/textStyles";
+import { Markdown } from "@/components/system/Markdown";
+import { markdownStyles } from "@/components/system/markdownStyles";
+import { textStyles } from "@/components/system/textStyles";
 import { Card } from "@/components/system/Card";
 import { DisclosureCard } from "@/components/system/DisclosureCard";
 import { TextLink } from "@/components/system/SmartLink";

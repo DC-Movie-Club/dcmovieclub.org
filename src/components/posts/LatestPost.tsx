@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/system/Card";
 import { SketchImage } from "@/components/system/SketchImage";
-import { ExpandableDescription } from "@/components/ExpandableDescription";
-import { proseHtml } from "@/components/markdownStyles";
-import { textStyles } from "@/components/textStyles";
+import { ExpandableDescription } from "@/components/system/ExpandableDescription";
+import { proseHtml } from "@/components/system/markdownStyles";
+import { textStyles } from "@/components/system/textStyles";
 import { DatePill } from "@/components/posts/PostParts";
 import type { SubstackPost } from "@/types/post";
 import { SmartLink } from "@/components/system/SmartLink";

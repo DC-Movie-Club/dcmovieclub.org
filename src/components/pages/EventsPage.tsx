@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/layout/EmptyState";
 import { PageContent, PageHeader, PageShell } from "@/components/layout/PageShell";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { TileGrid } from "@/components/layout/TileGrid";
-import { PageSections } from "@/components/PageSections";
+import { PageSections } from "@/components/sections/PageSections";
 import type { CalendarEvent } from "@/types/event";
 
 function groupByMonth(events: CalendarEvent[]) {

@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { Card } from "@/components/system/Card";
 import { Pill } from "@/components/system/Pill";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 
 // A card with a question (`summary`) that opens to its answer. It opens in
 // one step and the answer fades in: growing it over time would redraw the

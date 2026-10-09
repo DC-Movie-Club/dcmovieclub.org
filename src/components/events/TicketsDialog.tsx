@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogTitle, DialogTrigger } from "@/components/ui
 import { colorRoles } from "@/config/pages";
 import { Pill } from "@/components/system/Pill";
 import { SketchDialogContent } from "@/components/system/SketchDialogContent";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 import type { EventTicket } from "@/types/event";
 
 // The dialog portals out of the page, so it copies the colors the page sets

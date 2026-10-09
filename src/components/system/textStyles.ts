@@ -1,5 +1,5 @@
 // A relative import, so markdownStyles.test.ts can load this under node
-import { cn } from "../lib/utils.ts";
+import { cn } from "../../lib/utils.ts";
 
 // The kinds of text on the site, each with its color role (see colorRoles)
 // and the sizes and strengths that go with it. Text on the page background is

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ThumbnailImage } from "@/components/ThumbnailImage";
+import { ThumbnailImage } from "@/components/system/ThumbnailImage";
 import { SketchShape, wobbleClass, type SketchWeight } from "@/components/system/SketchShape";
 
 // A picture with a line drawn over its edge. The picture takes the same

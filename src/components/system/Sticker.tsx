@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { SketchShape } from "@/components/system/SketchShape";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 
 // A cream sticker with a faint edge, the same on any card or page: dates,
 // ratings, partner names. `as` makes it a list item; `className` places it

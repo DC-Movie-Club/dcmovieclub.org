@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SketchShape, type SketchWeight } from "@/components/system/SketchShape";
 import { SmartLink } from "@/components/system/SmartLink";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 
 // The button looks: filled in the page's accent, outlined or ghosted in its
 // text color, or cream on any page for small controls on cream (a dialog's

@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { colorVars, type PageColors } from "@/config/pages";
-import { HomeLink } from "@/components/HomeLink";
-import { SiteFooter } from "@/components/SiteFooter";
-import { textStyles } from "@/components/textStyles";
+import { HomeLink } from "@/components/layout/HomeLink";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { textStyles } from "@/components/system/textStyles";
 import { Container } from "@/components/layout/Container";
 
 // A page in its color roles (see colorRoles), from the page's Firestore doc,

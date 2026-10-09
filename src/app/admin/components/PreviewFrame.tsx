@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { SketchFilter } from "@/components/SketchFilter";
+import { SketchFilter } from "@/components/system/SketchFilter";
 import { cn } from "@/lib/utils";
 
 // Space left above an element scrolled to

@@ -3,8 +3,8 @@ import remarkDirective from "remark-directive";
 import { cn } from "@/lib/utils";
 import { parseYouTubeId } from "@/lib/youtube";
 import { TextLink } from "@/components/system/SmartLink";
-import { YouTubeEmbed } from "@/components/YouTubeEmbed";
-import { markdownStyles } from "@/components/markdownStyles";
+import { YouTubeEmbed } from "@/components/system/YouTubeEmbed";
+import { markdownStyles } from "@/components/system/markdownStyles";
 import { remarkDetails } from "@/lib/remark-details";
 
 // A paragraph that is only a link to a YouTube video, e.g. `<https://www.youtube.com/watch?v=…>`

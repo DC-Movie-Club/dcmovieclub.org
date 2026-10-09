@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowUpRight, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CardItem } from "@/lib/pages";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 import { SketchIcon } from "@/components/system/SketchIcon";
 import { Tile } from "@/components/system/Tile";
 

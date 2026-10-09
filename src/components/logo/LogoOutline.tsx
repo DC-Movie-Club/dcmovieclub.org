@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { logoLines } from "@/components/logoLetters";
-import { logoStars, logoStripes } from "@/components/logoStripes";
+import { logoLines } from "@/components/logo/logoLetters";
+import { logoStars, logoStripes } from "@/components/logo/logoStripes";
 
 // The logo's art framed the way dcmc-logo.png frames it, so the two can swap
 // in place

@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 
 // Shown over a linked tile or poster while it's hovered: a wash in the page's
 // accent edge with an arrow, and `caption` under it. `className` reveals it

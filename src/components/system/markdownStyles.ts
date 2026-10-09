@@ -1,5 +1,5 @@
 // Relative imports, so markdownStyles.test.ts can load this under node
-import { cn } from "../lib/utils.ts";
+import { cn } from "../../lib/utils.ts";
 import { proseHeadings, textStyles } from "./textStyles.ts";
 
 // Shared by the public renderer and the admin editor so editing looks like the live page.

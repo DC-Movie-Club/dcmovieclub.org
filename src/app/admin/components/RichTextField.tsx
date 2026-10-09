@@ -17,7 +17,7 @@ import {
   NODES,
   TRANSFORMERS,
 } from "@/app/admin/components/markdownEditor";
-import { markdownStyles } from "@/components/markdownStyles";
+import { markdownStyles } from "@/components/system/markdownStyles";
 
 // Loading markdown into the editor can normalize it, so an edit that ends up
 // back where it started reports the original markdown, not the normalized one.

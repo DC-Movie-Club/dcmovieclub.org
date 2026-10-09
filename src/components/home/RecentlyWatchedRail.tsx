@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/layout/SectionHeader";
 import { Pill } from "@/components/system/Pill";
 import { PosterCard, PosterFrame } from "@/components/system/PosterFrame";
 import { Sticker } from "@/components/system/Sticker";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 import type { LetterboxdReview } from "@/types/letterboxd";
 
 const POSTER_COUNT = 3;

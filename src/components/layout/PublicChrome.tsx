@@ -1,6 +1,6 @@
-import { BottomNav } from "@/components/BottomNav";
-import { PageReveal } from "@/components/PageReveal";
-import { SketchFilter } from "@/components/SketchFilter";
+import { BottomNav } from "@/components/layout/BottomNav";
+import { PageReveal } from "@/components/layout/PageReveal";
+import { SketchFilter } from "@/components/system/SketchFilter";
 
 // What every public page sits in: the sketch filters, the page, the bottom
 // nav, and PageReveal, which holds the entrance until the page is laid out.

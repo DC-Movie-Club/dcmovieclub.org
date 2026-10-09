@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { cn } from "@/lib/utils";
-import { CardSurface } from "@/components/CardSurface";
-import { textStyles } from "@/components/textStyles";
+import { CardSurface } from "@/components/system/CardSurface";
+import { textStyles } from "@/components/system/textStyles";
 
 // A fixed angle lifts the far end of a long heading well above the card, so the
 // tilt shrinks with length to keep that rise roughly constant (capped at 2deg).

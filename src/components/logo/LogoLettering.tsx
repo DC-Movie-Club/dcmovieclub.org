@@ -1,4 +1,4 @@
-import { logoLines } from "@/components/logoLetters";
+import { logoLines } from "@/components/logo/logoLetters";
 import { cn } from "@/lib/utils";
 
 // In the logo's own units. Row puts CLUB after DC MOVIE on one line, closing

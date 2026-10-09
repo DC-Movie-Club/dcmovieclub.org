@@ -14,7 +14,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { LogoOutline } from "@/components/LogoOutline";
+import { LogoOutline } from "@/components/logo/LogoOutline";
 import { routes } from "@/config/navigation";
 import { colorVars } from "@/config/pages";
 import {

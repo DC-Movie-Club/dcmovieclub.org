@@ -22,8 +22,8 @@ import {
 } from "@lexical/react/LexicalDecoratorBlockNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $insertBlockNode } from "@/app/admin/components/insertBlockNode";
-import { YouTubeEmbed } from "@/components/YouTubeEmbed";
-import { markdownStyles } from "@/components/markdownStyles";
+import { YouTubeEmbed } from "@/components/system/YouTubeEmbed";
+import { markdownStyles } from "@/components/system/markdownStyles";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

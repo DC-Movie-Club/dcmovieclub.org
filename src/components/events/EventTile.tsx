@@ -1,11 +1,11 @@
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatEventDate } from "@/lib/event-format";
-import { EventTime } from "@/components/EventTime";
-import { CalendarDate } from "@/components/events/CalendarDate";
+import { EventTime } from "@/components/events/EventTime";
+import { CalendarDate } from "@/components/system/CalendarDate";
 import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta } from "@/components/events/event-links";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 import { SketchIcon } from "@/components/system/SketchIcon";
 import { Tile } from "@/components/system/Tile";
 import type { CalendarEvent } from "@/types/event";

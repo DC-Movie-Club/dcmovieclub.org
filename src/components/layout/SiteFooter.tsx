@@ -1,12 +1,12 @@
 import { ArrowUpRight, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { SubscribeDialog } from "@/components/posts/SubscribeDialog";
 import { routes } from "@/config/navigation";
 import { Pill } from "@/components/system/Pill";
 import { SketchShape } from "@/components/system/SketchShape";
 import { TextLink } from "@/components/system/SmartLink";
 import { SocialLinks } from "@/components/system/SocialLinks";
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 
 const FOUNDED = 2023;
 

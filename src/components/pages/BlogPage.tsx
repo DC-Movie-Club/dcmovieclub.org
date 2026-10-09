@@ -6,8 +6,8 @@ import { PageContent, PageHeader, PageShell } from "@/components/layout/PageShel
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { TileGrid } from "@/components/layout/TileGrid";
 import { Tile } from "@/components/system/Tile";
-import { textStyles } from "@/components/textStyles";
-import { SubscribeCard } from "@/components/SubscribeDialog";
+import { textStyles } from "@/components/system/textStyles";
+import { SubscribeCard } from "@/components/posts/SubscribeDialog";
 import { LatestPost } from "@/components/posts/LatestPost";
 import {
   BleedCover,

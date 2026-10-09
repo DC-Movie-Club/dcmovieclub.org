@@ -74,7 +74,7 @@ import {
   YouTubePlugin,
 } from "@/app/admin/components/YouTubeNode";
 import { Youtube } from "@/components/icons/Youtube";
-import { markdownStyles } from "@/components/markdownStyles";
+import { markdownStyles } from "@/components/system/markdownStyles";
 import { cn } from "@/lib/utils";
 
 // Only what the public markdown renderer can display

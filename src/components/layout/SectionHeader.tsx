@@ -1,4 +1,4 @@
-import { textStyles } from "@/components/textStyles";
+import { textStyles } from "@/components/system/textStyles";
 
 // A heading on the page, in the page's text color, with an optional button
 // (`action`) at the end of its row, which drops under it when there's no room
