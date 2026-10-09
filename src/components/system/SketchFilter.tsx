@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { sketchFilters } from "@/components/system/filters";
+import { FILTER_COLOR_SPACE, sketchFilters } from "@/components/system/filters";
 
 // The shared filter defs the sketch, ink and boil utilities point at
 export function SketchFilter() {
@@ -11,7 +11,7 @@ export function SketchFilter() {
     >
       <defs>
         {sketchFilters.map(({ id, region, steps }) => (
-          <filter key={id} id={id} {...region} filterUnits="objectBoundingBox">
+          <filter key={id} id={id} {...region} filterUnits="objectBoundingBox" {...FILTER_COLOR_SPACE}>
             {steps.map((step, i) => createElement(step.tag, { key: i, ...step.attrs }))}
           </filter>
         ))}

@@ -23,6 +23,11 @@ export type SketchFilterDef = {
 
 type Region = { x: string; y: string; width: string; height: string };
 
+// Every filter works in sRGB, not the default linear RGB, which converts
+// each pixel in and out on every repaint. The wobble only moves pixels, and
+// the ink line blends one color with clear, so linear light buys nothing.
+export const FILTER_COLOR_SPACE = { colorInterpolationFilters: "sRGB" } as const;
+
 const SKETCH_REGION: Region = { x: "-5%", y: "-5%", width: "110%", height: "110%" };
 // Taller, for the boil's extra shudder and the ink line's spread
 const BOIL_REGION: Region = { x: "-5%", y: "-15%", width: "110%", height: "130%" };

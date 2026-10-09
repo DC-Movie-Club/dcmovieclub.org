@@ -4,6 +4,7 @@ import { createElement, useId, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
 import {
+  FILTER_COLOR_SPACE,
   INK_BLUR,
   WOBBLE,
   inkSteps,
@@ -173,6 +174,7 @@ function StripFilters({ id, strip }: { id: string; strip: Rect }) {
         id={`${id}-fill`}
         filterUnits="userSpaceOnUse"
         primitiveUnits="userSpaceOnUse"
+        {...FILTER_COLOR_SPACE}
         {...grow(strip, MARGIN)}
       >
         <Steps steps={FILL_STEPS} area={strip} padded={strip} />
@@ -181,6 +183,7 @@ function StripFilters({ id, strip }: { id: string; strip: Rect }) {
         id={`${id}-line`}
         filterUnits="userSpaceOnUse"
         primitiveUnits="userSpaceOnUse"
+        {...FILTER_COLOR_SPACE}
         {...grow(wide, MARGIN)}
       >
         <Steps steps={LINE_STEPS} area={strip} padded={wide} />
