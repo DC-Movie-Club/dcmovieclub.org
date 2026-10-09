@@ -43,6 +43,13 @@ async function center(locator: Locator) {
   );
 }
 
+// Moves the mouse off the page's content, after clicking something whose
+// card would otherwise count as hovered or not depending on when Chrome
+// rechecks what's under the mouse after the page moves
+async function clearHover(page: Page) {
+  await page.mouse.move(0, 0);
+}
+
 // Moves the mouse onto the element, even one that lets pointer events through
 // to a link underneath (as on the featured event card)
 async function hover(page: Page, locator: Locator) {
@@ -98,6 +105,7 @@ test.describe("open states", () => {
     await open(page, "events");
     await page.getByRole("button", { name: "Read more" }).click();
     await center(page.getByRole("button", { name: "Show less" }));
+    await clearHover(page);
     await shot(page, "events-read-more");
   });
 
@@ -107,6 +115,7 @@ test.describe("open states", () => {
     await question.click();
     await page.waitForTimeout(500);
     await center(question);
+    await clearHover(page);
     await shot(page, "events-faq-open");
   });
 
@@ -114,6 +123,7 @@ test.describe("open states", () => {
     await open(page, "blog");
     await page.getByRole("button", { name: "Read more" }).click();
     await center(page.getByRole("button", { name: "Show less" }));
+    await clearHover(page);
     await shot(page, "blog-read-more");
   });
 
@@ -130,6 +140,7 @@ test.describe("open states", () => {
     await question.click();
     await page.waitForTimeout(500);
     await center(question);
+    await clearHover(page);
     await shot(page, "about-faq-open");
   });
 
@@ -232,3 +243,31 @@ test.describe("hovers", () => {
     });
   }
 });
+
+// Hovering starts the boils and redraws, which run until the hover ends,
+// unless the visitor asks for reduced motion
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  test.describe(`motion: ${reducedMotion}`, () => {
+    test.skip(({ isMobile }) => isMobile, "Phones don't hover");
+    test.use({ contextOptions: { reducedMotion } });
+
+    test("hovering boils and redraws", async ({ page }) => {
+      await open(page, "home");
+      const targets = {
+        button: page.getByRole("link", { name: "View all" }),
+        "text link": footer(page).getByRole("link", { name: "Blog" }),
+        "nav item": navBar(page).getByRole("link", { name: "Events" }),
+      };
+      for (const [name, target] of Object.entries(targets)) {
+        await hover(page, target);
+        const endless = await target.evaluate((el) =>
+          el.getAnimations({ subtree: true }).filter(
+            (animation) => !Number.isFinite(animation.effect?.getComputedTiming().endTime),
+          ).length,
+        );
+        if (reducedMotion === "reduce") expect.soft(endless, name).toBe(0);
+        else expect.soft(endless, name).toBeGreaterThan(0);
+      }
+    });
+  });
+}

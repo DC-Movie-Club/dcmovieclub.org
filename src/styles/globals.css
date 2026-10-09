@@ -297,7 +297,8 @@ html[data-loading] .animate-nav-spring-in {
 
    The redraws and boils step their variable through five filters, ten a
    second, so the element repaints only when the frame changes. The layers
-   of one shape start boiling together, so they stay in step. */
+   of one shape start boiling together, so they stay in step. With reduced
+   motion they don't run, and the shape keeps its resting wobble. */
 @property --wobble {
   syntax: "*";
   inherits: false;
@@ -321,7 +322,9 @@ html[data-loading] .animate-nav-spring-in {
 
 @utility sketch-animated {
   filter: var(--boil, var(--wobble));
-  animation: redraw 500ms steps(1) infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: redraw 500ms steps(1) infinite;
+  }
 }
 
 @utility sketch-subtle {
@@ -332,7 +335,9 @@ html[data-loading] .animate-nav-spring-in {
 
 @utility sketch-subtle-animated {
   filter: var(--boil, var(--wobble));
-  animation: redraw-subtle 500ms steps(1) infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: redraw-subtle 500ms steps(1) infinite;
+  }
 }
 
 /* The sketch wobble drawn as a brush pen line */
@@ -353,17 +358,23 @@ html[data-loading] .animate-nav-spring-in {
 
 @utility boil-sm {
   filter: var(--boil, var(--wobble));
-  animation: boil-sm 500ms steps(1) infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: boil-sm 500ms steps(1) infinite;
+  }
 }
 
 @utility boil {
   filter: var(--boil, var(--wobble));
-  animation: boil 500ms steps(1) infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: boil 500ms steps(1) infinite;
+  }
 }
 
 @utility boil-lg {
   filter: var(--boil, var(--wobble));
-  animation: boil-lg 500ms steps(1) infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: boil-lg 500ms steps(1) infinite;
+  }
 }
 
 @keyframes redraw {
