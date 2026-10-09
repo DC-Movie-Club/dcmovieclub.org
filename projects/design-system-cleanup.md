@@ -123,9 +123,13 @@ needs its browser once: `pnpm exec playwright install chromium`.
   `tests/kit.spec.ts` screenshotting each page (top of page and whole) at
   phone and desktop sizes, plus open states (dialogs, Read more, FAQ) and 23
   desktop hovers, with animations held still.
-- [ ] **1. Foundations, no visual change.** `filters.ts`, PublicChrome,
-  `focus-ring`, SmartLink, site constants, deletions (WatercolorFilter, unused
-  icons, Contact, Instagram).
+- [x] **1. Foundations, no visual change.** `system/filters.ts` (one
+  definition for the shared defs and CardSurface's strips), PublicChrome,
+  `focus-ring`, SmartLink and TextLink (with `linkKind` in
+  `lib/external-links.ts`), `routes.contact` as the mailto address; deleted
+  WatercolorFilter, `ui/link.tsx`, `lib/constants.ts`, the paragraph icons,
+  Contact and Instagram. Screenshots unchanged; every link keeps its href,
+  target, rel and classes.
 - [ ] **2. SketchShape, Pill, Sticker, LinkOverlay, SocialLinks** and their
   call sites; the per-kind hover idioms.
 - [ ] **3. Tile, Card, SketchDialog**; the FAQ onto Card.
@@ -138,9 +142,14 @@ needs its browser once: `pnpm exec playwright install chromium`.
 
 ## Bugs found along the way
 
-- The 404 page sits outside the public layout: no filter defs (the nav's
-  sketch and ink point at nothing) and no PageReveal, so the nav's entrance
-  waits for the 3 s fallback. Fixed by PublicChrome.
+- Fixed: the Get Tickets pill on an event with several tickets wasn't in
+  the tab order (TicketsDialog passed an undefined tabIndex over Base UI's
+  default), so keyboard users couldn't open the ticket picker.
+- Fixed: the 404 page sat outside the public layout: no filter defs (the
+  nav's sketch and ink pointed at nothing) and no PageReveal, so the nav's
+  entrance waited for the 3 s fallback. Now in PublicChrome.
+- The hero's social icons are links with no accessible name. For
+  SocialLinks.
 - Admin dialogs use the sketched surface from `ui/dialog.tsx`, but the filters
   only exist in admin while a page preview is mounted, so the same dialog is
   sketched in the page editor and flat elsewhere. Fixed by moving the sketched
