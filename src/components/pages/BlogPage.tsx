@@ -3,7 +3,7 @@ import type { PageView } from "@/lib/pages";
 import { latestPost } from "@/lib/posts";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
 import { CreamCard } from "@/components/CreamCard";
-import { OpensOverlay } from "@/components/OpensOverlay";
+import { LinkOverlay } from "@/components/system/LinkOverlay";
 import { textStyles } from "@/components/textStyles";
 import { SubscribeCard } from "@/components/SubscribeDialog";
 import { LatestPost } from "@/components/posts/LatestPost";
@@ -50,7 +50,7 @@ function PostTile({ post }: { post: SubstackPost }) {
           </p>
         )}
       </div>
-      <OpensOverlay
+      <LinkOverlay
         className="group-hover/tile:opacity-100"
         washClassName="inset-px rounded-xl sketch"
       />

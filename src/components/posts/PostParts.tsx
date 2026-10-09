@@ -2,6 +2,8 @@ import { Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TIME_ZONE } from "@/lib/event-format";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { Pill } from "@/components/system/Pill";
+import { Sticker } from "@/components/system/Sticker";
 import { ThumbnailImage } from "@/components/ThumbnailImage";
 import { textStyles } from "@/components/textStyles";
 import type { SubstackPost } from "@/types/post";
@@ -19,7 +21,7 @@ function formatPostDate(raw: string, now = new Date()) {
   });
 }
 
-// Matches the date stickers on the Letterboxd posters.
+// A post's date on a sticker, after `label` if given
 export function DatePill({
   pubDate,
   label,
@@ -30,22 +32,10 @@ export function DatePill({
   className?: string;
 }) {
   return (
-    <span
-      className={cn(
-        "relative flex w-fit items-center whitespace-nowrap px-3 py-1.5",
-        textStyles.stickerDate,
-        className,
-      )}
-    >
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full border-2 border-charcoal/25 bg-cream shadow-md sketch-subtle"
-      />
-      <span className="relative">
-        {label && `${label}: `}
-        {formatPostDate(pubDate)}
-      </span>
-    </span>
+    <Sticker className={cn(textStyles.stickerDate, className)}>
+      {label && `${label}: `}
+      {formatPostDate(pubDate)}
+    </Sticker>
   );
 }
 
@@ -92,32 +82,10 @@ export function SubscribeButton({ className }: { className?: string }) {
   return (
     <SubscribeDialog
       trigger={
-        <button
-          type="button"
-          className={cn(
-            "group/subscribe relative rounded-full transition-transform hover:scale-105 focus-ring",
-            className,
-          )}
-        />
+        <Pill variant="accent" size="lg" icon={Mail} className={className}>
+          Subscribe
+        </Pill>
       }
-    >
-      <span
-        aria-hidden
-        className="absolute inset-px rounded-full bg-page-accent shadow-lg sketch group-hover/subscribe:boil"
-      />
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full border-[3px] border-page-accent-edge ink group-hover/subscribe:boil"
-      />
-      <span
-        className={cn(
-          "relative flex items-center gap-2 px-5 py-2.5 whitespace-nowrap",
-          textStyles.accentPill,
-        )}
-      >
-        <Mail size={18} className="shrink-0" />
-        Subscribe
-      </span>
-    </SubscribeDialog>
+    />
   );
 }

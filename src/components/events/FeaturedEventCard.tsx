@@ -9,11 +9,8 @@ import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta, getMapUrl } from "@/components/events/event-links";
 import { CardSurface } from "@/components/CardSurface";
 import { textStyles } from "@/components/textStyles";
-import {
-  CardEdgeFace,
-  CardLabel,
-  cardEdgeClassName,
-} from "@/components/section-cards";
+import { CardLabel } from "@/components/section-cards";
+import { CardAction } from "@/components/system/Pill";
 import type { CalendarEvent } from "@/types/event";
 
 // TODO: detect if the featured event is sold out via Ticket Tailor API and
@@ -101,16 +98,12 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
       </div>
 
       {cta && (
-        <EventCtaLink
-          cta={cta}
-          title={event.title}
-          className={cardEdgeClassName}
+        <CardAction
+          icon={cta.icon}
+          render={<EventCtaLink cta={cta} title={event.title} />}
         >
-          <CardEdgeFace>
-            <cta.icon size={18} className="shrink-0" />
-            {cta.label}
-          </CardEdgeFace>
-        </EventCtaLink>
+          {cta.label}
+        </CardAction>
       )}
     </div>
   );

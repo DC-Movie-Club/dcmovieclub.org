@@ -47,18 +47,13 @@ export function SubscribePlainCard() {
   );
 }
 
-// The signup form in a cream dialog, opened by `trigger` with `children`
-// inside it
-export function SubscribeDialog({
-  trigger,
-  children,
-}: {
-  trigger: React.ReactElement;
-  children: React.ReactNode;
-}) {
+// The signup form in a cream dialog, opened by `trigger`, a button with its
+// content: rendered on the server, it arrives drawn, so content given to the
+// DialogTrigger instead wouldn't reach it
+export function SubscribeDialog({ trigger }: { trigger: React.ReactElement }) {
   return (
     <Dialog>
-      <DialogTrigger render={trigger}>{children}</DialogTrigger>
+      <DialogTrigger render={trigger} />
       <DialogContent
         showCloseButton={false}
         className="sm:max-w-md"

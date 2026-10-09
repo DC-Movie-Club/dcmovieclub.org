@@ -5,6 +5,7 @@ import { flushSync } from "react-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { withExternalLinks } from "@/lib/external-links";
 import { cn } from "@/lib/utils";
+import { Pill } from "@/components/system/Pill";
 
 interface ExpandableDescriptionProps {
   html: string;
@@ -100,31 +101,17 @@ export function ExpandableDescription({
         </div>
       </div>
       {showToggle && (
-        <button
+        <Pill
           ref={toggleRef}
-          type="button"
+          variant="cream"
+          size="sm"
+          iconEnd={ToggleIcon}
           onClick={toggle}
           aria-expanded={expanded}
-          className={cn(
-            "group/toggle relative mx-auto mt-2 flex rounded-full text-charcoal focus-ring focus-ring-rust",
-            actionClassName,
-          )}
+          className={cn("mx-auto mt-2", actionClassName)}
         >
-          <span
-            aria-hidden
-            className="absolute inset-px rounded-full bg-cream shadow-md sketch-subtle group-hover/toggle:boil"
-          />
-          {/* Faded with opacity, since the ink filter cuts away a
-              translucent line */}
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-full border-2 border-charcoal opacity-25 ink-subtle group-hover/toggle:opacity-40 group-hover/toggle:boil"
-          />
-          <span className="relative flex items-center gap-1 px-4 py-1.5 text-xs uppercase tracking-wider">
-            {expanded ? "Show less" : "Read more"}
-            <ToggleIcon size={14} />
-          </span>
-        </button>
+          {expanded ? "Show less" : "Read more"}
+        </Pill>
       )}
     </div>
   );

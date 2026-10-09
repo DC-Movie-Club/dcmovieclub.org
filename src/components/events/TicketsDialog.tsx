@@ -11,9 +11,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CornerCloseButton } from "@/components/CornerCloseButton";
-import { CardEdgeFace } from "@/components/section-cards";
+import { Pill } from "@/components/system/Pill";
 import type { EventTicket } from "@/types/event";
-import { SmartLink } from "@/components/system/SmartLink";
 
 const ACCENT_VARS = [
   "--page-accent",
@@ -77,20 +76,21 @@ export function TicketsDialog({
         <ul className="mt-5 flex flex-col items-center gap-4 pb-2">
           {tickets.map((ticket) => (
             <li key={ticket.url}>
+              {/* On the dialog's cream, so the focus ring is rust */}
               <DialogClose
                 nativeButton={false}
                 render={
-                  <SmartLink
+                  <Pill
+                    variant="accent"
+                    size="lg"
                     href={ticket.url}
-                    className="group/edge relative block rounded-full transition-transform hover:scale-105 focus-ring focus-ring-rust"
-                  />
+                    icon={Ticket}
+                    className="focus-ring-rust"
+                  >
+                    {ticket.label}
+                  </Pill>
                 }
-              >
-                <CardEdgeFace>
-                  <Ticket size={18} className="shrink-0" />
-                  {ticket.label}
-                </CardEdgeFace>
-              </DialogClose>
+              />
             </li>
           ))}
         </ul>

@@ -3,13 +3,16 @@
 import { useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, Heart, Star, StarHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Letterboxd } from "@/components/icons/Letterboxd";
-import type { LetterboxdReview } from "@/types/letterboxd";
+import { socials } from "@/config/navigation";
+import { LinkOverlay } from "@/components/system/LinkOverlay";
+import { Pill } from "@/components/system/Pill";
 import { SmartLink } from "@/components/system/SmartLink";
+import { Sticker } from "@/components/system/Sticker";
+import { textStyles } from "@/components/textStyles";
+import type { LetterboxdReview } from "@/types/letterboxd";
 
 const POSTER_COUNT = 3;
 const SHORT_REVIEW_CHARS = 60;
-const LETTERBOXD_PROFILE_URL = "https://letterboxd.com/DCMovieClub/";
 
 function StarRating({ rating, size = 12 }: { rating: number; size?: number }) {
   return (
@@ -71,29 +74,6 @@ function TileLink({
       <SketchOutline className="group-hover/card:boil-sm" />
       {badge}
     </SmartLink>
-  );
-}
-
-function PosterSticker({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "absolute flex items-center whitespace-nowrap",
-        className,
-      )}
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-full border-2 border-charcoal/25 bg-cream shadow-md sketch-subtle"
-      />
-      <div className="relative flex items-center gap-1.5">{children}</div>
-    </div>
   );
 }
 
@@ -184,14 +164,16 @@ function FilmPoster({
   const badges = (
     <>
       {review.diaryDate && (
-        <PosterSticker className="-top-3.5 left-1/2 -translate-x-1/2 px-3 py-1.5 text-sm uppercase leading-none tracking-wider text-charcoal/70">
+        <Sticker
+          className={cn("absolute -top-3.5 left-1/2 -translate-x-1/2", textStyles.stickerDate)}
+        >
           {formatDiaryDate(review.diaryDate)}
-        </PosterSticker>
+        </Sticker>
       )}
       {showRating && review.rating !== null && (
-        <PosterSticker className="-bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-1.5 text-rust">
+        <Sticker className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-rust">
           <StarRating rating={review.rating} />
-        </PosterSticker>
+        </Sticker>
       )}
       {review.liked && (
         <HeartSticker className="absolute -top-2 -left-2" />
@@ -212,12 +194,7 @@ function FilmPoster({
           {review.filmTitle}
         </div>
       )}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#5c1a06]/85 p-3 text-center opacity-0 transition-opacity group-hover/card:opacity-100">
-        <ArrowUpRight size={32} className="text-white sketch" strokeWidth={2.5} />
-        <span className="text-sm uppercase leading-tight tracking-wide text-white">
-          {review.filmTitle}
-        </span>
-      </div>
+      <LinkOverlay caption={review.filmTitle} className="group-hover/card:opacity-100" />
     </TileLink>
   );
 }
@@ -278,26 +255,17 @@ function FeaturedReviewCard({ review }: { review: LetterboxdReview }) {
 }
 
 function FollowButton() {
+  const { letterboxd } = socials;
   return (
-    <SmartLink
-      href={LETTERBOXD_PROFILE_URL}
+    <Pill
+      variant="outline"
+      href={letterboxd.href}
+      icon={letterboxd.icon}
+      iconEnd={ArrowUpRight}
       aria-label="Follow us on Letterboxd"
-      className="group/follow relative block w-fit shrink-0 rounded-full transition-transform hover:scale-105 focus-ring focus-ring-rust"
     >
-      <span
-        aria-hidden
-        className="absolute inset-px rounded-full transition-colors sketch group-hover/follow:bg-charcoal group-hover/follow:boil"
-      />
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full border-[3px] border-charcoal ink group-hover/follow:boil"
-      />
-      <span className="relative flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider text-charcoal transition-colors group-hover/follow:text-cream">
-        <Letterboxd size={20} />
-        Follow us
-        <ArrowUpRight size={16} />
-      </span>
-    </SmartLink>
+      Follow us
+    </Pill>
   );
 }
 

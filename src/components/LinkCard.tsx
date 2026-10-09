@@ -5,7 +5,7 @@ import { ArrowUpRight, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CardItem } from "@/lib/pages";
 import { textStyles } from "@/components/textStyles";
-import { OpensOverlay } from "@/components/OpensOverlay";
+import { LinkOverlay } from "@/components/system/LinkOverlay";
 import { SmartLink } from "@/components/system/SmartLink";
 
 // A link with its site's preview picture, like a press piece. The picture is
@@ -69,7 +69,7 @@ export function LinkCard({ item }: { item: CardItem }) {
         </span>
       )}
       {item.url && (
-        <OpensOverlay
+        <LinkOverlay
           className="group-hover/tile:opacity-100"
           washClassName="inset-px rounded-xl sketch"
         />

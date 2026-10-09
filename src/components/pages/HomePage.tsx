@@ -1,8 +1,6 @@
-import NextLink from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { PageSection, PageView } from "@/lib/pages";
-import { TextLink } from "@/components/system/SmartLink";
-import { routes, socials } from "@/config/navigation";
+import { routes } from "@/config/navigation";
 import {
   colorVars,
   pageTemplates,
@@ -12,7 +10,11 @@ import {
 import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import { Markdown } from "@/components/Markdown";
-import { CardEdgeLink, SectionCard } from "@/components/section-cards";
+import { SectionCard } from "@/components/section-cards";
+import { TagList } from "@/components/PageSections";
+import { CardAction, Pill } from "@/components/system/Pill";
+import { SketchShape } from "@/components/system/SketchShape";
+import { SocialLinks } from "@/components/system/SocialLinks";
 import { textStyles } from "@/components/textStyles";
 import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
@@ -37,13 +39,13 @@ function TaglineBanner({
 }) {
   return (
     <span className={cn("relative px-[0.45em] py-[0.3em] text-balance sm:px-5 sm:py-2.5", className)}>
-      {/* Separate shadow layer: an offset box-shadow would be clipped by the
+      {/* A hard shadow layer: an offset box-shadow would be clipped by the
           sketch filter's region */}
-      <span
-        aria-hidden
-        className="absolute inset-0 translate-x-1 translate-y-1 bg-page-accent-edge sketch sm:translate-x-1.5 sm:translate-y-1.5"
+      <SketchShape
+        radius="rounded-none"
+        fill="bg-page-accent"
+        hardShadow="translate-x-1 translate-y-1 bg-page-accent-edge sm:translate-x-1.5 sm:translate-y-1.5"
       />
-      <span aria-hidden className="absolute inset-0 bg-page-accent sketch" />
       <span className="relative">{children}</span>
     </span>
   );
@@ -77,49 +79,12 @@ function Hero() {
         </p>
       </section>
 
-      <div className="flex items-center justify-center gap-4">
-        {Object.values(socials).map((link) => (
-          <TextLink
-            key={link.key}
-            href={link.href}
-            className="sketch-subtle text-muted-foreground transition-colors hover:text-rust"
-          >
-            <link.icon size={24} />
-          </TextLink>
-        ))}
-      </div>
+      <SocialLinks
+        size={24}
+        className="justify-center"
+        linkClassName="text-muted-foreground hover:text-rust"
+      />
     </>
-  );
-}
-
-// An outlined pill in the page's text color that fills in on hover
-function OutlineLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <NextLink
-      href={href}
-      className="group/outline relative shrink-0 rounded-full focus-ring"
-    >
-      <span
-        aria-hidden
-        className="absolute inset-px rounded-full transition-colors sketch-subtle group-hover/outline:bg-page-fg group-hover/outline:boil"
-      />
-      {/* Faded with opacity, since the ink filter cuts away a translucent
-          line */}
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-full border-2 border-page-fg opacity-70 transition-opacity ink-subtle group-hover/outline:opacity-100 group-hover/outline:boil"
-      />
-      <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-page-fg transition-colors group-hover/outline:text-charcoal">
-        {children}
-        <ArrowRight size={14} />
-      </span>
-    </NextLink>
   );
 }
 
@@ -144,7 +109,9 @@ function EventsSection({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <h2 className={textStyles.pageHeading}>Also coming up</h2>
-              <OutlineLink href={pageTemplates.events.href}>View all</OutlineLink>
+              <Pill variant="outline" href={pageTemplates.events.href} iconEnd={ArrowRight}>
+                View all
+              </Pill>
             </div>
             <ul className="grid gap-4 sm:grid-cols-3">
               {upcoming.map((event) => (
@@ -174,7 +141,9 @@ function NewsletterSection({
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         <div className="flex items-center justify-between gap-4">
           <h2 className={textStyles.pageHeading}>From the newsletter</h2>
-          <OutlineLink href={pageTemplates.blog.href}>Blog</OutlineLink>
+          <Pill variant="outline" href={pageTemplates.blog.href} iconEnd={ArrowRight}>
+            Blog
+          </Pill>
         </div>
         <LatestPost post={post} />
         <SubscribePlainCard />
@@ -216,56 +185,30 @@ function AboutSection({
             <SectionCard label={blurb.label}>
               <Markdown>{blurb.content}</Markdown>
             </SectionCard>
-            <CardEdgeLink href={pageTemplates.about.href}>
-              <routes.about.icon size={18} className="shrink-0" />
+            <CardAction
+              href={pageTemplates.about.href}
+              icon={routes.about.icon}
+              iconEnd={ArrowRight}
+            >
               More about us
-              <ArrowRight size={18} className="shrink-0" />
-            </CardEdgeLink>
+            </CardAction>
           </div>
         )}
 
         {partners && partners.items.length > 0 && (
           <div className="flex flex-col gap-5 border-t-2 border-dashed border-page-fg/30 pt-8">
             <h2 className={textStyles.pageHeading}>{partners.label}</h2>
-            <ul className="flex flex-wrap items-center gap-2.5">
+            <TagList items={partners.items}>
               <li className="flex">
-                <NextLink
+                <Pill
+                  variant="accent"
                   href={pageTemplates.partnerships.href}
-                  className="group/partner relative rounded-full transition-transform hover:scale-105 focus-ring"
+                  icon={routes.partnerships.icon}
                 >
-                  <span
-                    aria-hidden
-                    className="absolute inset-px rounded-full bg-page-accent sketch group-hover/partner:boil"
-                  />
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 rounded-full border-[2.5px] border-page-accent-edge ink group-hover/partner:boil"
-                  />
-                  <span className="relative flex items-center gap-1.5 px-4 py-2 text-sm uppercase tracking-widest text-page-accent-text">
-                    <routes.partnerships.icon size={16} className="shrink-0" />
-                    Partner with us
-                  </span>
-                </NextLink>
+                  Partner with us
+                </Pill>
               </li>
-              {partners.items.map((item) => (
-                <li
-                  key={item.key}
-                  className="relative px-3.5 py-2 text-sm uppercase leading-none tracking-wide text-charcoal"
-                >
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 rounded-full bg-cream shadow-sm sketch-subtle"
-                  />
-                  {item.url ? (
-                    <TextLink href={item.url} className="relative">
-                      {item.title}
-                    </TextLink>
-                  ) : (
-                    <span className="relative">{item.title}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
+            </TagList>
           </div>
         )}
       </div>

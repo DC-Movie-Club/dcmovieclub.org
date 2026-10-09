@@ -15,7 +15,7 @@ const proseHeading = "uppercase tracking-wider text-page-card-text";
 const proseLink =
   "text-rust underline decoration-rust/40 underline-offset-4 hover:decoration-rust";
 
-const accentPill = "uppercase tracking-wider text-page-accent-text";
+const buttonLabel = "uppercase tracking-wider whitespace-nowrap";
 
 const stickerText = "text-sm uppercase leading-none tracking-wider";
 
@@ -48,8 +48,10 @@ export const textStyles = {
   htmlLinks:
     "[&_a]:text-rust [&_a]:underline [&_a]:decoration-rust/40 [&_a]:underline-offset-4 [&_a]:hover:decoration-rust",
 
-  accentPill: cn("text-sm sm:text-base", accentPill),
-  accentPillSmall: cn("text-sm", accentPill),
+  // Button labels by the button's size (see Pill), which also sets their color
+  buttonSmall: cn("text-xs", buttonLabel),
+  button: cn("text-sm", buttonLabel),
+  buttonLarge: cn("text-sm sm:text-base", buttonLabel),
 
   // Charcoal whatever the page, since stickers are cream on any card or page
   stickerText: cn(stickerText, "text-charcoal"),

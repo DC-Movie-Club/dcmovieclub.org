@@ -15,7 +15,7 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoOutline } from "@/components/LogoOutline";
-import { routes, socials } from "@/config/navigation";
+import { routes } from "@/config/navigation";
 import { colorVars } from "@/config/pages";
 import {
   Dialog,
@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SmartLink } from "@/components/system/SmartLink";
+import { SocialLinks } from "@/components/system/SocialLinks";
 
 const menuRoutes = [routes.partnerships];
 const NAV_LOGO_SIZE = 112;
@@ -164,20 +164,11 @@ export function BottomNav({
                   </li>
                 </ul>
                 <hr className="sketch border-t-2 border-charcoal/20 my-2" />
-                <div className="flex items-center justify-center gap-4 py-2">
-                  {Object.values(socials).map((link) => (
-                    <SmartLink
-                      key={link.key}
-                      href={link.href}
-                      className="group/item text-muted-foreground transition-colors hover:text-rust"
-                    >
-                      <link.icon
-                        size={24}
-                        className="sketch-subtle group-hover/item:sketch-subtle-animated"
-                      />
-                    </SmartLink>
-                  ))}
-                </div>
+                <SocialLinks
+                  size={24}
+                  className="justify-center py-2"
+                  linkClassName="text-muted-foreground hover:text-rust"
+                />
               </DialogContent>
             </Dialog>
 

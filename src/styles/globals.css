@@ -17,6 +17,20 @@
   }
 }
 
+/* Hover styles for the layers inside a control (see SketchShape), set off by
+   hovering or pressing the control itself, their parent, so a control inside
+   another reacts only to its own hover. */
+@custom-variant parent-hover {
+  @media (hover: hover) {
+    :hover > & {
+      @slot;
+    }
+  }
+  :active > & {
+    @slot;
+  }
+}
+
 /* Hover styles for a clickable card that stay off while pointing at a button
    inside it (e.g. an inline "Read more" toggle), which does its own thing. */
 @custom-variant card-hover {
@@ -264,12 +278,14 @@ html[data-loading] .animate-nav-spring-in {
   --outline-ink: --value(--color-*);
 }
 
-/* Keyboard focus: a 2px ring, cream for controls on the page's colors.
-   focus-ring-* recolors it (focus-ring-rust on cream), and --focus-offset
-   spaces it further out. */
+/* Keyboard focus: a 2px ring in the page's text color, which stands out on
+   the page's background. focus-ring-* recolors it (focus-ring-rust on cream),
+   and --focus-offset spaces it further out. The page variable is read here
+   rather than through --color-page-fg, which resolves at the root, where no
+   page has set it. */
 @utility focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--focus-ring, var(--color-cream));
+    outline: 2px solid var(--focus-ring, var(--page-fg, var(--color-charcoal)));
     outline-offset: var(--focus-offset, 2px);
   }
 }
