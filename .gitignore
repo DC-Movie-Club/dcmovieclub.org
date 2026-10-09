@@ -45,5 +45,6 @@ credentials.json
 
 # kit screenshots (see playwright.config.ts)
 /tests/kit-screenshots/
+/tests/kit-shots-*/
 /test-results/
 /playwright-report/

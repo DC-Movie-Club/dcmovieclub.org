@@ -1,6 +1,10 @@
 import { defineConfig } from "@playwright/test";
 
 const PORT = 3100;
+// Another server to screenshot instead, like an older commit's, and a folder
+// to keep its shots apart
+const URL = process.env.KIT_URL;
+const SHOTS = process.env.KIT_SHOTS ?? "kit-screenshots";
 
 // Screenshots of the /kit pages, compared against a baseline taken before a
 // change (see tests/kit.spec.ts). The baseline stays out of git: take it with
@@ -8,7 +12,7 @@ const PORT = 3100;
 // `pnpm kit:check` after the change.
 export default defineConfig({
   testDir: "tests",
-  snapshotPathTemplate: "tests/kit-screenshots/{projectName}/{arg}{ext}",
+  snapshotPathTemplate: `tests/${SHOTS}/{projectName}/{arg}{ext}`,
   timeout: 60_000,
   reporter: [["list"]],
   expect: {
@@ -16,11 +20,14 @@ export default defineConfig({
       // Finishes transitions and holds CSS animations (the marquee) still
       animations: "disabled",
       caret: "hide",
+      // Exact: runs on one machine draw the same, and a faint color change is
+      // still a change
       maxDiffPixels: 0,
+      threshold: 0,
     },
   },
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: URL ?? `http://localhost:${PORT}`,
     timezoneId: "America/New_York",
     locale: "en-US",
   },
@@ -39,7 +46,7 @@ export default defineConfig({
       use: { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 },
     },
   ],
-  webServer: {
+  webServer: URL ? undefined : {
     command: `pnpm dev --port ${PORT}`,
     url: `http://localhost:${PORT}/kit`,
     reuseExistingServer: true,
