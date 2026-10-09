@@ -10,7 +10,7 @@ import {
 import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import { Markdown } from "@/components/Markdown";
-import { SectionCard } from "@/components/section-cards";
+import { Card } from "@/components/system/Card";
 import { TagList } from "@/components/PageSections";
 import { CardAction, Pill } from "@/components/system/Pill";
 import { SketchShape } from "@/components/system/SketchShape";
@@ -181,18 +181,20 @@ function AboutSection({
     <section className="bg-page-bg px-6 py-16" style={colorVars(about.colors)}>
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         {blurb?.content.trim() && (
-          <div className="relative">
-            <SectionCard label={blurb.label}>
-              <Markdown>{blurb.content}</Markdown>
-            </SectionCard>
-            <CardAction
-              href={pageTemplates.about.href}
-              icon={routes.about.icon}
-              iconEnd={ArrowRight}
-            >
-              More about us
-            </CardAction>
-          </div>
+          <Card
+            label={blurb.label}
+            action={
+              <CardAction
+                href={pageTemplates.about.href}
+                icon={routes.about.icon}
+                iconEnd={ArrowRight}
+              >
+                More about us
+              </CardAction>
+            }
+          >
+            <Markdown>{blurb.content}</Markdown>
+          </Card>
         )}
 
         {partners && partners.items.length > 0 && (

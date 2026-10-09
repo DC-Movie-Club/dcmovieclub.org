@@ -3,30 +3,19 @@
 import { useRef, useState } from "react";
 import { Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { CornerCloseButton } from "@/components/CornerCloseButton";
+import { Dialog, DialogClose, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { colorRoles } from "@/config/pages";
 import { Pill } from "@/components/system/Pill";
+import { SketchDialogContent } from "@/components/system/SketchDialogContent";
 import type { EventTicket } from "@/types/event";
 
-const ACCENT_VARS = [
-  "--page-accent",
-  "--page-accent-edge",
-  "--page-accent-text",
-];
-
-// The dialog portals out of the page, so it copies the accent colors the
-// page sets around the trigger onto its own ticket pills.
-function accentVars(element: HTMLElement | null) {
+// The dialog portals out of the page, so it copies the colors the page sets
+// around the trigger onto its own ticket pills
+function pageColorVars(element: HTMLElement | null) {
   if (!element) return undefined;
   const style = getComputedStyle(element);
   return Object.fromEntries(
-    ACCENT_VARS.map((name) => [name, style.getPropertyValue(name)]),
+    Object.values(colorRoles).map(({ cssVar }) => [cssVar, style.getPropertyValue(cssVar)]),
   ) as React.CSSProperties;
 }
 
@@ -49,12 +38,12 @@ export function TicketsDialog({
   children?: React.ReactNode;
 }) {
   const triggerRef = useRef<HTMLDivElement>(null);
-  const [accents, setAccents] = useState<React.CSSProperties>();
+  const [colors, setColors] = useState<React.CSSProperties>();
 
   return (
     <Dialog
       onOpenChange={(open) => {
-        if (open) setAccents(accentVars(triggerRef.current));
+        if (open) setColors(pageColorVars(triggerRef.current));
       }}
     >
       <DialogTrigger
@@ -69,7 +58,7 @@ export function TicketsDialog({
       >
         {children}
       </DialogTrigger>
-      <DialogContent showCloseButton={false} style={accents}>
+      <SketchDialogContent style={colors}>
         <DialogTitle className="px-4 pt-2 text-center text-lg uppercase leading-tight tracking-wide text-balance text-foreground">
           {title}
         </DialogTitle>
@@ -94,8 +83,7 @@ export function TicketsDialog({
             </li>
           ))}
         </ul>
-        <CornerCloseButton />
-      </DialogContent>
+      </SketchDialogContent>
     </Dialog>
   );
 }

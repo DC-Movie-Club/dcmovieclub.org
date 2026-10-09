@@ -1,14 +1,8 @@
 import { cn } from "@/lib/utils";
 import { socials } from "@/config/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { CornerCloseButton } from "@/components/CornerCloseButton";
-import { CreamCard } from "@/components/CreamCard";
-import { SectionCard } from "@/components/section-cards";
+import { Dialog, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Card } from "@/components/system/Card";
+import { SketchDialogContent } from "@/components/system/SketchDialogContent";
 
 // Substack's signup form. Its page can't be styled or told to focus its email
 // field from here, but its background is our cream, so on a cream surface it
@@ -32,18 +26,18 @@ const COMPACT_SIGNUP = "mx-auto h-[230px] max-w-md";
 // The signup form in a card labelled on its top edge, as on the blog
 export function SubscribeCard() {
   return (
-    <SectionCard label="Subscribe">
+    <Card label="Subscribe">
       <SubstackSignup className={cn(COMPACT_SIGNUP, "-mt-6 -mb-4")} />
-    </SectionCard>
+    </Card>
   );
 }
 
 // The signup form in a plain card, as on home
 export function SubscribePlainCard() {
   return (
-    <CreamCard>
+    <Card>
       <SubstackSignup className={cn(COMPACT_SIGNUP, "-my-4")} />
-    </CreamCard>
+    </Card>
   );
 }
 
@@ -54,15 +48,10 @@ export function SubscribeDialog({ trigger }: { trigger: React.ReactElement }) {
   return (
     <Dialog>
       <DialogTrigger render={trigger} />
-      <DialogContent
-        showCloseButton={false}
-        className="sm:max-w-md"
-        surfaceClassName="bg-cream"
-      >
+      <SketchDialogContent className="sm:max-w-md">
         <DialogTitle className="sr-only">Subscribe to our newsletter</DialogTitle>
         <SubstackSignup />
-        <CornerCloseButton />
-      </DialogContent>
+      </SketchDialogContent>
     </Dialog>
   );
 }

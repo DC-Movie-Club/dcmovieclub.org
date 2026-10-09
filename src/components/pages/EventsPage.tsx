@@ -3,7 +3,7 @@ import type { PageView } from "@/lib/pages";
 import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
 import { ColorPage, PageTitle } from "@/components/ColorPage";
-import { CreamCard } from "@/components/CreamCard";
+import { Card } from "@/components/system/Card";
 import { PageSections } from "@/components/PageSections";
 import { textStyles } from "@/components/textStyles";
 import type { CalendarEvent } from "@/types/event";
@@ -26,11 +26,11 @@ function UpcomingEvents({ events }: { events: CalendarEvent[] }) {
       {featured ? (
         <FeaturedEventCard event={featured} />
       ) : (
-        <CreamCard>
+        <Card>
           <p className={textStyles.cardEmpty}>
             No upcoming events right now. Check back soon!
           </p>
-        </CreamCard>
+        </Card>
       )}
 
       {months.map((month) => (

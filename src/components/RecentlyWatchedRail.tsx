@@ -4,9 +4,8 @@ import { useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, Heart, Star, StarHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { socials } from "@/config/navigation";
-import { LinkOverlay } from "@/components/system/LinkOverlay";
 import { Pill } from "@/components/system/Pill";
-import { SmartLink } from "@/components/system/SmartLink";
+import { PosterCard, PosterFrame } from "@/components/system/PosterFrame";
 import { Sticker } from "@/components/system/Sticker";
 import { textStyles } from "@/components/textStyles";
 import type { LetterboxdReview } from "@/types/letterboxd";
@@ -35,45 +34,6 @@ function StarRating({ rating, size = 12 }: { rating: number; size?: number }) {
         );
       })}
     </div>
-  );
-}
-
-function SketchOutline({ className }: { className?: string }) {
-  return (
-    <div
-      aria-hidden
-      className={cn(
-        "pointer-events-none absolute -inset-[2px] rounded-lg border-[3px] border-charcoal ink",
-        className,
-      )}
-    />
-  );
-}
-
-function TileLink({
-  href,
-  children,
-  badge,
-}: {
-  href: string;
-  children: React.ReactNode;
-  badge?: React.ReactNode;
-}) {
-  return (
-    <SmartLink
-      href={href}
-      className="group/card relative block w-full rounded-lg transition-transform hover:-rotate-1 hover:scale-105 focus-ring focus-ring-rust [--focus-offset:4px]"
-    >
-      {/* A filled twin of the outline, wobbling identically, so the ink
-          filter never opens a gap to the page between poster and border. It's
-          all one color, so it takes ink without smearing. */}
-      <SketchOutline className="bg-charcoal group-hover/card:boil-sm" />
-      <div className="relative aspect-poster w-full overflow-hidden rounded-[7px]">
-        {children}
-      </div>
-      <SketchOutline className="group-hover/card:boil-sm" />
-      {badge}
-    </SmartLink>
   );
 }
 
@@ -182,7 +142,7 @@ function FilmPoster({
   );
 
   return (
-    <TileLink href={review.url} badge={badges}>
+    <PosterFrame href={review.url} caption={review.filmTitle} badge={badges}>
       {review.posterUrl ? (
         <img
           src={review.posterUrl}
@@ -194,8 +154,7 @@ function FilmPoster({
           {review.filmTitle}
         </div>
       )}
-      <LinkOverlay caption={review.filmTitle} className="group-hover/card:opacity-100" />
-    </TileLink>
+    </PosterFrame>
   );
 }
 
@@ -222,34 +181,28 @@ function FeaturedReviewCard({ review }: { review: LetterboxdReview }) {
 
   return (
     <div className="relative xs:col-span-2">
-      <div className="absolute inset-0">
-        <div
-          aria-hidden
-          className="absolute -inset-[2px] rounded-lg bg-cream sketch"
-        />
-        <div className="absolute inset-0 flex flex-col gap-3 overflow-hidden rounded-[7px] p-4 text-charcoal">
-          {review.rating !== null && (
-            <div className="shrink-0 text-rust">
-              <StarRating rating={review.rating} size={14} />
-            </div>
+      <PosterCard className="flex flex-col gap-3 p-4 text-charcoal">
+        {review.rating !== null && (
+          <div className="shrink-0 text-rust">
+            <StarRating rating={review.rating} size={14} />
+          </div>
+        )}
+        <p
+          ref={clipRef}
+          className={cn(
+            "min-h-0 flex-1 overflow-hidden",
+            isShort ? "text-2xl leading-tight" : "text-sm leading-normal",
+            isClipped && "mask-b-from-[calc(100%-2rem)]",
           )}
-          <p
-            ref={clipRef}
-            className={cn(
-              "min-h-0 flex-1 overflow-hidden",
-              isShort ? "text-2xl leading-tight" : "text-sm leading-normal",
-              isClipped && "mask-b-from-[calc(100%-2rem)]",
-            )}
-          >
-            {text}
+        >
+          {text}
+        </p>
+        {review.reviewer && (
+          <p className="shrink-0 text-xs tracking-wide text-charcoal/55">
+            — {review.reviewer}
           </p>
-          {review.reviewer && (
-            <p className="shrink-0 text-xs tracking-wide text-charcoal/55">
-              — {review.reviewer}
-            </p>
-          )}
-        </div>
-      </div>
+        )}
+      </PosterCard>
     </div>
   );
 }

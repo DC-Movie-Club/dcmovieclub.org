@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
-import { CardSurface } from "@/components/CardSurface";
+import { Card } from "@/components/system/Card";
+import { SketchImage } from "@/components/system/SketchImage";
 import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { proseHtml } from "@/components/markdownStyles";
 import { textStyles } from "@/components/textStyles";
 import { DatePill } from "@/components/posts/PostParts";
-import { ThumbnailImage } from "@/components/ThumbnailImage";
 import type { SubstackPost } from "@/types/post";
 import { SmartLink } from "@/components/system/SmartLink";
 
@@ -27,8 +27,7 @@ function OpenOnSubstack({ post }: { post: SubstackPost }) {
 }
 
 // A copy of the cover, framed like a photo and set over the card's top edge:
-// across the card on phones, small in the top-left corner on wider screens.
-// The image takes the frame's wobble, so its edge stays under the frame's line.
+// across the card on phones, small in the top-left corner on wider screens
 function CoverSnapshot({
   post,
   priority,
@@ -38,20 +37,17 @@ function CoverSnapshot({
 }) {
   if (!post.imageUrl) return null;
   return (
-    <div className="relative -mt-6 w-full shrink-0 rounded-lg shadow-lg sm:-mt-8 sm:w-[22rem]">
-      <ThumbnailImage
-        src={post.imageUrl}
-        blurDataUrl={post.blurDataUrl}
-        sizes="(min-width: 640px) 352px, 100vw"
-        priority={priority}
-        fit="contain"
-        className="aspect-[1200/630] rounded-lg sketch-subtle"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-lg border-[2.5px] border-charcoal sketch-subtle"
-      />
-    </div>
+    <SketchImage
+      src={post.imageUrl}
+      blurDataUrl={post.blurDataUrl}
+      sizes="(min-width: 640px) 352px, 100vw"
+      priority={priority}
+      weight="fine"
+      aspect="aspect-[1200/630]"
+      radius="rounded-lg"
+      line="border-[2.5px] border-charcoal"
+      className="-mt-6 w-full shrink-0 rounded-lg shadow-lg sm:-mt-8 sm:w-[22rem]"
+    />
   );
 }
 
@@ -66,11 +62,11 @@ export function LatestPost({
   priority?: boolean;
 }) {
   return (
-    <article className="relative flex flex-col">
-      <CardSurface />
-
+    // Padded a little tighter than a card, which leaves the title room beside
+    // the cover: a title that wraps further pushes the cover down off the edge
+    <Card as="article" padded={false}>
       {/* The subtitle's last line sits level with the cover's bottom edge */}
-      <div className="relative flex flex-col gap-4 px-5 sm:flex-row sm:items-end sm:gap-6 sm:px-6">
+      <div className="relative flex flex-col gap-4 self-stretch px-5 sm:flex-row sm:items-end sm:gap-6 sm:px-6">
         <CoverSnapshot post={post} priority={priority} />
         <div
           className={cn(
@@ -92,7 +88,7 @@ export function LatestPost({
           // The clipping wrapper gets a gutter so button shadows and hover
           // growth aren't cut off at the sides
           className={cn(
-            "relative px-5 pt-5 pb-10 sm:px-6 sm:pt-10 sm:pb-12 [&>div:first-child]:-mx-3 [&>div:first-child]:px-3",
+            "relative self-stretch px-5 pt-5 pb-10 sm:px-6 sm:pt-10 sm:pb-12 [&>div:first-child]:-mx-3 [&>div:first-child]:px-3",
             textStyles.proseBody,
           )}
           htmlClassName={cn(proseHtml, ARTICLE_COLUMN)}
@@ -102,10 +98,10 @@ export function LatestPost({
           <OpenOnSubstack post={post} />
         </ExpandableDescription>
       ) : (
-        <div className="relative px-5 pb-8 sm:px-6">
+        <div className="relative self-stretch px-5 pb-8 sm:px-6">
           <OpenOnSubstack post={post} />
         </div>
       )}
-    </article>
+    </Card>
   );
 }

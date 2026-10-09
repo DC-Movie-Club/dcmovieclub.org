@@ -20,10 +20,10 @@ import { colorVars } from "@/config/pages";
 import {
   Dialog,
   DialogClose,
-  DialogContent,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SketchDialogContent } from "@/components/system/SketchDialogContent";
 import { SocialLinks } from "@/components/system/SocialLinks";
 
 const menuRoutes = [routes.partnerships];
@@ -113,7 +113,7 @@ export function BottomNav({
                   />
                 }
               />
-              <DialogContent showCloseButton={false}>
+              <SketchDialogContent closeButton={false}>
                 <DialogTitle className="sr-only">More</DialogTitle>
                 <ul className="flex flex-col gap-1">
                   {menuRoutes.map((route) => {
@@ -169,7 +169,7 @@ export function BottomNav({
                   className="justify-center py-2"
                   linkClassName="text-muted-foreground hover:text-rust"
                 />
-              </DialogContent>
+              </SketchDialogContent>
             </Dialog>
 
             <Link

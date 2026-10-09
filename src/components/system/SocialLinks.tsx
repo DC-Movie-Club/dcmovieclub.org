@@ -1,13 +1,14 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { socials } from "@/config/navigation";
+import { SketchIcon } from "@/components/system/SketchIcon";
 import { SmartLink } from "@/components/system/SmartLink";
 
 // An icon that links somewhere, named by `label`: drawn in the fine pencil
 // line and redrawn on hover. `className` sets its colors.
 export function IconLink({
   href,
-  icon: Icon,
+  icon,
   label,
   size,
   className,
@@ -24,7 +25,7 @@ export function IconLink({
       aria-label={label}
       className={cn("block transition-colors", className)}
     >
-      <Icon size={size} className="sketch-subtle parent-hover:sketch-subtle-animated" />
+      <SketchIcon icon={icon} size={size} redraw="parent" />
     </SmartLink>
   );
 }

@@ -2,8 +2,8 @@ import { Plus } from "lucide-react";
 import { LinkCard } from "@/components/LinkCard";
 import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
-import { SectionCard } from "@/components/section-cards";
 import { textStyles } from "@/components/textStyles";
+import { Card } from "@/components/system/Card";
 import { Pill } from "@/components/system/Pill";
 import { TextLink } from "@/components/system/SmartLink";
 import { Sticker } from "@/components/system/Sticker";
@@ -50,30 +50,31 @@ function ListHeading({ children }: { children: string }) {
 
 // The height animation uses ::details-content where supported; elsewhere it
 // just toggles
+// A question on a card that opens to its answer. It opens in one step and
+// the answer fades in: growing it over time would redraw the card's edges
+// every frame, as with ExpandableDescription. The badge boils while the card
+// is hovered.
 export function FaqEntry({ item }: { item: FaqItem }) {
   return (
-    // The card is drawn with ::before (its fill) and ::after (its line, over
-    // everything, so it lets clicks through) because any child element other
-    // than <summary> lands in ::details-content, which is hidden while closed.
-    <details className="group/faq group/card relative [interpolate-size:allow-keywords] before:absolute before:inset-px before:rounded-xl before:bg-cream before:shadow-lg before:content-[''] before:sketch after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:border-[2.5px] after:border-page-edge after:content-[''] after:ink [&::details-content]:h-0 [&::details-content]:overflow-hidden [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto">
-      <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-5 py-4 focus-ring focus-ring-rust sm:px-6 [&::-webkit-details-marker]:hidden">
-        <span className={textStyles.cardQuestion}>
-          {item.question}
-        </span>
-        <Pill
-          decorative
-          variant="accent"
-          round
-          size="sm"
-          withCard
-          icon={Plus}
-          iconClassName="transition-transform duration-300 group-open/faq:rotate-45"
-        />
-      </summary>
-      <div className="relative mx-5 border-t border-dashed border-charcoal/20 pt-4 pb-6 sm:mx-6">
-        <Markdown>{item.answer}</Markdown>
-      </div>
-    </details>
+    <Card padded={false} className="group/card">
+      <details className="group/faq relative self-stretch">
+        <summary className="relative flex cursor-pointer list-none items-center justify-between gap-4 rounded-2xl px-6 py-4 focus-ring focus-ring-rust sm:px-8 [&::-webkit-details-marker]:hidden">
+          <span className={textStyles.cardQuestion}>{item.question}</span>
+          <Pill
+            decorative
+            variant="accent"
+            round
+            size="sm"
+            withCard
+            icon={Plus}
+            iconClassName="transition-transform duration-300 group-open/faq:rotate-45"
+          />
+        </summary>
+        <div className="relative mx-6 border-t border-dashed border-charcoal/20 pt-4 pb-6 group-open/faq:duration-300 motion-safe:group-open/faq:animate-in motion-safe:group-open/faq:fade-in sm:mx-8">
+          <Markdown>{item.answer}</Markdown>
+        </div>
+      </details>
+    </Card>
   );
 }
 
@@ -81,25 +82,25 @@ function Section({ section }: { section: PageSection }) {
   switch (section.kind) {
     case "text":
       return section.content.trim() ? (
-        <SectionCard id={section.key} label={section.label}>
+        <Card as="section" id={section.key} label={section.label}>
           <Markdown>{section.content}</Markdown>
-        </SectionCard>
+        </Card>
       ) : null;
     case "links":
       return section.items.length > 0 ? (
-        <SectionCard id={section.key} label={section.label}>
+        <Card as="section" id={section.key} label={section.label}>
           <ul className={markdownStyles.ul}>
             {section.items.map((item) => (
               <LinkListItem key={item.key} item={item} />
             ))}
           </ul>
-        </SectionCard>
+        </Card>
       ) : null;
     case "tags":
       return section.items.length > 0 ? (
-        <SectionCard id={section.key} label={section.label}>
+        <Card as="section" id={section.key} label={section.label}>
           <TagList items={section.items} />
-        </SectionCard>
+        </Card>
       ) : null;
     case "cards": {
       // A card still being filled in stays off the page until it has a link

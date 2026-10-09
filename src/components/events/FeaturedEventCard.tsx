@@ -7,9 +7,8 @@ import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { CalendarDate } from "@/components/events/CalendarDate";
 import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta, getMapUrl } from "@/components/events/event-links";
-import { CardSurface } from "@/components/CardSurface";
 import { textStyles } from "@/components/textStyles";
-import { CardLabel } from "@/components/section-cards";
+import { Card } from "@/components/system/Card";
 import { CardAction } from "@/components/system/Pill";
 import type { CalendarEvent } from "@/types/event";
 
@@ -23,32 +22,24 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
   const mapUrl = getMapUrl(event.location);
 
   return (
-    <div className="group/card relative flex flex-col items-start">
-      <CardSurface className={cn(cta && "card-hover:stroke-page-accent-edge")} />
-
-      {/* Stretched link makes the whole card clickable; the pill below is the
-          focusable CTA, so this one stays out of the tab order. */}
-      {cta && (
-        <EventCtaLink
-          cta={cta}
-          title={event.title}
-          tabIndex={-1}
-          aria-hidden
-          className="absolute inset-0 rounded-2xl"
-        />
-      )}
-
-      <CardLabel
-        as="p"
-        className={cn(
-          "pointer-events-none",
-          cta && "card-hover:outline-ink-page-accent-edge",
-        )}
-      >
-        Next Up
-      </CardLabel>
-
-      <div className="pointer-events-none relative flex items-start gap-4 self-stretch px-5 pt-4 pb-8 sm:gap-5 sm:px-6 sm:pb-9">
+    // The whole card links to the CTA too; the corner pill is the focusable
+    // one, so the card's link stays out of the tab order
+    <Card
+      label="Next Up"
+      labelAs="p"
+      link={cta ? <EventCtaLink cta={cta} title={event.title} /> : undefined}
+      action={
+        cta && (
+          <CardAction
+            icon={cta.icon}
+            render={<EventCtaLink cta={cta} title={event.title} />}
+          >
+            {cta.label}
+          </CardAction>
+        )
+      }
+    >
+      <div className="flex items-start gap-4 sm:gap-5">
         <CalendarDate month={month} day={day} variant="tall" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -96,15 +87,6 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
           )}
         </div>
       </div>
-
-      {cta && (
-        <CardAction
-          icon={cta.icon}
-          render={<EventCtaLink cta={cta} title={event.title} />}
-        >
-          {cta.label}
-        </CardAction>
-      )}
-    </div>
+    </Card>
   );
 }

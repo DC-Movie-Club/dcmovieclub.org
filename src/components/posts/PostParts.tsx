@@ -4,7 +4,7 @@ import { TIME_ZONE } from "@/lib/event-format";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { Pill } from "@/components/system/Pill";
 import { Sticker } from "@/components/system/Sticker";
-import { ThumbnailImage } from "@/components/ThumbnailImage";
+import { SketchImage } from "@/components/system/SketchImage";
 import { textStyles } from "@/components/textStyles";
 import type { SubstackPost } from "@/types/post";
 
@@ -39,41 +39,21 @@ export function DatePill({
   );
 }
 
-// A cover across the top of a card, out to its edges, at Substack's cover
-// size; other shapes (square logos, wide banners) are shown whole over a blur
-// of themselves. It covers the card's line there, so the line is drawn again
-// over it. The image takes the same wobble as the line (both from the card's
-// corner, with the same noise), so its edge stays under the line wherever it
-// moves; a straight edge shows past it or leaves a gap.
-export function BleedCover({
-  post,
-  sizes,
-  priority,
-  roundedClassName,
-  lineClassName,
-}: {
-  post: SubstackPost;
-  sizes: string;
-  priority?: boolean;
-  roundedClassName: string;
-  lineClassName: string;
-}) {
+// A post's cover across the top of a tile, out to its edges, at Substack's
+// cover size. It covers the tile's line there, so the line is drawn again
+// over it, turning with the tile's on hover.
+export function BleedCover({ post, sizes }: { post: SubstackPost; sizes: string }) {
   if (!post.imageUrl) return null;
   return (
-    <div className="relative self-stretch">
-      <ThumbnailImage
-        src={post.imageUrl}
-        blurDataUrl={post.blurDataUrl}
-        sizes={sizes}
-        priority={priority}
-        fit="contain"
-        className={cn("aspect-[1200/630] sketch", roundedClassName)}
-      />
-      <div
-        aria-hidden
-        className={cn("absolute inset-0 ink", roundedClassName, lineClassName)}
-      />
-    </div>
+    <SketchImage
+      src={post.imageUrl}
+      blurDataUrl={post.blurDataUrl}
+      sizes={sizes}
+      aspect="aspect-[1200/630]"
+      radius="rounded-t-xl"
+      line="border-[2.5px] border-page-edge transition-colors group-hover/tile:border-page-accent-edge"
+      className="self-stretch"
+    />
   );
 }
 

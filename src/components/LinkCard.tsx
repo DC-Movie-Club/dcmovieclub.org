@@ -5,8 +5,8 @@ import { ArrowUpRight, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CardItem } from "@/lib/pages";
 import { textStyles } from "@/components/textStyles";
-import { LinkOverlay } from "@/components/system/LinkOverlay";
-import { SmartLink } from "@/components/system/SmartLink";
+import { SketchIcon } from "@/components/system/SketchIcon";
+import { Tile } from "@/components/system/Tile";
 
 // A link with its site's preview picture, like a press piece. The picture is
 // loaded from that site, so if it's gone the card shows without it.
@@ -15,16 +15,8 @@ export function LinkCard({ item }: { item: CardItem }) {
   const [broken, setBroken] = useState("");
   const image = item.image === broken ? "" : item.image;
 
-  const content = (
-    <>
-      <div
-        aria-hidden
-        className="absolute inset-px rounded-xl bg-cream sketch"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge transition-colors ink group-hover/tile:border-page-accent-edge"
-      />
+  return (
+    <Tile href={item.url || undefined} opens={Boolean(item.url)}>
       <div className="relative grid grid-cols-[auto_1fr] items-start gap-x-4 p-3 sm:flex sm:h-full sm:flex-col sm:items-stretch sm:gap-3">
         {image ? (
           <img
@@ -42,7 +34,7 @@ export function LinkCard({ item }: { item: CardItem }) {
         ) : (
           // Holds the picture's place so cards in a row stay alike
           <div className="flex aspect-square w-20 items-center justify-center rounded-md bg-page-card-text/10 text-page-card-text/40 sm:aspect-wide sm:w-full">
-            <Newspaper size={28} className="sketch-subtle" />
+            <SketchIcon icon={Newspaper} size={28} />
           </div>
         )}
         <div
@@ -65,29 +57,9 @@ export function LinkCard({ item }: { item: CardItem }) {
         // On wider screens the picture fills the card's top, so the arrow
         // sits on a chip over the picture's corner
         <span className="absolute top-3 right-3 flex rounded-full text-rust sm:top-4.5 sm:right-4.5 sm:bg-cream sm:p-1 sm:shadow-md">
-          <ArrowUpRight size={16} className="sketch-subtle" />
+          <SketchIcon icon={ArrowUpRight} size={16} />
         </span>
       )}
-      {item.url && (
-        <LinkOverlay
-          className="group-hover/tile:opacity-100"
-          washClassName="inset-px rounded-xl sketch"
-        />
-      )}
-    </>
-  );
-
-  const className =
-    "group/tile relative block h-full rounded-xl transition-transform focus-ring";
-
-  return item.url ? (
-    <SmartLink
-      href={item.url}
-      className={cn(className, "hover:-rotate-1 hover:scale-102")}
-    >
-      {content}
-    </SmartLink>
-  ) : (
-    <div className={className}>{content}</div>
+    </Tile>
   );
 }

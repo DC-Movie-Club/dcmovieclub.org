@@ -42,14 +42,16 @@ function DialogOverlay({
   );
 }
 
+// `surface` draws the popup's background (see SketchDialogContent for the
+// public site's); the default is plain, for the admin
 function DialogContent({
   className,
-  surfaceClassName,
+  surface,
   children,
   showCloseButton = true,
   ...props
 }: DialogPrimitive.Popup.Props & {
-  surfaceClassName?: string;
+  surface?: React.ReactNode;
   showCloseButton?: boolean;
 }) {
   return (
@@ -63,12 +65,9 @@ function DialogContent({
         )}
         {...props}
       >
-        <div
-          className={cn(
-            "absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-surface sketch",
-            surfaceClassName,
-          )}
-        />
+        {surface ?? (
+          <div className="absolute inset-0 rounded-xl border-2 border-charcoal/20 bg-surface" />
+        )}
         <div className="relative">{children}</div>
         {showCloseButton && (
           <DialogPrimitive.Close

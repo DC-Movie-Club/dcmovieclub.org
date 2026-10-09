@@ -9,6 +9,12 @@ const WEIGHTS = {
 
 export type SketchWeight = keyof typeof WEIGHTS;
 
+// The fill's wobble, for something drawn inside a shape of that weight, like
+// a picture under its line
+export function wobbleClass(weight: SketchWeight) {
+  return WEIGHTS[weight].fill;
+}
+
 // A hand-drawn shape filling its positioned parent: a fill, a line over it in
 // brush pen ink, and a hard shadow under it, each optional and each given as
 // classes. The ink line only suits one color on a clear ground, so the fill

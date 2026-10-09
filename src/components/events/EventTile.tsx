@@ -6,22 +6,16 @@ import { CalendarDate } from "@/components/events/CalendarDate";
 import { EventCtaLink } from "@/components/events/EventCtaLink";
 import { getEventCta } from "@/components/events/event-links";
 import { textStyles } from "@/components/textStyles";
+import { SketchIcon } from "@/components/system/SketchIcon";
+import { Tile } from "@/components/system/Tile";
 import type { CalendarEvent } from "@/types/event";
 
 export function EventTile({ event }: { event: CalendarEvent }) {
   const { month, day, weekday } = formatEventDate(event);
   const cta = getEventCta(event);
 
-  const content = (
-    <>
-      <div
-        aria-hidden
-        className="absolute inset-px rounded-xl bg-cream sketch"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-xl border-[2.5px] border-page-edge ink"
-      />
+  return (
+    <Tile render={cta ? <EventCtaLink cta={cta} title={event.title} /> : undefined}>
       <div className="relative grid h-full grid-cols-[auto_1fr_auto] items-center gap-x-4 px-4 py-3 sm:grid-cols-[1fr_auto] sm:grid-rows-[auto_1fr] sm:items-start sm:gap-y-2 sm:p-4">
         <CalendarDate
           month={month}
@@ -62,28 +56,15 @@ export function EventTile({ event }: { event: CalendarEvent }) {
           </div>
         </div>
         {cta && (
-          <cta.icon
+          <SketchIcon
+            icon={cta.icon}
             size={16}
-            className="shrink-0 text-rust sketch-subtle group-hover/tile:sketch-subtle-animated sm:col-start-2 sm:row-start-1 sm:self-center"
+            redraw="tile"
+            className="shrink-0 text-rust sm:col-start-2 sm:row-start-1 sm:self-center"
           />
         )}
         {cta && <span className="sr-only">{cta.label}</span>}
       </div>
-    </>
-  );
-
-  const className =
-    "group/tile relative block h-full rounded-xl transition-transform focus-ring";
-
-  return cta ? (
-    <EventCtaLink
-      cta={cta}
-      title={event.title}
-      className={cn(className, "hover:-rotate-1 hover:scale-102")}
-    >
-      {content}
-    </EventCtaLink>
-  ) : (
-    <div className={className}>{content}</div>
+    </Tile>
   );
 }
