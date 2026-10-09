@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { CardItem } from "@/lib/pages";
 import { textStyles } from "@/components/textStyles";
 import { OpensOverlay } from "@/components/OpensOverlay";
+import { SmartLink } from "@/components/system/SmartLink";
 
 // A link with its site's preview picture, like a press piece. The picture is
 // loaded from that site, so if it's gone the card shows without it.
@@ -80,14 +81,12 @@ export function LinkCard({ item }: { item: CardItem }) {
     "group/tile relative block h-full rounded-xl transition-transform focus-ring";
 
   return item.url ? (
-    <a
+    <SmartLink
       href={item.url}
-      target="_blank"
-      rel="noopener noreferrer"
       className={cn(className, "hover:-rotate-1 hover:scale-102")}
     >
       {content}
-    </a>
+    </SmartLink>
   ) : (
     <div className={className}>{content}</div>
   );

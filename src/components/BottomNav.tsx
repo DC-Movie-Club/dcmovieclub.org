@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Ellipsis, Mail } from "lucide-react";
+import { ArrowUpRight, Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoOutline } from "@/components/LogoOutline";
 import { routes, socials } from "@/config/navigation";
@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SmartLink } from "@/components/system/SmartLink";
 
 const menuRoutes = [routes.partnerships];
 const NAV_LOGO_SIZE = 112;
@@ -144,7 +145,7 @@ export function BottomNav({
                       nativeButton={false}
                       render={
                         <a
-                          href="mailto:hello@dcmovieclub.org"
+                          href={routes.contact.href}
                           className={navItemClass("menu", false)}
                         />
                       }
@@ -152,7 +153,7 @@ export function BottomNav({
                       <NavItemContent
                         layout="menu"
                         active={false}
-                        icon={Mail}
+                        icon={routes.contact.icon}
                         label={routes.contact.label}
                       />
                       <ArrowUpRight
@@ -165,18 +166,16 @@ export function BottomNav({
                 <hr className="sketch border-t-2 border-charcoal/20 my-2" />
                 <div className="flex items-center justify-center gap-4 py-2">
                   {Object.values(socials).map((link) => (
-                    <a
+                    <SmartLink
                       key={link.key}
                       href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="group/item text-muted-foreground transition-colors hover:text-rust"
                     >
                       <link.icon
                         size={24}
                         className="sketch-subtle group-hover/item:sketch-subtle-animated"
                       />
-                    </a>
+                    </SmartLink>
                   ))}
                 </div>
               </DialogContent>

@@ -47,19 +47,13 @@ export const routes = {
     href: "/partnerships",
     icon: Handshake,
   },
+  // Writes to us rather than opening a page
   contact: {
     key: "contact",
     label: "Contact",
     labelShort: "Contact",
-    href: "/contact",
+    href: "mailto:hello@dcmovieclub.org",
     icon: Mail,
-  },
-  instagram: {
-    key: "instagram",
-    label: "Link in Bio",
-    labelShort: "Links",
-    href: "/instagram",
-    icon: Instagram,
   },
 } as const;
 

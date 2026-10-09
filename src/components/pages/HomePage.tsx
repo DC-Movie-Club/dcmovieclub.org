@@ -1,7 +1,7 @@
 import NextLink from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { PageSection, PageView } from "@/lib/pages";
-import { ExternalLink } from "@/components/ui/link";
+import { TextLink } from "@/components/system/SmartLink";
 import { routes, socials } from "@/config/navigation";
 import {
   colorVars,
@@ -79,13 +79,13 @@ function Hero() {
 
       <div className="flex items-center justify-center gap-4">
         {Object.values(socials).map((link) => (
-          <ExternalLink
+          <TextLink
             key={link.key}
             href={link.href}
             className="sketch-subtle text-muted-foreground transition-colors hover:text-rust"
           >
             <link.icon size={24} />
-          </ExternalLink>
+          </TextLink>
         ))}
       </div>
     </>
@@ -257,9 +257,9 @@ function AboutSection({
                     className="absolute inset-0 rounded-full bg-cream shadow-sm sketch-subtle"
                   />
                   {item.url ? (
-                    <ExternalLink href={item.url} className="relative">
+                    <TextLink href={item.url} className="relative">
                       {item.title}
-                    </ExternalLink>
+                    </TextLink>
                   ) : (
                     <span className="relative">{item.title}</span>
                   )}

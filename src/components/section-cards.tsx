@@ -1,7 +1,7 @@
-import NextLink from "next/link";
 import { cn } from "@/lib/utils";
 import { CardSurface } from "@/components/CardSurface";
 import { textStyles } from "@/components/textStyles";
+import { SmartLink } from "@/components/system/SmartLink";
 
 // A fixed angle lifts the far end of a long heading well above the card, so the
 // tilt shrinks with length to keep that rise roughly constant (capped at 2deg).
@@ -72,15 +72,10 @@ export function CardEdgeLink({
   href: string;
   children: React.ReactNode;
 }) {
-  const external = !href.startsWith("/");
   return (
-    <NextLink
-      href={href}
-      {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-      className={cardEdgeClassName}
-    >
+    <SmartLink href={href} className={cardEdgeClassName}>
       <CardEdgeFace>{children}</CardEdgeFace>
-    </NextLink>
+    </SmartLink>
   );
 }
 

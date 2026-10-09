@@ -5,6 +5,7 @@ import { ArrowUpRight, Heart, Star, StarHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Letterboxd } from "@/components/icons/Letterboxd";
 import type { LetterboxdReview } from "@/types/letterboxd";
+import { SmartLink } from "@/components/system/SmartLink";
 
 const POSTER_COUNT = 3;
 const SHORT_REVIEW_CHARS = 60;
@@ -56,10 +57,8 @@ function TileLink({
   badge?: React.ReactNode;
 }) {
   return (
-    <a
+    <SmartLink
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
       className="group/card relative block w-full rounded-lg transition-transform hover:-rotate-1 hover:scale-105 focus-ring focus-ring-rust [--focus-offset:4px]"
     >
       {/* A filled twin of the outline, wobbling identically, so the ink
@@ -71,7 +70,7 @@ function TileLink({
       </div>
       <SketchOutline className="group-hover/card:boil-sm" />
       {badge}
-    </a>
+    </SmartLink>
   );
 }
 
@@ -280,10 +279,8 @@ function FeaturedReviewCard({ review }: { review: LetterboxdReview }) {
 
 function FollowButton() {
   return (
-    <a
+    <SmartLink
       href={LETTERBOXD_PROFILE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
       aria-label="Follow us on Letterboxd"
       className="group/follow relative block w-fit shrink-0 rounded-full transition-transform hover:scale-105 focus-ring focus-ring-rust"
     >
@@ -300,7 +297,7 @@ function FollowButton() {
         Follow us
         <ArrowUpRight size={16} />
       </span>
-    </a>
+    </SmartLink>
   );
 }
 

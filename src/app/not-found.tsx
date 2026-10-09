@@ -1,4 +1,4 @@
-import { Link } from "@/components/ui/link";
+import { TextLink } from "@/components/system/SmartLink";
 import { PublicChrome } from "@/components/layout/PublicChrome";
 import { getPageAccents, getPageBackgrounds } from "@/lib/pages";
 
@@ -13,12 +13,12 @@ export default async function NotFound() {
       <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center px-6 text-center">
         <h1 className="text-6xl font-bold">404</h1>
         <p className="mt-4 text-muted-foreground">Page not found.</p>
-        <Link
+        <TextLink
           href="/"
           className="mt-8 text-sm underline underline-offset-4"
         >
           Go home
-        </Link>
+        </TextLink>
       </div>
     </PublicChrome>
   );

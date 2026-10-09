@@ -1,6 +1,6 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { withExternalLinks } from "./external-links.ts"
+import { linkKind, withExternalLinks } from "./external-links.ts"
 
 const NEW_TAB = 'target="_blank" rel="noopener noreferrer"'
 
@@ -41,5 +41,26 @@ describe("withExternalLinks", () => {
       withExternalLinks('<A HREF="https://example.com">x</A><a\n  href="https://example.org">y</a>'),
       `<a HREF="https://example.com" ${NEW_TAB}>x</A><a\n  href="https://example.org" ${NEW_TAB}>y</a>`,
     )
+  })
+})
+
+describe("linkKind", () => {
+  it("routes paths on this site", () => {
+    assert.equal(linkKind("/events"), "internal")
+    assert.equal(linkKind("/about#conduct"), "internal")
+  })
+
+  it("opens other sites in a new tab, protocol-relative ones included", () => {
+    assert.equal(linkKind("https://dcmovieclub.substack.com"), "external")
+    assert.equal(linkKind("http://example.com/a"), "external")
+    assert.equal(linkKind("//example.com"), "external")
+  })
+
+  it("opens mail, phone and anchors in place", () => {
+    assert.equal(linkKind("mailto:hello@dcmovieclub.org"), "plain")
+    assert.equal(linkKind("MAILTO:hello@dcmovieclub.org"), "plain")
+    assert.equal(linkKind("tel:+12025550100"), "plain")
+    assert.equal(linkKind("#faq"), "plain")
+    assert.equal(linkKind(""), "plain")
   })
 })

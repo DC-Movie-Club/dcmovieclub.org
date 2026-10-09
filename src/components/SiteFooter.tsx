@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { textStyles } from "@/components/textStyles";
 import { routes, socials } from "@/config/navigation";
+import { SmartLink } from "@/components/system/SmartLink";
 
-const EMAIL = "hello@dcmovieclub.org";
 const FOUNDED = 2023;
 
 // The bottom nav's order, with Partnerships and Contact in the place of the
@@ -73,13 +73,13 @@ export function SiteFooter({ className }: { className?: string }) {
                 </li>
               ))}
               <li>
-                <a
-                  href={`mailto:${EMAIL}`}
+                <SmartLink
+                  href={routes.contact.href}
                   className={cn("flex items-center gap-1", LINK)}
                 >
                   {routes.contact.labelShort}
                   <ArrowUpRight size={12} />
-                </a>
+                </SmartLink>
               </li>
             </ul>
           </nav>
@@ -87,10 +87,8 @@ export function SiteFooter({ className }: { className?: string }) {
           <ul className="flex items-center gap-4">
             {Object.values(socials).map((link) => (
               <li key={link.key}>
-                <a
+                <SmartLink
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   aria-label={link.label}
                   className="group/social block transition-colors hover:text-page-fg"
                 >
@@ -98,7 +96,7 @@ export function SiteFooter({ className }: { className?: string }) {
                     size={20}
                     className="sketch-subtle group-hover/social:sketch-subtle-animated"
                   />
-                </a>
+                </SmartLink>
               </li>
             ))}
           </ul>
@@ -108,15 +106,13 @@ export function SiteFooter({ className }: { className?: string }) {
           <p>
             © {new Date().getFullYear()} DC Movie Club · Est. {FOUNDED}
           </p>
-          <a
+          <SmartLink
             href="https://gus.siteless.co"
-            target="_blank"
-            rel="noopener noreferrer"
             className={cn("flex w-fit items-center gap-1", LINK)}
           >
             Site by Gus
             <ArrowUpRight size={12} />
-          </a>
+          </SmartLink>
         </div>
       </div>
     </footer>

@@ -1,7 +1,7 @@
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatEventDate } from "@/lib/event-format";
-import { ExternalLink } from "@/components/ui/link";
+import { TextLink } from "@/components/system/SmartLink";
 import { EventTime } from "@/components/EventTime";
 import { ExpandableDescription } from "@/components/ExpandableDescription";
 import { CalendarDate } from "@/components/events/CalendarDate";
@@ -76,13 +76,13 @@ export function FeaturedEventCard({ event }: { event: CalendarEvent }) {
               </span>
             )}
             {event.location && mapUrl && (
-              <ExternalLink
+              <TextLink
                 href={mapUrl}
                 className="pointer-events-auto flex items-center gap-1.5 underline decoration-page-card-text/30 underline-offset-4 hover:decoration-rust"
               >
                 <MapPin size={14} className="shrink-0" />
                 {event.location}
-              </ExternalLink>
+              </TextLink>
             )}
           </div>
 

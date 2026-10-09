@@ -2,7 +2,7 @@ import ReactMarkdown, { type Components, type ExtraProps } from "react-markdown"
 import remarkDirective from "remark-directive";
 import { cn } from "@/lib/utils";
 import { parseYouTubeId } from "@/lib/youtube";
-import { Link, ExternalLink } from "@/components/ui/link";
+import { TextLink } from "@/components/system/SmartLink";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { markdownStyles } from "@/components/markdownStyles";
 import { remarkDetails } from "@/lib/remark-details";
@@ -47,27 +47,11 @@ const components: Components = {
   strong: ({ children }) => (
     <strong className={markdownStyles.bold}>{children}</strong>
   ),
-  a: ({ href = "", children }) => {
-    if (href.startsWith("/")) {
-      return (
-        <Link href={href} className={markdownStyles.link}>
-          {children}
-        </Link>
-      );
-    }
-    if (/^https?:\/\//.test(href)) {
-      return (
-        <ExternalLink href={href} className={markdownStyles.link}>
-          {children}
-        </ExternalLink>
-      );
-    }
-    return (
-      <a href={href} className={markdownStyles.link}>
-        {children}
-      </a>
-    );
-  },
+  a: ({ href = "", children }) => (
+    <TextLink href={href} className={markdownStyles.link}>
+      {children}
+    </TextLink>
+  ),
 };
 
 // Raw HTML in the markdown is ignored, so admin-written copy can't inject markup

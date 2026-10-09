@@ -13,6 +13,7 @@ import {
 import { CornerCloseButton } from "@/components/CornerCloseButton";
 import { CardEdgeFace } from "@/components/section-cards";
 import type { EventTicket } from "@/types/event";
+import { SmartLink } from "@/components/system/SmartLink";
 
 const ACCENT_VARS = [
   "--page-accent",
@@ -79,10 +80,8 @@ export function TicketsDialog({
               <DialogClose
                 nativeButton={false}
                 render={
-                  <a
+                  <SmartLink
                     href={ticket.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="group/edge relative block rounded-full transition-transform hover:scale-105 focus-ring focus-ring-rust"
                   />
                 }

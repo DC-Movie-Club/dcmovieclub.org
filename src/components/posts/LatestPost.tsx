@@ -6,6 +6,7 @@ import { textStyles } from "@/components/textStyles";
 import { DatePill } from "@/components/posts/PostParts";
 import { ThumbnailImage } from "@/components/ThumbnailImage";
 import type { SubstackPost } from "@/types/post";
+import { SmartLink } from "@/components/system/SmartLink";
 
 // About 70 characters of body text a line: all caps tire the eye over the
 // card's full width
@@ -15,14 +16,12 @@ const ARTICLE_COLUMN = "mx-auto w-full max-w-[32rem]";
 function OpenOnSubstack({ post }: { post: SubstackPost }) {
   return (
     <p className="mt-8 text-center text-base">
-      <a
+      <SmartLink
         href={post.link}
-        target="_blank"
-        rel="noopener noreferrer"
         className={textStyles.proseLink}
       >
         Open on Substack
-      </a>
+      </SmartLink>
     </p>
   );
 }

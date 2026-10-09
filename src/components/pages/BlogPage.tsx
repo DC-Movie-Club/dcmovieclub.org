@@ -13,13 +13,12 @@ import {
   SubscribeButton,
 } from "@/components/posts/PostParts";
 import type { SubstackPost } from "@/types/post";
+import { SmartLink } from "@/components/system/SmartLink";
 
 function PostTile({ post }: { post: SubstackPost }) {
   return (
-    <a
+    <SmartLink
       href={post.link}
-      target="_blank"
-      rel="noopener noreferrer"
       className="group/tile relative flex h-full flex-col rounded-xl transition-transform hover:-rotate-1 hover:scale-102 focus-ring"
     >
       <div
@@ -56,7 +55,7 @@ function PostTile({ post }: { post: SubstackPost }) {
         washClassName="inset-px rounded-xl sketch"
       />
       <DatePill pubDate={post.pubDate} className="absolute -top-3.5 left-4" />
-    </a>
+    </SmartLink>
   );
 }
 

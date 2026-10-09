@@ -1,5 +1,6 @@
 import { TicketsDialog } from "@/components/events/TicketsDialog";
 import type { EventCta } from "@/components/events/event-links";
+import { SmartLink } from "@/components/system/SmartLink";
 
 // Follows an event's CTA: a link, or with several tickets, a dialog to pick one
 export function EventCtaLink({
@@ -32,15 +33,13 @@ export function EventCtaLink({
   }
 
   return (
-    <a
+    <SmartLink
       href={cta.href}
-      target="_blank"
-      rel="noopener noreferrer"
       tabIndex={tabIndex}
       aria-hidden={ariaHidden}
       className={className}
     >
       {children}
-    </a>
+    </SmartLink>
   );
 }

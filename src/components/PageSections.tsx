@@ -5,17 +5,16 @@ import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { SectionCard } from "@/components/section-cards";
 import { textStyles } from "@/components/textStyles";
-import { Link, ExternalLink } from "@/components/ui/link";
+import { TextLink } from "@/components/system/SmartLink";
 import type { FaqItem, LinkItem, PageSection } from "@/lib/pages";
 
 function LinkListItem({ item }: { item: LinkItem }) {
   if (!item.url) return <li>{item.title}</li>;
-  const LinkComponent = item.url.startsWith("/") ? Link : ExternalLink;
   return (
     <li>
-      <LinkComponent href={item.url} className={textStyles.proseLink}>
+      <TextLink href={item.url} className={textStyles.proseLink}>
         {item.title}
-      </LinkComponent>
+      </TextLink>
     </li>
   );
 }
@@ -28,9 +27,9 @@ function TagItem({ item }: { item: LinkItem }) {
         className="absolute inset-0 rounded-full border-2 border-page-accent-edge/30 bg-page-accent/20 shadow-sm sketch-subtle"
       />
       {item.url ? (
-        <ExternalLink href={item.url} className="relative">
+        <TextLink href={item.url} className="relative">
           {item.title}
-        </ExternalLink>
+        </TextLink>
       ) : (
         <span className="relative">{item.title}</span>
       )}
