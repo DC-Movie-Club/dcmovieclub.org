@@ -326,6 +326,13 @@ filtered strips. Since this was written the system gained the brush pen line
 Tailwind utilities: `sketch`, `sketch-animated`, `sketch-subtle`,
 `sketch-subtle-animated`, plus those.
 
+The SMIL animation has since been replaced too: Chrome repainted an element
+with an animated filter on every frame of the screen, though its noise only
+changed ten times a second. The redraws and boils are now CSS animations
+that step a variable through five static filters (one per seed), so an
+element repaints only when its frame changes: about a fifth of the raster
+work.
+
 ---
 
 ## Watercolor Active Indicator

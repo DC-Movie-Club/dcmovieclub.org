@@ -152,8 +152,13 @@ The filters are defined once, in `system/filters.ts`. `SketchFilter` (in
 defs; `CardSurface` draws a tall card's edge as strips, each in its own
 short filter, because filtering a whole tall card stalls scrolling on phones.
 
-The boil variables don't inherit, so a boiling parent leaves its children
-be.
+The redraws and boils are CSS animations that step their variable through
+five static filters, ten a second (the keyframes in `globals.css` name the
+filters `filters.ts` defines, and a test checks they match). An element
+repaints only when its frame changes; animating the noise itself repainted
+it on every frame of the screen. The boil variables don't inherit, so a
+boiling parent leaves its children be, and the layers of one shape start
+boiling together, so they stay in step.
 
 ### Hover variants
 

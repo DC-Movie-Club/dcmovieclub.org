@@ -287,13 +287,17 @@ html[data-loading] .animate-nav-spring-in {
 }
 
 /* A sketch or ink class sets an element's resting wobble; a boil class adds
-   a shudder on top (see SketchFilter). Each names its filter in its own
+   a shudder on top (see filters.ts). Each names its filter in its own
    variable and sets the same composed filter, so they combine in any order:
    the boil variable holds the whole chain, ending in the wobble. Safari
    misplaces the second of two chained filters whose regions differ, so a
    wobble with a smaller region than the boil's names a matching copy to
    boil with in --wobble-boiling. The variables don't inherit, so a boiling
-   parent leaves its children be. */
+   parent leaves its children be.
+
+   The redraws and boils step their variable through five filters, ten a
+   second, so the element repaints only when the frame changes. The layers
+   of one shape start boiling together, so they stay in step. */
 @property --wobble {
   syntax: "*";
   inherits: false;
@@ -316,7 +320,8 @@ html[data-loading] .animate-nav-spring-in {
 }
 
 @utility sketch-animated {
-  filter: url(#sketch-animated);
+  filter: var(--boil, var(--wobble));
+  animation: redraw 500ms steps(1) infinite;
 }
 
 @utility sketch-subtle {
@@ -326,7 +331,8 @@ html[data-loading] .animate-nav-spring-in {
 }
 
 @utility sketch-subtle-animated {
-  filter: url(#sketch-subtle-animated);
+  filter: var(--boil, var(--wobble));
+  animation: redraw-subtle 500ms steps(1) infinite;
 }
 
 /* The sketch wobble drawn as a brush pen line */
@@ -346,18 +352,58 @@ html[data-loading] .animate-nav-spring-in {
 }
 
 @utility boil-sm {
-  --boil: url(#boil-sm) var(--wobble-boiling, var(--wobble,));
   filter: var(--boil, var(--wobble));
+  animation: boil-sm 500ms steps(1) infinite;
 }
 
 @utility boil {
-  --boil: url(#boil) var(--wobble-boiling, var(--wobble,));
   filter: var(--boil, var(--wobble));
+  animation: boil 500ms steps(1) infinite;
 }
 
 @utility boil-lg {
-  --boil: url(#boil-lg) var(--wobble-boiling, var(--wobble,));
   filter: var(--boil, var(--wobble));
+  animation: boil-lg 500ms steps(1) infinite;
+}
+
+@keyframes redraw {
+  0% { --wobble: url(#sketch-redraw-0); }
+  20% { --wobble: url(#sketch-redraw-1); }
+  40% { --wobble: url(#sketch-redraw-2); }
+  60% { --wobble: url(#sketch-redraw-3); }
+  80% { --wobble: url(#sketch-redraw-4); }
+}
+
+@keyframes redraw-subtle {
+  0% { --wobble: url(#sketch-subtle-redraw-0); }
+  20% { --wobble: url(#sketch-subtle-redraw-1); }
+  40% { --wobble: url(#sketch-subtle-redraw-2); }
+  60% { --wobble: url(#sketch-subtle-redraw-3); }
+  80% { --wobble: url(#sketch-subtle-redraw-4); }
+}
+
+@keyframes boil-sm {
+  0% { --boil: url(#boil-sm-0) var(--wobble-boiling, var(--wobble,)); }
+  20% { --boil: url(#boil-sm-1) var(--wobble-boiling, var(--wobble,)); }
+  40% { --boil: url(#boil-sm-2) var(--wobble-boiling, var(--wobble,)); }
+  60% { --boil: url(#boil-sm-3) var(--wobble-boiling, var(--wobble,)); }
+  80% { --boil: url(#boil-sm-4) var(--wobble-boiling, var(--wobble,)); }
+}
+
+@keyframes boil {
+  0% { --boil: url(#boil-0) var(--wobble-boiling, var(--wobble,)); }
+  20% { --boil: url(#boil-1) var(--wobble-boiling, var(--wobble,)); }
+  40% { --boil: url(#boil-2) var(--wobble-boiling, var(--wobble,)); }
+  60% { --boil: url(#boil-3) var(--wobble-boiling, var(--wobble,)); }
+  80% { --boil: url(#boil-4) var(--wobble-boiling, var(--wobble,)); }
+}
+
+@keyframes boil-lg {
+  0% { --boil: url(#boil-lg-0) var(--wobble-boiling, var(--wobble,)); }
+  20% { --boil: url(#boil-lg-1) var(--wobble-boiling, var(--wobble,)); }
+  40% { --boil: url(#boil-lg-2) var(--wobble-boiling, var(--wobble,)); }
+  60% { --boil: url(#boil-lg-3) var(--wobble-boiling, var(--wobble,)); }
+  80% { --boil: url(#boil-lg-4) var(--wobble-boiling, var(--wobble,)); }
 }
 
 :root {

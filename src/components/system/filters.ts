@@ -10,8 +10,6 @@ export type FilterStep = {
     | "feComposite"
     | "feMorphology";
   attrs: Record<string, string | number>;
-  // Seeds the noise cycles through, re-rolling it ten times a second
-  seeds?: number[];
   // A later step reads past this one's pixels (the ink line's blur and
   // spread), so CardSurface computes it over a strip grown to cover that
   padded?: boolean;
@@ -38,10 +36,10 @@ const NOISE = { type: "turbulence", baseFrequency: 0.03, numOctaves: 2 };
 // The sketch wobble: noise, and the shape displaced by it
 export function wobbleSteps(
   scale: number,
-  { seed = 1, seeds, result }: { seed?: number; seeds?: number[]; result?: string } = {},
+  { seed = 1, result }: { seed?: number; result?: string } = {},
 ): FilterStep[] {
   return [
-    { tag: "feTurbulence", attrs: { ...NOISE, seed, result: "noise" }, seeds },
+    { tag: "feTurbulence", attrs: { ...NOISE, seed, result: "noise" } },
     {
       tag: "feDisplacementMap",
       attrs: {
@@ -89,20 +87,31 @@ export function inkSteps(scale: number, blur: number): FilterStep[] {
 // The bold ink line's blur, which CardSurface draws its edge with
 export const INK_BLUR = 0.8;
 
-// The full redraw: the wobble re-rolled ten times a second
+// The redraws and boils are animations that step through frames, ten a
+// second, each frame a filter of its own with its own noise (see the
+// keyframes in globals.css, which name these filters). Stepping between
+// static filters repaints an element only when its frame changes; animating
+// the noise itself repainted it on every frame of the screen.
+//
+// The full redraw: the wobble re-rolled
 const REDRAW_SEEDS = [1, 20, 42, 65, 88];
 
-// A boil is a small jitter re-rolled ten times a second on top of the
-// resting wobble, so the shape shudders in place rather than being redrawn.
-// How far each level shudders a shape, in px; see the boil utilities.
+// A boil: a small jitter re-rolled on top of the resting wobble, so the
+// shape shudders in place rather than being redrawn. How far each level
+// shudders a shape, in px; see the boil utilities.
 const BOIL_SEEDS = [7, 31, 53, 76, 97];
 const BOIL_SCALES = { "boil-sm": 0.7, boil: 1.4, "boil-lg": 3 };
 
+// One filter per seed, `id-0` to `id-4`
+function frames(id: string, region: Region, steps: (seed: number) => FilterStep[], seeds: number[]) {
+  return seeds.map((seed, i) => ({ id: `${id}-${i}`, region, steps: steps(seed) }));
+}
+
 export const sketchFilters: SketchFilterDef[] = [
   { id: "sketch", region: SKETCH_REGION, steps: wobbleSteps(WOBBLE.bold) },
-  { id: "sketch-animated", region: SKETCH_REGION, steps: wobbleSteps(WOBBLE.bold, { seeds: REDRAW_SEEDS }) },
   { id: "sketch-subtle", region: SKETCH_REGION, steps: wobbleSteps(WOBBLE.fine) },
-  { id: "sketch-subtle-animated", region: SKETCH_REGION, steps: wobbleSteps(WOBBLE.fine, { seeds: REDRAW_SEEDS }) },
+  ...frames("sketch-redraw", SKETCH_REGION, (seed) => wobbleSteps(WOBBLE.bold, { seed }), REDRAW_SEEDS),
+  ...frames("sketch-subtle-redraw", SKETCH_REGION, (seed) => wobbleSteps(WOBBLE.fine, { seed }), REDRAW_SEEDS),
   // The wobbles again in the boil's region, for boiling: Safari misplaces
   // the second of two chained filters whose regions differ
   { id: "sketch-boiling", region: BOIL_REGION, steps: wobbleSteps(WOBBLE.bold) },
@@ -110,24 +119,7 @@ export const sketchFilters: SketchFilterDef[] = [
   { id: "ink", region: BOIL_REGION, steps: inkSteps(WOBBLE.bold, INK_BLUR) },
   { id: "ink-subtle", region: BOIL_REGION, steps: inkSteps(WOBBLE.fine, 0.6) },
   { id: "ink-fine", region: BOIL_REGION, steps: inkSteps(WOBBLE.bold, 0.45) },
-  ...Object.entries(BOIL_SCALES).map(([id, scale]) => ({
-    id,
-    region: BOIL_REGION,
-    steps: wobbleSteps(scale, { seed: BOIL_SEEDS[0], seeds: BOIL_SEEDS }),
-  })),
+  ...Object.entries(BOIL_SCALES).flatMap(([id, scale]) =>
+    frames(id, BOIL_REGION, (seed) => wobbleSteps(scale, { seed }), BOIL_SEEDS),
+  ),
 ];
-
-// As markup, since React doesn't render SMIL's <animate> (see SketchFilter)
-export function filterMarkup({ id, region, steps }: SketchFilterDef) {
-  const attrs = (values: Record<string, string | number>) =>
-    Object.entries(values)
-      .map(([name, value]) => `${name}="${value}"`)
-      .join(" ");
-  const step = ({ tag, attrs: values, seeds }: FilterStep) => {
-    const animate = seeds
-      ? `<animate attributeName="seed" values="${seeds.join(";")}" dur="0.5s" calcMode="discrete" repeatCount="indefinite" />`
-      : "";
-    return `<${tag} ${attrs(values)}>${animate}</${tag}>`;
-  };
-  return `<filter id="${id}" ${attrs(region)} filterUnits="objectBoundingBox">${steps.map(step).join("")}</filter>`;
-}
