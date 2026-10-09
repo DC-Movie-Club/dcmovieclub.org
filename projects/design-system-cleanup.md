@@ -199,12 +199,27 @@ needs its browser once: `pnpm exec playwright install chromium`.
 
 From the filter benchmark (headless Chromium, CPU raster, 360×640 box at 3×):
 `sketch` costs ~9 ms per repaint, `ink` ~41 ms, and cost grows with area; a
-boiling element repaints every frame (60/s) though its noise changes 10×/s.
-After the cleanup each fix is one place:
+boiling element repainted every frame (60/s) though its noise changes 10×/s.
 
-- `color-interpolation-filters="sRGB"` (~1.8× faster plain wobble) and any
-  noise changes: `filters.ts`
-- Reduced motion: the `boil` utility
-- Strips vs whole-box filter: per primitive (Card already uses strips)
-- The FAQ's per-frame redraw: gone with decision 3
-- SMIL vs CSS-stepped boil: one filter definition
+Done (measured on the kit pages, phone size at DPR 3):
+
+- [x] **Lighter boil**: the boils and redraws step a variable through five
+  static filters with CSS keyframes instead of animating the noise with
+  SMIL. A hovered element repaints 10 times a second instead of 60: about a
+  fifth of the raster work (a hovered poster 5.3 s → 1.0 s over 3 s).
+  Screenshots identical.
+- [x] **Reduced motion**: with `prefers-reduced-motion`, the boils and
+  redraws don't run; a shape keeps its resting wobble. The kit spec checks
+  it.
+- [x] **sRGB**: `color-interpolation-filters="sRGB"` on every filter.
+  11–24% less raster per full repaint, 7–16% per boil; pixels change by a
+  level or two, nothing moves.
+- [x] The FAQ's per-frame redraw: gone with decision 3.
+
+Next, if wanted: **strips for tiles.** Filters are 85–93% of a repaint's
+raster time, and a tile's ink line is filtered over the whole tile though
+it only runs round the edge. Switching tiles' lines off cuts a repaint of
+the blog's second screen from 69 ms to 33 ms, the events page's from 42 to
+28. Drawing the line in strips, as CardSurface does for cards, would get
+most of that back; SketchImage's line and the posters' frames are the same
+case at a smaller size.
