@@ -314,12 +314,25 @@ Replaced the T9 approach with a simpler filter using SVG SMIL `<animate>` for th
 - Much simpler filter chain: just `feTurbulence` + `feDisplacementMap` (no blur/sharpen/texture layers)
 - React doesn't render SMIL `<animate>` correctly in JSX, so the SVG is injected via `dangerouslySetInnerHTML`
 
-### Current file: `src/components/SketchFilter.tsx`
-### Tailwind utilities: `sketch`, `sketch-animated`, `sketch-subtle`, `sketch-subtle-animated`
+### Where it lives now
+
+The filters are defined once, in `src/components/system/filters.ts`.
+`SketchFilter` (`src/components/system/SketchFilter.tsx`) renders them as
+shared defs, and `CardSurface` draws a tall card's edge as separately
+filtered strips. Since this was written the system gained the brush pen line
+(`ink`, `ink-subtle`, `ink-fine`) and the boil (`boil-sm`, `boil`,
+`boil-lg`), and components that use them; see `docs/design-guide.md`.
+
+Tailwind utilities: `sketch`, `sketch-animated`, `sketch-subtle`,
+`sketch-subtle-animated`, plus those.
 
 ---
 
 ## Watercolor Active Indicator
+
+Removed: the nav's active item now fills its label instead, and the filter
+and its utilities were deleted in the design-system cleanup. Kept as a
+record.
 
 Separate from the sketch/hand-drawn border system. Used as a background splash behind active nav items.
 
@@ -363,5 +376,5 @@ Faded rust `#e8cfc5` (`fill-rust-wash` / `--color-rust-wash`). Tested blue (`#d7
 - [CodePen: sevenissimo — watercolor playground](https://codepen.io/sevenissimo/pen/dmarJr) — multi-layer displacement with masks
 - [CodePen: cassie-codes — watercolor painting](https://codepen.io/cassie-codes/pen/GRJzgLL) — SourceAlpha displacement for blob shapes
 
-### Current file: `src/components/WatercolorFilter.tsx`
-### Tailwind utilities: `watercolor-0`, `watercolor-1`, `watercolor-2`, `watercolor-3`
+Was `src/components/WatercolorFilter.tsx`, with the utilities `watercolor-0`
+to `watercolor-3`.

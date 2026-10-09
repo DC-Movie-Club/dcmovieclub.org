@@ -81,8 +81,9 @@ hand in about 18 places across 14 files.
 - **Card**: CardSurface, one padding scale, optional edge label, corner
   action and whole-card link.
 - **LinkOverlay**: the hover wash with an arrow and optional caption.
-- **SketchDialog**: the public dialog: sketched surface, corner close, and the
-  page's color roles carried into the portal.
+- **SketchDialogContent**: the public dialog: sketched surface, corner
+  close, rust focus inside. (TicketsDialog carries the page's color roles
+  into the portal.)
 - **SmartLink / TextLink**: one link that picks Next's link or a new-tab `<a>`
   from the href, and a prose-styled one.
 - **SocialLinks**: the icon row.
@@ -165,10 +166,15 @@ needs its browser once: `pnpm exec playwright install chromium`.
   brand's named colors stay. Converged: the featured review in card text with
   its reviewer at 80%, the missing-poster card on cream, the tickets
   dialog's title in card text.
-- [ ] **6. File moves and docs.** Rename-only commit; rewrite
-  `docs/design-guide.md` as the component reference; a CLAUDE.md with the
-  rules; a node test that fails when effect, focus or new-tab classes appear
-  outside `system/`.
+- [x] **6. File moves and docs.** First the last raw uses moved into
+  primitives (DisclosureCard for the FAQ, the footer panel as a SketchShape,
+  SketchDialogContent ringing focus in rust), screenshots unchanged. Then a
+  rename-only commit into `system/`, `layout/`, `logo/`, `sections/`,
+  `home/`, `events/` and `posts/`. `docs/design-guide.md` is rewritten as the
+  component reference, `docs/hand-drawn-borders.md` points at the current
+  files, and CLAUDE.md has the rules. `system/boundaries.test.ts` fails when
+  effect, focus or `target` classes appear outside `system/` (the bottom nav
+  and its logo excepted), and checks that it catches them.
 
 ## Bugs found along the way
 
