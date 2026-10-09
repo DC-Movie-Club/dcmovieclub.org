@@ -17,7 +17,7 @@ export function PublicChrome({
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <SketchFilter />
-      <main className="pb-24 animate-page-fade-in">{children}</main>
+      <main className="animate-page-fade-in">{children}</main>
       <BottomNav accents={accents} backgrounds={backgrounds} />
       <PageReveal />
     </div>

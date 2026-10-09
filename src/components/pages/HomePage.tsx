@@ -2,20 +2,23 @@ import { ArrowRight } from "lucide-react";
 import type { PageSection, PageView } from "@/lib/pages";
 import { routes } from "@/config/navigation";
 import {
-  colorVars,
   pageTemplates,
   type PageColors,
   type SectionKind,
 } from "@/config/pages";
 import { FeaturedEventCard } from "@/components/events/FeaturedEventCard";
 import { EventTile } from "@/components/events/EventTile";
+import { ColorBand } from "@/components/layout/ColorBand";
+import { Container } from "@/components/layout/Container";
+import { PageShell } from "@/components/layout/PageShell";
+import { SectionHeader } from "@/components/layout/SectionHeader";
+import { TileGrid } from "@/components/layout/TileGrid";
 import { Markdown } from "@/components/Markdown";
 import { Card } from "@/components/system/Card";
 import { TagList } from "@/components/PageSections";
 import { CardAction, Pill } from "@/components/system/Pill";
 import { SketchShape } from "@/components/system/SketchShape";
 import { SocialLinks } from "@/components/system/SocialLinks";
-import { textStyles } from "@/components/textStyles";
 import type { CalendarEvent } from "@/types/event";
 import type { LetterboxdReview } from "@/types/letterboxd";
 import type { SubstackPost } from "@/types/post";
@@ -25,7 +28,6 @@ import { SubscribePlainCard } from "@/components/SubscribeDialog";
 import { RecentlyWatchedRail } from "@/components/RecentlyWatchedRail";
 import { AudienceMarquee } from "@/components/AudienceMarquee";
 import { LogoLettering } from "@/components/LogoLettering";
-import { SiteFooter } from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
 
 const UPCOMING_TILE_COUNT = 3;
@@ -56,11 +58,11 @@ function Hero() {
     <>
       <section className="flex flex-col items-center pt-8">
         <AudienceMarquee />
-        <h1 className="relative w-full px-6">
+        <Container as="h1" className="relative">
           <span className="sr-only">DC Movie Club</span>
-          <LogoLettering layout="stacked" className="mx-auto max-w-3xl sm:hidden" />
-          <LogoLettering layout="row" className="mx-auto max-w-3xl max-sm:hidden" />
-        </h1>
+          <LogoLettering layout="stacked" className="sm:hidden" />
+          <LogoLettering layout="row" className="max-sm:hidden" />
+        </Container>
         {/* The offsets stagger the strips while keeping them, shadows
             included, centered as a group in the tagline's space. On phones
             the text scales with the title, which spans the screen less its
@@ -101,29 +103,29 @@ function EventsSection({
   const upcoming = rest.slice(0, UPCOMING_TILE_COUNT);
 
   return (
-    <section className="bg-page-bg px-6 pt-16 pb-14" style={colorVars(colors)}>
-      <div className="mx-auto flex max-w-3xl flex-col gap-10">
-        <FeaturedEventCard event={featured} />
+    <ColorBand colors={colors}>
+      <FeaturedEventCard event={featured} />
 
-        {upcoming.length > 0 && (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className={textStyles.pageHeading}>Also coming up</h2>
+      {upcoming.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <SectionHeader
+            title="Also coming up"
+            action={
               <Pill variant="outline" href={pageTemplates.events.href} iconEnd={ArrowRight}>
                 View all
               </Pill>
-            </div>
-            <ul className="grid gap-4 sm:grid-cols-3">
-              {upcoming.map((event) => (
-                <li key={event.id}>
-                  <EventTile event={event} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </section>
+            }
+          />
+          <TileGrid columns={3}>
+            {upcoming.map((event) => (
+              <li key={event.id}>
+                <EventTile event={event} />
+              </li>
+            ))}
+          </TileGrid>
+        </div>
+      )}
+    </ColorBand>
   );
 }
 
@@ -137,18 +139,18 @@ function NewsletterSection({
   colors: PageColors;
 }) {
   return (
-    <section className="bg-page-bg px-6 pt-16 pb-14" style={colorVars(colors)}>
-      <div className="mx-auto flex max-w-3xl flex-col gap-10">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className={textStyles.pageHeading}>From the newsletter</h2>
+    <ColorBand colors={colors}>
+      <SectionHeader
+        title="From the newsletter"
+        action={
           <Pill variant="outline" href={pageTemplates.blog.href} iconEnd={ArrowRight}>
             Blog
           </Pill>
-        </div>
-        <LatestPost post={post} />
-        <SubscribePlainCard />
-      </div>
-    </section>
+        }
+      />
+      <LatestPost post={post} />
+      <SubscribePlainCard />
+    </ColorBand>
   );
 }
 
@@ -178,43 +180,41 @@ function AboutSection({
     pageSection(partnerships, pageTemplates.partnerships.sections.partners);
 
   return (
-    <section className="bg-page-bg px-6 py-16" style={colorVars(about.colors)}>
-      <div className="mx-auto flex max-w-3xl flex-col gap-10">
-        {blurb?.content.trim() && (
-          <Card
-            label={blurb.label}
-            action={
-              <CardAction
-                href={pageTemplates.about.href}
-                icon={routes.about.icon}
-                iconEnd={ArrowRight}
-              >
-                More about us
-              </CardAction>
-            }
-          >
-            <Markdown>{blurb.content}</Markdown>
-          </Card>
-        )}
+    <ColorBand colors={about.colors}>
+      {blurb?.content.trim() && (
+        <Card
+          label={blurb.label}
+          action={
+            <CardAction
+              href={pageTemplates.about.href}
+              icon={routes.about.icon}
+              iconEnd={ArrowRight}
+            >
+              More about us
+            </CardAction>
+          }
+        >
+          <Markdown>{blurb.content}</Markdown>
+        </Card>
+      )}
 
-        {partners && partners.items.length > 0 && (
-          <div className="flex flex-col gap-5 border-t-2 border-dashed border-page-fg/30 pt-8">
-            <h2 className={textStyles.pageHeading}>{partners.label}</h2>
-            <TagList items={partners.items}>
-              <li className="flex">
-                <Pill
-                  variant="accent"
-                  href={pageTemplates.partnerships.href}
-                  icon={routes.partnerships.icon}
-                >
-                  Partner with us
-                </Pill>
-              </li>
-            </TagList>
-          </div>
-        )}
-      </div>
-    </section>
+      {partners && partners.items.length > 0 && (
+        <div className="flex flex-col gap-5 border-t-2 border-dashed border-page-fg/30 pt-8">
+          <SectionHeader title={partners.label} />
+          <TagList items={partners.items}>
+            <li className="flex">
+              <Pill
+                variant="accent"
+                href={pageTemplates.partnerships.href}
+                icon={routes.partnerships.icon}
+              >
+                Partner with us
+              </Pill>
+            </li>
+          </TagList>
+        </div>
+      )}
+    </ColorBand>
   );
 }
 
@@ -241,34 +241,28 @@ export function HomePage({
   const post = latestPost(posts);
 
   return (
-    // The negative margin cancels the layout's bottom padding (reserved for the
-    // nav) so the background runs to the bottom edge; pb-34 re-adds it.
-    <div
-      className="-mb-24 flex min-h-screen flex-col gap-10 bg-page-bg pb-34"
-      style={colorVars(page.colors)}
-    >
-      <Hero />
-      {/* Colored bands back to back, without the page's cream between them */}
-      <div>
-        <EventsSection
-          events={events}
-          colors={eventsPage?.colors ?? {}}
-        />
-        {post && (
-          <NewsletterSection post={post} colors={blogPage?.colors ?? {}} />
-        )}
-        {aboutPage && (
-          <AboutSection
-            blurb={pageSection(page, pageTemplates.home.sections.about)}
-            about={aboutPage}
-            partnerships={partnershipsPage}
+    <PageShell colors={page.colors}>
+      <div className="flex flex-col gap-10">
+        <Hero />
+        {/* Colored bands back to back, without the page's cream between them */}
+        <div>
+          <EventsSection
+            events={events}
+            colors={eventsPage?.colors ?? {}}
           />
-        )}
+          {post && (
+            <NewsletterSection post={post} colors={blogPage?.colors ?? {}} />
+          )}
+          {aboutPage && (
+            <AboutSection
+              blurb={pageSection(page, pageTemplates.home.sections.about)}
+              about={aboutPage}
+              partnerships={partnershipsPage}
+            />
+          )}
+        </div>
+        {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
       </div>
-      {reviews.length > 0 && <RecentlyWatchedRail reviews={reviews} />}
-      <div className="mt-auto px-6 pt-14">
-        <SiteFooter />
-      </div>
-    </div>
+    </PageShell>
   );
 }

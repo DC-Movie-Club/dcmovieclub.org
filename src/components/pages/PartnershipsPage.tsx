@@ -1,15 +1,14 @@
-import { ColorPage, PageTitle } from "@/components/ColorPage";
+import { PageContent, PageHeader, PageShell } from "@/components/layout/PageShell";
 import { PageSections } from "@/components/PageSections";
 import type { PageView } from "@/lib/pages";
 
 export function PartnershipsPage({ page }: { page: PageView }) {
   return (
-    <ColorPage
-      colors={page.colors}
-      header={<PageTitle className="text-4xl">{page.title}</PageTitle>}
-      contentClassName="mt-12 gap-16"
-    >
-      <PageSections sections={page.sections} />
-    </ColorPage>
+    <PageShell colors={page.colors}>
+      <PageHeader title={page.title} />
+      <PageContent className="mt-12 gap-16">
+        <PageSections sections={page.sections} />
+      </PageContent>
+    </PageShell>
   );
 }

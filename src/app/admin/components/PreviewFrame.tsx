@@ -69,7 +69,7 @@ export function PreviewFrame({
         ref={contentRef}
         data-preview
         className={cn(
-          "bg-background pb-24 font-dcmc text-foreground antialiased",
+          "bg-background font-dcmc text-foreground antialiased",
           !measured && "invisible",
         )}
         style={

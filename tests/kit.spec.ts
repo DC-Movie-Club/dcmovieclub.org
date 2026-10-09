@@ -5,7 +5,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 // so the shots survive changes to the markup underneath. A state shot centers
 // its element in the viewport and takes the viewport.
 
-const PAGES = ["home", "events", "blog", "about", "partnerships"] as const;
+const PAGES = ["home", "events", "blog", "about", "partnerships", "404"] as const;
 
 async function open(page: Page, key: string) {
   // Nothing outside the dev server loads (Substack's signup form), so every

@@ -23,15 +23,11 @@ const footerLinks = [
 const LINK = "hover:text-page-fg";
 
 // Colored by the page it sits on, so it has to render inside the element that
-// sets the page's color variables. The panel is the page background darkened.
-export function SiteFooter({ className }: { className?: string }) {
+// sets the page's color variables (PageShell places it). The panel is the page
+// background darkened.
+export function SiteFooter() {
   return (
-    <footer
-      className={cn(
-        "relative mx-auto w-full max-w-3xl text-sm uppercase tracking-widest",
-        className,
-      )}
-    >
+    <footer className="relative text-sm uppercase tracking-widest">
       <div
         aria-hidden
         className="absolute inset-0 rounded-2xl bg-black/10 sketch"

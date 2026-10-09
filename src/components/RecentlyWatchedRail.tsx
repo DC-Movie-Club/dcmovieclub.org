@@ -4,6 +4,8 @@ import { useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, Heart, Star, StarHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { socials } from "@/config/navigation";
+import { Container } from "@/components/layout/Container";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 import { Pill } from "@/components/system/Pill";
 import { PosterCard, PosterFrame } from "@/components/system/PosterFrame";
 import { Sticker } from "@/components/system/Sticker";
@@ -233,30 +235,23 @@ export function RecentlyWatchedRail({
     .slice(0, POSTER_COUNT);
 
   return (
-    <section className="px-6 pb-2">
-      <div className="mx-auto max-w-3xl">
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-          <h2 className="text-xl uppercase tracking-wide text-charcoal sm:text-2xl">
-            What we&apos;ve been watching
-          </h2>
-          <FollowButton />
-        </div>
+    <Container as="section" className="pb-2">
+      <SectionHeader title="What we've been watching" action={<FollowButton />} />
 
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 xs:grid-cols-3 md:grid-cols-6">
-          {featured && (
-            <>
-              <FilmPoster review={featured} showRating={false} />
-              <FeaturedReviewCard review={featured} />
-            </>
-          )}
-          {posters.map((review, i) => (
-            // Phones fit two posters under the featured row
-            <div key={review.id} className={cn(i >= 2 && "max-xs:hidden")}>
-              <FilmPoster review={review} showRating />
-            </div>
-          ))}
-        </div>
+      <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 xs:grid-cols-3 md:grid-cols-6">
+        {featured && (
+          <>
+            <FilmPoster review={featured} showRating={false} />
+            <FeaturedReviewCard review={featured} />
+          </>
+        )}
+        {posters.map((review, i) => (
+          // Phones fit two posters under the featured row
+          <div key={review.id} className={cn(i >= 2 && "max-xs:hidden")}>
+            <FilmPoster review={review} showRating />
+          </div>
+        ))}
       </div>
-    </section>
+    </Container>
   );
 }

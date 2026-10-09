@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { LinkCard } from "@/components/LinkCard";
+import { TileGrid } from "@/components/layout/TileGrid";
 import { Markdown } from "@/components/Markdown";
 import { markdownStyles } from "@/components/markdownStyles";
 import { textStyles } from "@/components/textStyles";
@@ -48,8 +49,6 @@ function ListHeading({ children }: { children: string }) {
   );
 }
 
-// The height animation uses ::details-content where supported; elsewhere it
-// just toggles
 // A question on a card that opens to its answer. It opens in one step and
 // the answer fades in: growing it over time would redraw the card's edges
 // every frame, as with ExpandableDescription. The badge boils while the card
@@ -111,13 +110,13 @@ function Section({ section }: { section: PageSection }) {
       return items.length > 0 ? (
         <section id={section.key} className="flex scroll-mt-8 flex-col gap-8">
           {section.label && <ListHeading>{section.label}</ListHeading>}
-          <ul className="grid gap-4 sm:grid-cols-3">
+          <TileGrid columns={3}>
             {items.map((item) => (
               <li key={item.key}>
                 <LinkCard item={item} />
               </li>
             ))}
-          </ul>
+          </TileGrid>
         </section>
       ) : null;
     }

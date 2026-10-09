@@ -58,11 +58,11 @@ export function BleedCover({ post, sizes }: { post: SubstackPost; sizes: string 
 }
 
 // The page's one filled button: getting the next post is what the blog is for
-export function SubscribeButton({ className }: { className?: string }) {
+export function SubscribeButton() {
   return (
     <SubscribeDialog
       trigger={
-        <Pill variant="accent" size="lg" icon={Mail} className={className}>
+        <Pill variant="accent" size="lg" icon={Mail}>
           Subscribe
         </Pill>
       }

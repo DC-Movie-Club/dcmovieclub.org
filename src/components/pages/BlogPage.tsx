@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 import type { PageView } from "@/lib/pages";
 import { latestPost } from "@/lib/posts";
-import { ColorPage, PageTitle } from "@/components/ColorPage";
-import { Card } from "@/components/system/Card";
+import { EmptyState } from "@/components/layout/EmptyState";
+import { PageContent, PageHeader, PageShell } from "@/components/layout/PageShell";
+import { SectionHeader } from "@/components/layout/SectionHeader";
+import { TileGrid } from "@/components/layout/TileGrid";
 import { Tile } from "@/components/system/Tile";
 import { textStyles } from "@/components/textStyles";
 import { SubscribeCard } from "@/components/SubscribeDialog";
@@ -44,13 +46,7 @@ function PostTile({ post }: { post: SubstackPost }) {
 
 function Posts({ posts }: { posts: SubstackPost[] }) {
   if (posts.length === 0) {
-    return (
-      <Card>
-        <p className={textStyles.cardEmpty}>
-          No posts yet. Check back soon!
-        </p>
-      </Card>
-    );
+    return <EmptyState>No posts yet. Check back soon!</EmptyState>;
   }
 
   const latest = latestPost(posts);
@@ -64,31 +60,17 @@ function Posts({ posts }: { posts: SubstackPost[] }) {
 
       {more.length > 0 && (
         <section className="flex flex-col gap-6">
-          <h2 className={textStyles.pageHeading}>Older posts</h2>
-          <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2">
+          <SectionHeader title="Older posts" />
+          <TileGrid columns={2} badged>
             {more.map((post) => (
               <li key={post.link}>
                 <PostTile post={post} />
               </li>
             ))}
-          </ul>
+          </TileGrid>
         </section>
       )}
     </>
-  );
-}
-
-function BlogHeader({ page }: { page: PageView }) {
-  return (
-    <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-      <div className="flex flex-col gap-4">
-        <PageTitle>{page.title}</PageTitle>
-        {page.subtitle && (
-          <p className={textStyles.pageSubtitle}>{page.subtitle}</p>
-        )}
-      </div>
-      <SubscribeButton className="self-start sm:self-auto" />
-    </header>
   );
 }
 
@@ -100,12 +82,15 @@ export function BlogPage({
   posts: SubstackPost[];
 }) {
   return (
-    <ColorPage
-      colors={page.colors}
-      header={<BlogHeader page={page} />}
-      contentClassName="mt-14"
-    >
-      <Posts posts={posts} />
-    </ColorPage>
+    <PageShell colors={page.colors}>
+      <PageHeader
+        title={page.title}
+        subtitle={page.subtitle}
+        action={<SubscribeButton />}
+      />
+      <PageContent className="mt-14">
+        <Posts posts={posts} />
+      </PageContent>
+    </PageShell>
   );
 }

@@ -15,6 +15,11 @@ export default function KitIndex() {
             </NextLink>
           </li>
         ))}
+        <li>
+          <NextLink href="/kit/404" className="underline underline-offset-4">
+            404
+          </NextLink>
+        </li>
       </ul>
     </div>
   );
