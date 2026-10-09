@@ -130,8 +130,13 @@ needs its browser once: `pnpm exec playwright install chromium`.
   WatercolorFilter, `ui/link.tsx`, `lib/constants.ts`, the paragraph icons,
   Contact and Instagram. Screenshots unchanged; every link keeps its href,
   target, rel and classes.
-- [ ] **2. SketchShape, Pill, Sticker, LinkOverlay, SocialLinks** and their
-  call sites; the per-kind hover idioms.
+- [x] **2. SketchShape, Pill, Sticker, LinkOverlay, SocialLinks** and their
+  call sites; the per-kind hover idioms (buttons boil, text and icon links
+  redraw). A `parent-hover` variant replaces the group name per control.
+  Converged: one accent button (3px line, shadow), one outline button in the
+  page's text color whose hover text takes the page's background, the Home
+  link as a ghost button, one cream sticker, the poster overlay in the
+  page's accent edge, and the focus ring in the page's text color.
 - [ ] **3. Tile, Card, SketchDialog**; the FAQ onto Card.
 - [ ] **4. Layout components**; the 404 page onto PageShell.
 - [ ] **5. Text and tokens.**
@@ -148,8 +153,8 @@ needs its browser once: `pnpm exec playwright install chromium`.
 - Fixed: the 404 page sat outside the public layout: no filter defs (the
   nav's sketch and ink pointed at nothing) and no PageReveal, so the nav's
   entrance waited for the 3 s fallback. Now in PublicChrome.
-- The hero's social icons are links with no accessible name. For
-  SocialLinks.
+- Fixed: the hero's and the More menu's social icons were links with no
+  accessible name. SocialLinks names them.
 - Admin dialogs use the sketched surface from `ui/dialog.tsx`, but the filters
   only exist in admin while a page preview is mounted, so the same dialog is
   sketched in the page editor and flat elsewhere. Fixed by moving the sketched
