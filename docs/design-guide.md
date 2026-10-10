@@ -19,11 +19,6 @@ A test (`system/boundaries.test.ts`, part of `pnpm test`) fails if effect
 classes, `focus-ring` or `target` attributes show up outside `system/` (the
 bottom nav and its logo are the one exception: they keep their own system).
 
-Every page renders at `/kit` in development from made-up data
-(`src/app/kit/fixtures.ts`), and `pnpm kit:check` compares screenshots of
-them, exactly, against a baseline taken with `pnpm kit:baseline`. See
-[Checking a change](#checking-a-change).
-
 ---
 
 ## Brand
@@ -285,7 +280,7 @@ In `src/components/layout/`.
 
 - **PublicChrome**: what every public page sits in: the filter defs, the
   page, the bottom nav, and PageReveal (which holds the entrance until the
-  page is laid out). Used by the public layout, the 404 page and `/kit`.
+  page is laid out). Used by the public layout and the 404 page.
 - **PageShell**: a page in its color roles, its background to the bottom
   edge, the footer (at the bottom of the screen on a short page), and room
   for the nav at the end.
@@ -344,22 +339,14 @@ A content page is:
 
 ## Checking a change
 
-1. On the commit before the change, `pnpm kit:baseline` screenshots every
-   `/kit` page (top and whole, phone and desktop), open dialogs and
-   disclosures, keyboard focus and hovers.
-2. After it, `pnpm kit:check` compares them exactly. Differences land in
-   `test-results/` as expected, actual and diff images.
-3. `pnpm test` runs the unit tests and the boundaries test; `pnpm lint` and
-   `npx tsc --noEmit` the rest.
+- `pnpm test` runs the unit tests, the boundaries test, and the check that
+  every filter the CSS names exists; `pnpm lint` and `npx tsc --noEmit` the
+  rest.
+- Look at it in the browser: the page at rest, its hovers, what opens
+  (dialogs, FAQs, Read more), keyboard focus, and a narrow window.
 
-To compare against another commit side by side, serve it from a second
-checkout and point the spec at it with `KIT_URL` (and `KIT_SHOTS` for a
-separate folder). Restart a dev server after switching commits under it,
-since Turbopack doesn't always rebuild the CSS. Playwright needs its browser
-once: `pnpm exec playwright install chromium`.
-
-A new state worth checking (a variant, an empty list) goes in the fixtures
-and the spec.
+Restart the dev server after switching commits under it, since Turbopack
+doesn't always rebuild the CSS.
 
 ---
 

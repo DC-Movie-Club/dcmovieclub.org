@@ -26,8 +26,8 @@ one-place changes.
    placeholders (the nav and footer mail us directly). The 404 page stays and
    moves onto the shared chrome.
 
-Defaults: admin dialogs go back to plain shadcn, `/kit` is dev-only (404 in
-production), folder moves happen last as pure renames.
+Defaults: admin dialogs go back to plain shadcn, folder moves happen last as
+pure renames.
 
 ## What was duplicated
 
@@ -91,7 +91,7 @@ hand in about 18 places across 14 files.
 ### Layout
 
 - **PublicChrome**: filters, main, nav, PageReveal; shared by the public
-  layout, the 404 page and `/kit`.
+  layout and the 404 page.
 - **PageShell**: color roles, background to the bottom edge, nav clearance,
   footer. Replaces ColorPage and Home's wrapper. PageHeader carries the
   HomeLink.
@@ -112,22 +112,16 @@ hand in about 18 places across 14 files.
 
 ## Phases
 
-Each phase is a commit (or several), checked against the `/kit` screenshots
-before moving on.
+Each phase is a commit (or several). While the work was under way each was
+checked against exact screenshots of a dev-only `/kit` route that drew every
+page from made-up data, taken with Playwright. That harness (the route, its
+fixtures, the spec and the Playwright dependency) was removed once the work
+was verified; it's in the branch's history if it's ever wanted again.
 
-To check a change: on the commit before it, `pnpm kit:baseline`; after it,
-`pnpm kit:check`. Comparisons are exact. To compare two commits side by side,
-serve the older one from a second checkout and point the spec at it with
-`KIT_URL` (and `KIT_SHOTS` for a separate folder); restart that server after
-each checkout, since Turbopack doesn't always rebuild the CSS. Differences land in `test-results/` as expected, actual and
-diff images. `pnpm dev` and `/kit` show the pages by eye. Locally, Playwright
-needs its browser once: `pnpm exec playwright install chromium`.
-
-- [x] **0. Safety net.** Fixture data (`src/app/kit/fixtures.ts`); dev-only
-  `/kit` pages rendering every page from fixtures under the real chrome;
-  `tests/kit.spec.ts` screenshotting each page (top of page and whole) at
-  phone and desktop sizes, plus open states (dialogs, Read more, FAQ) and 23
-  desktop hovers, with animations held still.
+- [x] **0. Safety net.** The `/kit` route and screenshot spec described
+  above: each page top and whole at phone and desktop sizes, open states
+  (dialogs, Read more, FAQ), keyboard focus and 23 desktop hovers. Since
+  removed.
 - [x] **1. Foundations, no visual change.** `system/filters.ts` (one
   definition for the shared defs and CardSurface's strips), PublicChrome,
   `focus-ring`, SmartLink and TextLink (with `linkKind` in
@@ -153,10 +147,9 @@ needs its browser once: `pnpm exec playwright install chromium`.
   `-mb-24` that cancelled `main`'s padding is gone), Container, PageHeader
   (a title with a word too long for a 320px phone steps down a size),
   PageContent, ColorBand, SectionHeader, TileGrid, EmptyState. The 404 page
-  is a PageShell page with a PageHeader, at `/kit/404` and in the
-  screenshots. Converged on the home page: the About band's padding, the
-  rail heading in the page's text color, the footer spacing and bottom
-  clearance. The other pages are pixel-identical.
+  is a PageShell page with a PageHeader. Converged on the home page: the
+  About band's padding, the rail heading in the page's text color, the
+  footer spacing and bottom clearance. The other pages are pixel-identical.
 - [x] **5. Text and tokens.** The last inline type in feature code is in
   textStyles (dialog title, quotes, overlay caption, footer); the bottom nav,
   calendar date and hero tagline keep their own. Semantic and shadcn colors
@@ -192,8 +185,8 @@ needs its browser once: `pnpm exec playwright install chromium`.
   the filters only exist in admin while a page preview is mounted, so the
   same dialog was sketched in the page editor and flat elsewhere. The
   sketched surface moved to SketchDialogContent.
-- The 404 page can't render in local dev without Firestore credentials
-  (it fetches the nav's colors); `/kit/404` draws it from fixtures.
+- The 404 page can't render without Firestore credentials (it fetches the
+  nav's colors).
 
 ## Afterwards: performance
 
@@ -201,7 +194,7 @@ From the filter benchmark (headless Chromium, CPU raster, 360×640 box at 3×):
 `sketch` costs ~9 ms per repaint, `ink` ~41 ms, and cost grows with area; a
 boiling element repainted every frame (60/s) though its noise changes 10×/s.
 
-Done (measured on the kit pages, phone size at DPR 3):
+Done (measured on the fixture pages, phone size at DPR 3):
 
 - [x] **Lighter boil**: the boils and redraws step a variable through five
   static filters with CSS keyframes instead of animating the noise with
@@ -209,8 +202,7 @@ Done (measured on the kit pages, phone size at DPR 3):
   fifth of the raster work (a hovered poster 5.3 s → 1.0 s over 3 s).
   Screenshots identical.
 - [x] **Reduced motion**: with `prefers-reduced-motion`, the boils and
-  redraws don't run; a shape keeps its resting wobble. The kit spec checks
-  it.
+  redraws don't run; a shape keeps its resting wobble.
 - [x] **sRGB**: `color-interpolation-filters="sRGB"` on every filter.
   11–24% less raster per full repaint, 7–16% per boil; pixels change by a
   level or two, nothing moves.

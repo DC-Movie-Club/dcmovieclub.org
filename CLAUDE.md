@@ -5,11 +5,9 @@ Base UI, with content in Firestore and an admin at `/admin`. pnpm 11.
 
 ## Commands
 
-- `pnpm dev`: the site, with every page drawn from fixtures at `/kit`
+- `pnpm dev`: the site
 - `pnpm test`: unit tests, and the design system's boundaries test
 - `pnpm lint`, `npx tsc --noEmit`
-- `pnpm kit:baseline`, then `pnpm kit:check` after a change: exact screenshots
-  of the `/kit` pages (see `docs/design-guide.md`, "Checking a change")
 
 ## The design system
 
@@ -28,8 +26,8 @@ Base UI, with content in Firestore and an admin at `/admin`. pnpm 11.
   Next's router or a new tab from the address.
 - One hover per kind of element: buttons boil, text links turn rust and
   redraw, icon links redraw.
-- A visual change is checked with the kit screenshots, and a deliberate
-  difference is called out in the commit.
+- A visual change is checked in the browser, and a deliberate difference is
+  called out in the commit.
 
 ## Gotchas
 
@@ -44,5 +42,5 @@ Base UI, with content in Firestore and an admin at `/admin`. pnpm 11.
   part.
 - Turbopack sometimes keeps serving old CSS after files move or a commit is
   checked out: restart `pnpm dev` with `.next` removed.
-- The 404 page fetches the nav's colors from Firestore, so it errors in local
-  dev without credentials; `/kit/404` draws it.
+- The 404 page fetches the nav's colors from Firestore, so it only renders
+  with Firebase credentials.
