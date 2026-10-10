@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm exec tsc",
     "build:watch": "pnpm exec tsc --watch",
-    "serve": "npm run build && firebase emulators:start --only functions",
+    "serve": "pnpm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },

@@ -2,7 +2,7 @@
   "functions": {
     "source": "functions",
     "predeploy": [
-      "pnpm --prefix \"$RESOURCE_DIR\" install --ignore-workspace",
+      "pnpm --prefix \"$RESOURCE_DIR\" install",
       "pnpm --prefix \"$RESOURCE_DIR\" run build"
     ]
   },

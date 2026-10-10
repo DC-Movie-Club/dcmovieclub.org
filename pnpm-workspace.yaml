@@ -7,3 +7,6 @@ allowBuilds:
   unrs-resolver: true
   # Mock API tooling pulled in by a dependency, not needed to build the site
   msw: false
+
+# pnpm v11 no longer reads save-exact from ~/.npmrc
+saveExact: true

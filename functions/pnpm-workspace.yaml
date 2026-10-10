@@ -1,0 +1,4 @@
+# Makes functions/ its own pnpm root, so an install here reads these settings
+# rather than the site's.
+allowBuilds:
+  protobufjs: true

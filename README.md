@@ -5,8 +5,8 @@ Website for DC Movie Club — a community of film lovers in Washington, DC.
 ## Getting Started
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -15,9 +15,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Command | Description |
 |---|---|
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
+| `pnpm build` | Production build |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
 
 ## Caching
 
