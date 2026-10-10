@@ -4,10 +4,11 @@ import { linkKind } from "@/lib/external-links";
 
 type SmartLinkProps = Omit<React.ComponentProps<"a">, "href"> & { href: string };
 
-// A link with no look of its own that opens the way its address calls for:
-// a page on this site through Next's router, anywhere else in a new tab
-// (see linkKind)
-export function SmartLink({ href, ...props }: SmartLinkProps) {
+// A link with no look of its own, beyond the keyboard focus ring every link
+// shows. It opens the way its address calls for: a page on this site through
+// Next's router, anywhere else in a new tab (see linkKind).
+export function SmartLink({ href, className, ...rest }: SmartLinkProps) {
+  const props = { ...rest, className: cn("rounded-sm focus-ring", className) };
   switch (linkKind(href)) {
     case "internal":
       return <NextLink href={href} {...props} />;

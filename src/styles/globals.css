@@ -5,7 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Tailwind only applies hover on devices that can hover; :active gives touch
-   screens the same styles while a finger is down. group-hover builds on this. */
+   screens the same styles while a finger is down, and :focus-visible gives
+   them to the keyboard: an element shows it has keyboard focus by taking its
+   hover state, not a ring (see focus-ring). group-hover builds on this. */
 @custom-variant hover {
   @media (hover: hover) {
     &:hover {
@@ -15,11 +17,14 @@
   &:active {
     @slot;
   }
+  &:focus-visible {
+    @slot;
+  }
 }
 
 /* Hover styles for the layers inside a control (see SketchShape), set off by
-   hovering or pressing the control itself, their parent, so a control inside
-   another reacts only to its own hover. */
+   hovering, pressing or focusing the control itself, their parent, so a
+   control inside another reacts only to its own hover. */
 @custom-variant parent-hover {
   @media (hover: hover) {
     :hover > & {
@@ -29,10 +34,14 @@
   :active > & {
     @slot;
   }
+  :focus-visible > & {
+    @slot;
+  }
 }
 
 /* Hover styles for a clickable card that stay off while pointing at a button
-   inside it (e.g. an inline "Read more" toggle), which does its own thing. */
+   inside it (e.g. an inline "Read more" toggle), which does its own thing.
+   Keyboard focus on something in the card counts as hovering it. */
 @custom-variant card-hover {
   @media (hover: hover) {
     &:is(:where(.group\/card):hover:not(:has(button:hover)) *) {
@@ -40,6 +49,9 @@
     }
   }
   &:is(:where(.group\/card):active:not(:has(button:active)) *) {
+    @slot;
+  }
+  &:is(:where(.group\/card):has(:focus-visible):not(:has(button:focus-visible)) *) {
     @slot;
   }
 }
@@ -270,15 +282,22 @@ html[data-loading] .animate-nav-spring-in {
   stop-color: --value(--color-*);
 }
 
-/* Keyboard focus: a 2px ring in the page's text color, which stands out on
-   the page's background. focus-ring-* recolors it (focus-ring-rust on cream),
-   and --focus-offset spaces it further out. The page variable is read here
-   rather than through --color-page-fg, which resolves at the root, where no
-   page has set it. */
+/* Keyboard focus shows as an element's hover state (see the hover variant),
+   so it draws no ring. With reduced motion, where a hovered button doesn't
+   boil and would only grow a little, a ring stands in: 2px in the page's
+   text color, which stands out on the page's background. focus-ring-*
+   recolors it (focus-ring-rust on cream), and --focus-offset spaces it
+   further out. The page variable is read here rather than through
+   --color-page-fg, which resolves at the root, where no page has set it. */
 @utility focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--focus-ring, var(--page-fg, var(--color-charcoal)));
-    outline-offset: var(--focus-offset, 2px);
+    outline: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:focus-visible {
+      outline: 2px solid var(--focus-ring, var(--page-fg, var(--color-charcoal)));
+      outline-offset: var(--focus-offset, 2px);
+    }
   }
 }
 

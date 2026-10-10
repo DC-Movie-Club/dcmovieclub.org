@@ -232,7 +232,8 @@ export function Pill({
 }
 
 // An accent pill straddling the top-right corner of a card, which boils and
-// grows with the card while it's hovered
+// grows with the card while it's hovered. Half on the page, it keeps the
+// page's focus ring, not the card's.
 export function CardAction({
   className,
   ...props
@@ -242,7 +243,10 @@ export function CardAction({
       variant="accent"
       size="lg"
       withCard
-      className={cn("absolute top-0 right-4 z-10 -translate-y-1/2 sm:right-6", className)}
+      className={cn(
+        "absolute top-0 right-4 z-10 -translate-y-1/2 [--focus-ring:initial] sm:right-6",
+        className,
+      )}
       {...props}
     />
   );

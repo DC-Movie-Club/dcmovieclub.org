@@ -25,7 +25,8 @@ Base UI, with content in Firestore and an admin at `/admin`. pnpm 11.
 - Links go through `SmartLink` (or `TextLink` in running text), which picks
   Next's router or a new tab from the address.
 - One hover per kind of element: buttons boil, text links turn rust and
-  redraw, icon links redraw.
+  redraw, icon links redraw. Keyboard focus shows the same state, not a
+  ring (a ring only stands in under reduced motion).
 - A visual change is checked in the browser, and a deliberate difference is
   called out in the commit.
 

@@ -4,7 +4,8 @@ import { textStyles } from "@/components/system/textStyles";
 
 // A cream sticker with a faint edge, the same on any card or page: dates,
 // ratings, partner names. `as` makes it a list item; `className` places it
-// and can soften its text (textStyles.stickerDate).
+// and can soften its text (textStyles.stickerDate). A link on it rings
+// keyboard focus in rust.
 export function Sticker({
   as: Tag = "span",
   className,
@@ -17,7 +18,7 @@ export function Sticker({
   return (
     <Tag
       className={cn(
-        "relative flex w-fit items-center whitespace-nowrap px-3 py-1.5",
+        "relative flex w-fit items-center whitespace-nowrap px-3 py-1.5 focus-ring-rust",
         textStyles.stickerText,
         className,
       )}

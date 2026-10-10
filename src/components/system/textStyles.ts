@@ -54,7 +54,7 @@ export const textStyles = {
   proseLink,
   // proseLink for the links inside HTML
   htmlLinks:
-    "[&_a]:text-rust [&_a]:underline [&_a]:decoration-rust/40 [&_a]:underline-offset-4 [&_a]:hover:decoration-rust",
+    "[&_a]:rounded-sm [&_a]:text-rust [&_a]:underline [&_a]:decoration-rust/40 [&_a]:underline-offset-4 [&_a]:hover:decoration-rust [&_a]:hover:sketch-subtle-animated [&_a]:focus-ring",
 
   // Button labels by the button's size (see Pill), which also sets their color
   buttonSmall: cn("text-xs", buttonLabel),

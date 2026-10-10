@@ -157,12 +157,15 @@ boiling together, so they stay in step.
 
 ### Hover variants
 
-- `hover:` also applies while pressed (`:active`), so touch screens get it.
+- `hover:` also applies while pressed (`:active`), so touch screens get it,
+  and on keyboard focus (`:focus-visible`).
 - `parent-hover:` styles a control's own layers (a Pill's fill and line)
-  from hovering the control, so a control inside another reacts only to its
-  own hover. Prefer it to naming a `group/*` per control.
+  from hovering, pressing or focusing the control, so a control inside
+  another reacts only to its own hover. Prefer it to naming a `group/*` per
+  control.
 - `card-hover:` styles things on a card (its corner button) while the card
-  is hovered, but not while hovering a button inside the card.
+  is hovered, or something in it has keyboard focus, but not while hovering
+  or focusing a button inside the card.
 
 ### Idioms
 
@@ -183,11 +186,18 @@ differences are deliberate.
 
 ### Focus
 
-`focus-ring` draws a 2px outline on keyboard focus in the page's text
-color, which shows on the page background. On cream it's rust:
-`focus-ring-rust` sets it, and the cream Pill, `SketchDialogContent` (for
-everything inside it) and `DisclosureCard` already do. `--focus-offset`
-spaces it further out. Only primitives set it.
+Keyboard focus shows as an element's hover state, not a ring: the hover
+variants above all apply on `:focus-visible`, so a focused button boils, a
+focused link redraws, a focused tile tilts, and a card looks hovered while
+its question or a link in it has focus. The bottom nav has always worked
+this way.
+
+With reduced motion nothing boils or redraws, so there `focus-ring` draws a
+ring instead: 2px in the page's text color, or rust on cream (`Card`,
+`Sticker`, `SketchDialogContent` and the cream Pill set that for what's
+inside them). Every link gets `focus-ring` from `SmartLink`, and the other
+focusable primitives set it themselves. `--focus-offset` spaces it further
+out. Only primitives set it.
 
 ### Links
 

@@ -51,6 +51,7 @@ type LinkProps = {
 //   While the card is hovered its edge and label turn the page's accent edge.
 // - The content gets the card's padding, unless `padded` is false for content
 //   that lays itself out against the edges.
+// - On its cream, keyboard focus rings in rust.
 export function Card({
   as: Tag = "div",
   id,
@@ -77,7 +78,7 @@ export function Card({
     <Tag
       id={id}
       className={cn(
-        "relative flex scroll-mt-8 flex-col items-start",
+        "relative flex scroll-mt-8 flex-col items-start focus-ring-rust",
         link && "group/card",
         className,
       )}
